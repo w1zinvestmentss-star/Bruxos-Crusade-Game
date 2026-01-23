@@ -4,11 +4,11 @@ const GameContext = createContext();
 
 // 1. MOCK STUDENTS (Expanded list for Leaderboard demo)
 const INITIAL_STUDENTS = [
-  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400 },
-  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120 },
-  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550 },
-  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50 },
-  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900 },
+  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [] },
+  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [] },
+  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [] },
+  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [] },
+  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [] },
 ];
 
 // 2. MOCK QUESTS
@@ -91,10 +91,41 @@ export function GameProvider({ children }) {
     return sub.status;
   };
 
+  // STUDENT: Buy Item from Barracks
+  const buyItem = (item) => {
+    if (!currentUser) return { success: false, message: "Not logged in!" };
+    
+    if (currentUser.gold >= item.cost) {
+      // Update students array
+      setStudents(prev => prev.map(student => {
+        if (student.id === currentUser.id) {
+          return {
+            ...student,
+            gold: student.gold - item.cost,
+            inventory: [...(student.inventory || []), item]
+          };
+        }
+        return student;
+      }));
+
+      // Update currentUser state
+      setCurrentUser(prev => ({
+        ...prev,
+        gold: prev.gold - item.cost,
+        inventory: [...(prev.inventory || []), item]
+      }));
+
+      return { success: true };
+    } else {
+      return { success: false, message: "Not enough gold!" };
+    }
+  };
+
   const value = {
     students, quests, submissions,
     createQuest, submitQuest, approveSubmission, getQuestStatus,
-    userRole, setUserRole, currentUser, setCurrentUser
+    userRole, setUserRole, currentUser, setCurrentUser,
+    buyItem
   };
 
   return (

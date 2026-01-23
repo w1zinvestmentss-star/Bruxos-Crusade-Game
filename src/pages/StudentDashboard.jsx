@@ -122,7 +122,7 @@ const StudentDashboard = () => {
         x="30%" 
         y="65%" 
         delay={0.8}
-        onClick={() => console.log("Avatar editor coming soon")} 
+        onClick={() => navigate('/barracks')} 
       />
 
       <div className="absolute bottom-4 right-4 text-white/50 font-mono text-xs z-10">
