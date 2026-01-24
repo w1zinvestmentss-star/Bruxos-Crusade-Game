@@ -4,11 +4,11 @@ const GameContext = createContext();
 
 // 1. MOCK STUDENTS (Expanded list for Leaderboard demo)
 const INITIAL_STUDENTS = [
-  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [] },
-  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [] },
-  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [] },
-  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [] },
-  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [] },
+  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 75, finalGPA: 85 },
+  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 88, finalGPA: 90 },
+  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 60, finalGPA: 70 },
+  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 92, finalGPA: null },
+  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 85, finalGPA: 95 },
 ];
 
 // 2. MOCK QUESTS
@@ -96,13 +96,16 @@ export function GameProvider({ children }) {
     if (!currentUser) return { success: false, message: "Not logged in!" };
     
     if (currentUser.gold >= item.cost) {
+      // The item object, which now must include imageLink, is added to the inventory.
+      const itemToSave = { ...item };
+      
       // Update students array
       setStudents(prev => prev.map(student => {
         if (student.id === currentUser.id) {
           return {
             ...student,
             gold: student.gold - item.cost,
-            inventory: [...(student.inventory || []), item]
+            inventory: [...(student.inventory || []), itemToSave]
           };
         }
         return student;
@@ -112,7 +115,7 @@ export function GameProvider({ children }) {
       setCurrentUser(prev => ({
         ...prev,
         gold: prev.gold - item.cost,
-        inventory: [...(prev.inventory || []), item]
+        inventory: [...(prev.inventory || []), itemToSave]
       }));
 
       return { success: true };
@@ -121,11 +124,26 @@ export function GameProvider({ children }) {
     }
   };
 
+  // New calculation functions
+  const calculateScholarScore = (student) => {
+    const currentGPA = student.finalGPA !== null ? student.finalGPA : student.midtermGPA;
+    return (currentGPA * 10) + (student.xp * 0.1);
+  };
+
+  const calculateComebackScore = (student) => {
+    if (student.finalGPA === null) {
+      return 0;
+    }
+    return student.finalGPA - student.midtermGPA;
+  };
+
   const value = {
     students, quests, submissions,
     createQuest, submitQuest, approveSubmission, getQuestStatus,
     userRole, setUserRole, currentUser, setCurrentUser,
-    buyItem
+    buyItem,
+    calculateScholarScore,
+    calculateComebackScore
   };
 
   return (
