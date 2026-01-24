@@ -4,11 +4,11 @@ const GameContext = createContext();
 
 // 1. MOCK STUDENTS (Expanded list for Leaderboard demo)
 const INITIAL_STUDENTS = [
-  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 75, finalGPA: 85 },
-  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 88, finalGPA: 90 },
-  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 60, finalGPA: 70 },
-  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 92, finalGPA: null },
-  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 85, finalGPA: 95 },
+  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 75, finalGPA: 85, equippedItems: { armor: null, weapon: null } },
+  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 88, finalGPA: 90, equippedItems: { armor: null, weapon: null } },
+  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 60, finalGPA: 70, equippedItems: { armor: null, weapon: null } },
+  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 92, finalGPA: null, equippedItems: { armor: null, weapon: null } },
+  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 85, finalGPA: 95, equippedItems: { armor: null, weapon: null } },
 ];
 
 // 2. MOCK QUESTS
@@ -124,6 +124,38 @@ export function GameProvider({ children }) {
     }
   };
 
+  // STUDENT: Equip Item
+  const equipItem = (itemType, itemLink) => {
+    if (!currentUser) return;
+
+    // Logic to toggle equip/unequip
+    const isEquipped = currentUser.equippedItems[itemType] === itemLink;
+    const newLink = isEquipped ? null : itemLink;
+
+    // Update currentUser state
+    setCurrentUser(prev => ({
+      ...prev,
+      equippedItems: {
+        ...prev.equippedItems,
+        [itemType]: newLink
+      }
+    }));
+
+    // Update students array
+    setStudents(prev => prev.map(student => {
+      if (student.id === currentUser.id) {
+        return {
+          ...student,
+          equippedItems: {
+            ...student.equippedItems,
+            [itemType]: newLink
+          }
+        };
+      }
+      return student;
+    }));
+  };
+
   // New calculation functions
   const calculateScholarScore = (student) => {
     const currentGPA = student.finalGPA !== null ? student.finalGPA : student.midtermGPA;
@@ -142,6 +174,7 @@ export function GameProvider({ children }) {
     createQuest, submitQuest, approveSubmission, getQuestStatus,
     userRole, setUserRole, currentUser, setCurrentUser,
     buyItem,
+    equipItem,
     calculateScholarScore,
     calculateComebackScore
   };
