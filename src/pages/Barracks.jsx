@@ -73,7 +73,7 @@ const Barracks = () => {
             </div>
           </div>
 
-          <div className="relative mb-6 w-full h-96 bg-stone-800 rounded-lg overflow-hidden border-2 border-stone-700">
+          <div className="relative mb-6 w-full h-96 bg-stone-700 rounded-lg overflow-hidden border-2 border-stone-700">
             <img
               src={currentUser.currentBodySprite} 
               alt="Hero Preview"
@@ -122,7 +122,7 @@ const Barracks = () => {
               return (
                 <div key={item.id} className="bg-stone-700 border-2 border-stone-600 rounded-lg p-4 hover:border-yellow-400 transition-colors flex flex-col justify-between">
                   <div className="flex flex-col items-center text-center mb-3">
-                    <div className="w-full h-32 mb-2 rounded-lg bg-stone-900 flex items-center justify-center overflow-hidden">
+                    <div className="w-full h-32 mb-2 rounded-lg bg-stone-700 flex items-center justify-center overflow-hidden">
                        <img src={item.imageLink} alt={item.name} className="h-full w-full object-contain"/>
                     </div>
                     <h3 className="text-lg font-bold text-white font-mono mb-1">{item.name}</h3>
