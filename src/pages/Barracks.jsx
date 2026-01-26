@@ -1,21 +1,29 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sword, Shirt, ArrowLeft } from 'lucide-react';
+import { Shirt, ArrowLeft } from 'lucide-react';
 import { useGame } from '../context/GameContext';
-
-// 1. ASSET URLs
-const BASE_BODY_URL = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/base.body2.png";
-const ARMOR_URL = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Chest.plate2.png";
-const SWORD_URL = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Heavy.sword2.png";
 
 const Barracks = () => {
   const navigate = useNavigate();
-  const { currentUser, buyItem, equipItem } = useGame();
+  const { currentUser, buyItem, equipOutfit, unequipOutfit } = useGame();
 
-  // 2. MOCK SHOP (with item types)
   const shopItems = [
-    { id: 1, name: "Heavy Sword", cost: 150, icon: Sword, imageLink: SWORD_URL, type: 'weapon' },
-    { id: 4, name: "Chest Plate", cost: 250, icon: Shirt, imageLink: ARMOR_URL, type: 'armor' },
+    {
+      id: 101,
+      name: 'Ninja Outfit',
+      cost: 20,
+      imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Base.body.ninja.png',
+      type: 'outfit',
+      icon: Shirt
+    },
+    {
+      id: 102,
+      name: 'Knight Outfit',
+      cost: 20,
+      imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight.sword.png',
+      type: 'outfit',
+      icon: Shirt
+    }
   ];
 
   const handleBuyItem = (item) => {
@@ -53,49 +61,41 @@ const Barracks = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto">
-        {/* Left Column: Hero Preview */}
-        <div className="md:col-span-1 bg-stone-800/80 border-2 border-stone-600 rounded-xl p-6 backdrop-blur-sm">
+        <div className="md:col-span-1 bg-stone-800 border-2 border-stone-600 rounded-xl p-6">
           <h2 className="text-2xl font-bold text-yellow-400 font-mono mb-4 uppercase text-center">Hero Preview</h2>
           
           <div className="text-center mb-6">
             <div className="text-3xl font-bold text-white mb-1">{currentUser.heroName}</div>
             <div className="text-lg text-stone-300 font-mono">Level {currentUser.level}</div>
-            <div className="text-sm text-yellow-400 font-mono mt-1">{currentUser.gold} 🪙</div>
-          </div>
-
-          {/* 3. PAPER DOLL (Layered Images) */}
-          <div className="flex justify-center items-center mb-6 w-full h-96 bg-stone-900/50 rounded-lg overflow-hidden border-2 border-stone-700">
-            <div className="relative w-96 h-96">
-              {/* Layer 1: Base Body */}
-              <img src={BASE_BODY_URL} alt="Hero Body" className="absolute inset-0 w-full h-full object-contain" />
-
-              {/* Layer 2: Equipped Armor */}
-              {currentUser.equippedItems?.armor && (
-                <img src={currentUser.equippedItems.armor} alt="Equipped Armor" className="absolute inset-0 w-full h-full object-contain" />
-              )}
-
-              {/* Layer 3: Equipped Weapon */}
-              {currentUser.equippedItems?.weapon && (
-                <img src={currentUser.equippedItems.weapon} alt="Equipped Weapon" className="absolute inset-0 w-full h-full object-contain" />
-              )}
+            <div className="flex items-center justify-center text-sm text-yellow-400 font-mono mt-1">
+              <span>{currentUser.gold}</span>
+              <span className="ml-2">🪙</span>
             </div>
           </div>
 
-          {/* 4. INVENTORY (with Equip/Unequip buttons) */}
+          <div className="relative mb-6 w-full h-96 bg-stone-800 rounded-lg overflow-hidden border-2 border-stone-700">
+            <img
+              src={currentUser.currentBodySprite} 
+              alt="Hero Preview"
+              className="absolute inset-0 w-full h-full object-contain"
+            />
+          </div>
+
           <div>
-            <h3 className="text-lg font-bold text-white font-mono mb-3 uppercase">Inventory</h3>
-            {currentUser.inventory && currentUser.inventory.length > 0 ? (
+            <h3 className="text-lg font-bold text-white font-mono mb-3 uppercase">Outfits</h3>
+            {currentUser.inventory && currentUser.inventory.filter(i => i.type === 'outfit').length > 0 ? (
               <div className="space-y-2">
                 {currentUser.inventory.map((item, index) => {
-                  const isEquipped = currentUser.equippedItems[item.type] === item.imageLink;
+                   if (item.type !== 'outfit') return null;
+                  const isEquipped = currentUser.currentBodySprite === item.imageLink;
                   return (
-                    <div key={index} className="flex items-center justify-between gap-3 p-3 bg-stone-700/50 rounded-lg border border-stone-600">
+                    <div key={index} className="flex items-center justify-between gap-3 p-3 bg-stone-700 rounded-lg border border-stone-600">
                       <div className="flex items-center gap-3">
-                        <Sword size={24} className="text-yellow-400" />
+                        <Shirt size={24} className="text-yellow-400" />
                         <span className="text-white font-mono">{item.name}</span>
                       </div>
                       <button
-                        onClick={() => equipItem(item.type, item.imageLink)}
+                        onClick={() => isEquipped ? unequipOutfit() : equipOutfit(item.imageLink)}
                         className={`py-1 px-3 rounded-md text-sm font-mono transition-colors ${
                           isEquipped
                             ? 'bg-red-600 hover:bg-red-500 text-white'
@@ -109,22 +109,22 @@ const Barracks = () => {
                 })}
               </div>
             ) : (
-              <div className="text-stone-400 italic font-mono text-sm">Your inventory is empty.</div>
+              <div className="text-stone-400 italic font-mono text-sm">You don't own any outfits.</div>
             )}
           </div>
         </div>
 
-        {/* Right Column: The Armory */}
-        <div className="md:col-span-2 bg-stone-800/80 border-2 border-stone-600 rounded-xl p-6 backdrop-blur-sm">
+        <div className="md:col-span-2 bg-stone-800 border-2 border-stone-600 rounded-xl p-6">
           <h2 className="text-2xl font-bold text-yellow-400 font-mono mb-4 uppercase">The Armory</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {shopItems.map((item) => {
-              const IconComponent = item.icon;
               const alreadyOwned = ownsItem(item.id);
               return (
-                <div key={item.id} className="bg-stone-700/50 border-2 border-stone-600 rounded-lg p-4 hover:border-yellow-400 transition-colors flex flex-col justify-between">
+                <div key={item.id} className="bg-stone-700 border-2 border-stone-600 rounded-lg p-4 hover:border-yellow-400 transition-colors flex flex-col justify-between">
                   <div className="flex flex-col items-center text-center mb-3">
-                    <img src={item.imageLink} alt={item.name} className="w-24 h-24 object-contain mb-2"/>
+                    <div className="w-full h-32 mb-2 rounded-lg bg-stone-900 flex items-center justify-center overflow-hidden">
+                       <img src={item.imageLink} alt={item.name} className="h-full w-full object-contain"/>
+                    </div>
                     <h3 className="text-lg font-bold text-white font-mono mb-1">{item.name}</h3>
                     <div className="text-yellow-400 font-mono text-sm">{item.cost} 🪙</div>
                   </div>

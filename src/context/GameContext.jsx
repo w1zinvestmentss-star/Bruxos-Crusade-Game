@@ -2,16 +2,16 @@ import React, { createContext, useContext, useState } from 'react';
 
 const GameContext = createContext();
 
-// 1. MOCK STUDENTS (Expanded list for Leaderboard demo)
+const BASE_BODY_SPRITE = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body.png';
+
 const INITIAL_STUDENTS = [
-  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 75, finalGPA: 85, equippedItems: { armor: null, weapon: null } },
-  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 88, finalGPA: 90, equippedItems: { armor: null, weapon: null } },
-  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 60, finalGPA: 70, equippedItems: { armor: null, weapon: null } },
-  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 92, finalGPA: null, equippedItems: { armor: null, weapon: null } },
-  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 85, finalGPA: 95, equippedItems: { armor: null, weapon: null } },
+  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 75, finalGPA: 85, currentBodySprite: BASE_BODY_SPRITE },
+  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 88, finalGPA: 90, currentBodySprite: BASE_BODY_SPRITE },
+  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 60, finalGPA: 70, currentBodySprite: BASE_BODY_SPRITE },
+  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 92, finalGPA: null, currentBodySprite: BASE_BODY_SPRITE },
+  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 85, finalGPA: 95, currentBodySprite: BASE_BODY_SPRITE },
 ];
 
-// 2. MOCK QUESTS
 const INITIAL_QUESTS = [
   { id: 101, title: "Math Worksheet", description: "Upload a photo of your completed algebra sheet.", xp: 50, gold: 20 },
   { id: 102, title: "Science Project", description: "Submit a picture of your science fair poster.", xp: 100, gold: 50 },
@@ -20,21 +20,15 @@ const INITIAL_QUESTS = [
 export function GameProvider({ children }) {
   const [students, setStudents] = useState(INITIAL_STUDENTS);
   const [quests, setQuests] = useState(INITIAL_QUESTS);
-  
-  // 3. THE SUBMISSION INBOX (Where uploads go)
   const [submissions, setSubmissions] = useState([]);
-  
   const [userRole, setUserRole] = useState(null); 
   const [currentUser, setCurrentUser] = useState(null); 
 
-  // TEACHER: Create Quest
   const createQuest = (newQuest) => {
     setQuests(prev => [...prev, { ...newQuest, id: Date.now() }]);
   };
 
-  // STUDENT: Submit Proof (Fake Upload)
   const submitQuest = (questId, proofFile) => {
-    // We create a temporary URL so the browser can display the image immediately
     const proofUrl = proofFile ? URL.createObjectURL(proofFile) : null;
     
     const newSubmission = {
@@ -50,14 +44,12 @@ export function GameProvider({ children }) {
     setSubmissions(prev => [...prev, newSubmission]);
   };
 
-  // TEACHER: Approve & Reward
   const approveSubmission = (submissionId) => {
     const submission = submissions.find(s => s.id === submissionId);
     if (!submission) return;
 
     const quest = quests.find(q => q.id === submission.questId);
 
-    // Give XP/Gold to Student
     setStudents(prev => prev.map(student => {
       if (student.id === submission.studentId) {
         return {
@@ -69,12 +61,10 @@ export function GameProvider({ children }) {
       return student;
     }));
 
-    // Mark as Approved
     setSubmissions(prev => prev.map(s => 
       s.id === submissionId ? { ...s, status: 'approved' } : s
     ));
     
-    // Update local user state if logged in
     if (currentUser && currentUser.id === submission.studentId) {
        setCurrentUser(prev => ({
           ...prev,
@@ -91,16 +81,13 @@ export function GameProvider({ children }) {
     return sub.status;
   };
 
-  // STUDENT: Buy Item from Barracks
   const buyItem = (item) => {
     if (!currentUser) return { success: false, message: "Not logged in!" };
     
     if (currentUser.gold >= item.cost) {
-      // The item object, which now must include imageLink, is added to the inventory.
       const itemToSave = { ...item };
       
-      // Update students array
-      setStudents(prev => prev.map(student => {
+      const updatedStudents = students.map(student => {
         if (student.id === currentUser.id) {
           return {
             ...student,
@@ -109,14 +96,15 @@ export function GameProvider({ children }) {
           };
         }
         return student;
-      }));
+      });
+      setStudents(updatedStudents);
 
-      // Update currentUser state
-      setCurrentUser(prev => ({
-        ...prev,
-        gold: prev.gold - item.cost,
-        inventory: [...(prev.inventory || []), itemToSave]
-      }));
+      const updatedCurrentUser = {
+        ...currentUser,
+        gold: currentUser.gold - item.cost,
+        inventory: [...(currentUser.inventory || []), itemToSave]
+      };
+      setCurrentUser(updatedCurrentUser);
 
       return { success: true };
     } else {
@@ -124,39 +112,44 @@ export function GameProvider({ children }) {
     }
   };
 
-  // STUDENT: Equip Item
-  const equipItem = (itemType, itemLink) => {
+  const equipOutfit = (outfitLink) => {
     if (!currentUser) return;
 
-    // Logic to toggle equip/unequip
-    const isEquipped = currentUser.equippedItems[itemType] === itemLink;
-    const newLink = isEquipped ? null : itemLink;
-
-    // Update currentUser state
     setCurrentUser(prev => ({
       ...prev,
-      equippedItems: {
-        ...prev.equippedItems,
-        [itemType]: newLink
-      }
+      currentBodySprite: outfitLink
     }));
 
-    // Update students array
     setStudents(prev => prev.map(student => {
       if (student.id === currentUser.id) {
         return {
           ...student,
-          equippedItems: {
-            ...student.equippedItems,
-            [itemType]: newLink
-          }
+          currentBodySprite: outfitLink
         };
       }
       return student;
     }));
   };
 
-  // New calculation functions
+  const unequipOutfit = () => {
+    if (!currentUser) return;
+
+    setCurrentUser(prev => ({
+      ...prev,
+      currentBodySprite: BASE_BODY_SPRITE
+    }));
+
+    setStudents(prev => prev.map(student => {
+      if (student.id === currentUser.id) {
+        return {
+          ...student,
+          currentBodySprite: BASE_BODY_SPRITE
+        };
+      }
+      return student;
+    }));
+  };
+  
   const calculateScholarScore = (student) => {
     const currentGPA = student.finalGPA !== null ? student.finalGPA : student.midtermGPA;
     return (currentGPA * 10) + (student.xp * 0.1);
@@ -174,7 +167,8 @@ export function GameProvider({ children }) {
     createQuest, submitQuest, approveSubmission, getQuestStatus,
     userRole, setUserRole, currentUser, setCurrentUser,
     buyItem,
-    equipItem,
+    equipOutfit,
+    unequipOutfit,
     calculateScholarScore,
     calculateComebackScore
   };
