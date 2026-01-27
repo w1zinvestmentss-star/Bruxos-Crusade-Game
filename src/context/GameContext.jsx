@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState } from 'react';
 
 const GameContext = createContext();
 
-const BASE_BODY_SPRITE = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body.png';
+const BASE_BODY_SPRITE = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body.png?v=3';
 
 const INITIAL_STUDENTS = [
   { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 75, finalGPA: 85, currentBodySprite: BASE_BODY_SPRITE },
