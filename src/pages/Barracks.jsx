@@ -12,7 +12,7 @@ const Barracks = () => {
       id: 101,
       name: 'Ninja Outfit',
       cost: 20,
-      imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Base.body.ninja.png?v=3',
+      imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Base.body.ninja.png?v=99',
       type: 'outfit',
       icon: Shirt
     },
@@ -20,7 +20,7 @@ const Barracks = () => {
       id: 102,
       name: 'Knight Outfit',
       cost: 20,
-      imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight.png?v=3',
+      imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight.png?v=99',
       type: 'outfit',
       icon: Shirt
     }
@@ -109,7 +109,7 @@ const Barracks = () => {
                 })}
               </div>
             ) : (
-              <div className="text-stone-400 italic font-mono text-sm">You don\'t own any outfits.</div>
+              <div className="text-stone-400 italic font-mono text-sm">You don't own any outfits.</div>
             )}
           </div>
         </div>
