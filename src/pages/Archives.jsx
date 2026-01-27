@@ -16,10 +16,14 @@ const Archives = () => {
     );
   }
 
-  const { heroName, midtermGPA, finalGPA, xp, level } = currentUser;
+  const { heroName, midtermGPA, finalGPA, xp } = currentUser;
   const scholarScore = calculateScholarScore(currentUser);
-  const xpForNextLevel = (level + 1) * 1000;
-  const xpProgress = (xp / xpForNextLevel) * 100;
+
+  // Relative Level & XP Calculations
+  const currentLevel = Math.floor(xp / 1000) + 1;
+  const xpInCurrentLevel = xp % 1000;
+  const xpNeededForNext = 1000 - xpInCurrentLevel;
+  const relativeXpProgress = (xpInCurrentLevel / 1000) * 100;
 
   const approvedSubmissions = submissions.filter(s => s.studentId === currentUser.id && s.status === 'approved');
 
@@ -71,11 +75,18 @@ const Archives = () => {
                 <p className="text-5xl font-mono font-bold text-cyan-400 mt-2">{Math.floor(scholarScore)}</p>
               </div>
               <div>
-                <h3 className="text-lg font-semibold mb-2 text-stone-300">XP Progress</h3>
-                <div className="w-full bg-stone-700 rounded-full h-4 border-2 border-stone-600">
-                  <div className="bg-green-500 h-full rounded-full" style={{ width: `${xpProgress}%` }}></div>
+                <div className="flex justify-between items-center mb-1">
+                  <h3 className="text-lg font-semibold text-stone-300">Level Progress</h3>
+                  <p className="text-sm font-mono text-stone-400">
+                    Level {currentLevel} &bull; {xpInCurrentLevel} / 1000 XP
+                  </p>
                 </div>
-                <p className="text-right text-sm font-mono mt-1 text-stone-400">{xp} / {xpForNextLevel} XP</p>
+                <div className="w-full bg-stone-700 rounded-full h-4 border-2 border-stone-600 overflow-hidden">
+                  <div className="bg-green-500 h-full rounded-full transition-all duration-500" style={{ width: `${relativeXpProgress}%` }}></div>
+                </div>
+                <p className="text-center text-xs font-mono mt-2 text-yellow-500/80 italic">
+                  {xpNeededForNext} XP until Level {currentLevel + 1}!
+                </p>
               </div>
             </div>
           </div>
