@@ -111,7 +111,7 @@ const StudentDashboard = () => {
         x="75%" 
         y="35%" 
         delay={0.6}
-        onClick={() => console.log("Grades coming soon")} 
+        onClick={() => navigate('/archives')} 
       />
 
       {/* BARRACKS (Red) - Placeholder */}

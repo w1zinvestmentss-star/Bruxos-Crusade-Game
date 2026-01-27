@@ -10,6 +10,7 @@ import TeacherDashboard from './pages/TeacherDashboard';
 import QuestBoard from './pages/QuestBoard';
 import Leaderboard from './pages/Leaderboard'; // <--- NEW IMPORT
 import Barracks from './pages/Barracks';
+import Archives from './pages/Archives';
 
 function App() {
   return (
@@ -27,6 +28,8 @@ function App() {
           
           {/* BARRACKS ROUTE: Avatar Shop */}
           <Route path="/barracks" element={<Barracks />} />
+
+          <Route path="/archives" element={<Archives />} />
         </Routes>
       </HashRouter>
     </GameProvider>
