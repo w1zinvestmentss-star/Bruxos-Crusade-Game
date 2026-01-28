@@ -1,16 +1,16 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Scroll, Upload, Clock, CheckCircle, Coins, Star } from 'lucide-react';
+import { ArrowLeft, Scroll, Upload, Clock, CheckCircle, Coins, Star, Brain } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const QuestBoard = () => {
   const navigate = useNavigate();
-  const { quests, submitQuest, getQuestStatus, currentUser } = useGame();
+  const { quests, submitQuest, getQuestStatus, currentUser, attemptQuiz } = useGame();
   
-  // Hidden input logic
   const fileInputRef = useRef(null);
   const selectedQuestRef = useRef(null);
+  const [quizAnswers, setQuizAnswers] = useState({});
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
@@ -21,12 +21,21 @@ const QuestBoard = () => {
 
   const triggerUpload = (questId) => {
     selectedQuestRef.current = questId;
-    fileInputRef.current.click(); // Opens your computer's file picker
+    fileInputRef.current.click();
+  };
+
+  const handleQuizAnswerChange = (questId, answer) => {
+    setQuizAnswers(prev => ({ ...prev, [questId]: answer }));
+  };
+
+  const handleQuizSubmit = async (questId) => {
+    const answer = quizAnswers[questId] || '';
+    const result = await attemptQuiz(questId, answer);
+    alert(result.message);
   };
 
   return (
     <div className="min-h-screen bg-stone-900 text-stone-200 p-6 relative">
-      {/* Hidden File Input */}
       <input 
         type="file" 
         ref={fileInputRef} 
@@ -35,7 +44,6 @@ const QuestBoard = () => {
         onChange={handleFileSelect}
       />
 
-      {/* Header */}
       <div className="flex justify-between items-center mb-8 max-w-4xl mx-auto z-10 relative">
         <button onClick={() => navigate('/student-dashboard')} className="flex items-center gap-2 text-stone-400 hover:text-white">
           <ArrowLeft size={20} /> Back to Map
@@ -67,7 +75,8 @@ const QuestBoard = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="text-xl font-bold mb-2 flex items-center gap-2 text-white">
-                      <Scroll size={20} /> {quest.title}
+                      {quest.type === 'quiz' ? <Brain size={20} /> : <Scroll size={20} />}
+                      {quest.title}
                     </h3>
                     <p className="text-stone-400 mb-4">{quest.description}</p>
                     <div className="flex gap-3 text-sm font-mono">
@@ -76,14 +85,33 @@ const QuestBoard = () => {
                     </div>
                   </div>
 
-                  {/* DYNAMIC STATUS BUTTONS */}
                   {status === 'available' && (
-                    <button
-                      onClick={() => triggerUpload(quest.id)}
-                      className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 shadow-lg border-2 border-blue-400 flex items-center gap-2"
-                    >
-                      <Upload size={18} /> Submit Proof
-                    </button>
+                    <>
+                      {quest.type === 'quiz' ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            placeholder="Type answer..."
+                            value={quizAnswers[quest.id] || ''}
+                            onChange={(e) => handleQuizAnswerChange(quest.id, e.target.value)}
+                            className="bg-stone-900 border border-stone-600 rounded-md px-3 py-2 text-white placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                          />
+                          <button
+                            onClick={() => handleQuizSubmit(quest.id)}
+                            className="px-4 py-2 bg-yellow-600 text-black rounded-lg hover:bg-yellow-500 shadow-lg border-2 border-yellow-400 flex items-center gap-2"
+                          >
+                            Check Answer
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => triggerUpload(quest.id)}
+                          className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 shadow-lg border-2 border-blue-400 flex items-center gap-2"
+                        >
+                          <Upload size={18} /> Submit Proof
+                        </button>
+                      )}
+                    </>
                   )}
                   {status === 'pending' && (
                     <div className="px-4 py-2 bg-yellow-900/30 text-yellow-500 rounded-lg border border-yellow-700 flex items-center gap-2 font-mono">

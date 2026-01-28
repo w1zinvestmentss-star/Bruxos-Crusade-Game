@@ -11,8 +11,10 @@ const INITIAL_STUDENTS = [
 ];
 
 const INITIAL_QUESTS = [
-  { id: 101, title: "Math Worksheet", description: "Upload a photo of your completed algebra sheet.", xp: 50, gold: 20 },
-  { id: 102, title: "Science Project", description: "Submit a picture of your science fair poster.", xp: 100, gold: 50 },
+  { id: 101, title: "Math Worksheet", description: "Upload a photo of your completed algebra sheet.", xp: 50, gold: 20, type: 'upload' },
+  { id: 102, title: "Science Project", description: "Submit a picture of your science fair poster.", xp: 100, gold: 50, type: 'upload' },
+  { id: 103, title: "Math Speed Run", description: "What is 12 x 12?", correctAnswer: "144", xp: 50, gold: 20, type: 'quiz' },
+  { id: 104, title: "History Check", description: "What year did WWII end?", correctAnswer: "1945", xp: 50, gold: 20, type: 'quiz' },
 ];
 
 export function GameProvider({ children }) {
@@ -69,6 +71,47 @@ export function GameProvider({ children }) {
           xp: prev.xp + quest.xp,
           gold: prev.gold + quest.gold
        }));
+    }
+  };
+
+  const attemptQuiz = (questId, userAnswer) => {
+    const quest = quests.find(q => q.id === questId);
+
+    if (!quest) return { success: false, message: "Quest not found!" };
+
+    if (userAnswer.trim().toLowerCase() === quest.correctAnswer.trim().toLowerCase()) {
+      const updatedStudents = students.map(student => {
+        if (student.id === currentUser.id) {
+          return {
+            ...student,
+            xp: student.xp + quest.xp,
+            gold: student.gold + quest.gold
+          };
+        }
+        return student;
+      });
+      setStudents(updatedStudents);
+
+      const updatedCurrentUser = {
+        ...currentUser,
+        xp: currentUser.xp + quest.xp,
+        gold: currentUser.gold + quest.gold
+      };
+      setCurrentUser(updatedCurrentUser);
+
+      const newSubmission = {
+        id: Date.now(),
+        questId,
+        studentId: currentUser.id,
+        studentName: currentUser.heroName,
+        status: 'approved',
+        timestamp: new Date().toLocaleDateString()
+      };
+      setSubmissions(prev => [...prev, newSubmission]);
+
+      return { success: true, message: "Correct! Rewards claimed." };
+    } else {
+      return { success: false, message: "Incorrect answer. Try again!" };
     }
   };
 
@@ -182,7 +225,8 @@ export function GameProvider({ children }) {
     unequipOutfit,
     calculateScholarScore,
     calculateComebackScore,
-    updateStudentStats
+    updateStudentStats,
+    attemptQuiz
   };
 
   return (
