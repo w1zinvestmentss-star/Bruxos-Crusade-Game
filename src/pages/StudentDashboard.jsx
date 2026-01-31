@@ -9,7 +9,7 @@ const StudentDashboard = () => {
   const { currentUser, setUserRole } = useGame();
 
   // Fantasy Map Background
-  const MAP_BG = "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=2070&auto=format&fit=crop";
+  const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
 
   const handleLogout = () => {
     setUserRole(null);
@@ -17,27 +17,22 @@ const StudentDashboard = () => {
   };
 
   // Reusable Map Pin Component
-  const MapLocation = ({ label, icon: Icon, onClick, color, x, y, delay }) => (
+  const MapLocation = ({ label, onClick, x, y, delay }) => (
     <motion.button
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ delay: delay, type: "spring", stiffness: 260, damping: 20 }}
-      whileHover={{ scale: 1.1, y: -10 }}
+      transition={{ delay, type: "spring", stiffness: 260, damping: 20 }}
+      whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
       onClick={onClick}
-      className={`absolute flex flex-col items-center group z-10`}
-      style={{ left: x, top: y }}
+      className="absolute z-10 bg-black/80 border-2 border-yellow-500/50 text-white font-bold font-mono uppercase tracking-widest px-4 py-2 hover:border-yellow-400 hover:bg-black/90 transition-colors"
+      style={{
+        left: x,
+        top: y,
+        transform: 'translate(-50%, -50%)',
+      }}
     >
-      {/* The Pin Icon */}
-      <div className={`p-4 rounded-2xl border-4 border-white shadow-xl bg-${color}-600 relative overflow-hidden`}>
-        <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-black/20" />
-        <Icon size={32} className="text-white relative z-10" />
-      </div>
-      
-      {/* The Label */}
-      <div className="mt-2 px-3 py-1 bg-black/80 border-2 border-white/50 rounded text-white font-bold text-xs font-mono uppercase tracking-wider backdrop-blur-sm group-hover:bg-black group-hover:border-yellow-400 transition-colors">
-        {label}
-      </div>
+      {label}
     </motion.button>
   );
 
@@ -80,47 +75,38 @@ const StudentDashboard = () => {
 
       {/* 3. Interactive Map Locations */}
       
-      {/* QUEST BOARD (Blue) */}
+      {/* QUEST BOARD */}
       <MapLocation 
         label="Quest Board" 
-        icon={Scroll} 
-        color="blue" 
         x="20%" 
-        y="30%" 
+        y="37%" 
         delay={0.2}
         onClick={() => navigate('/quests')} 
       />
 
-      {/* TOWN SQUARE / LEADERBOARD (Purple) */}
+      {/* TOWN SQUARE / LEADERBOARD */}
       <MapLocation 
         label="Town Square" 
-        icon={Users} 
-        color="purple" 
-        x="50%" 
-        y="45%" 
+        x="46%" 
+        y="24%" 
         delay={0.4}
-        // FIX: This now navigates to the Leaderboard page!
         onClick={() => navigate('/leaderboard')} 
       />
 
-      {/* ARCHIVES (Emerald) - Placeholder */}
+      {/* THE ARCHIVES */}
       <MapLocation 
         label="The Archives" 
-        icon={BookOpen} 
-        color="emerald" 
         x="75%" 
-        y="35%" 
+        y="15%" 
         delay={0.6}
         onClick={() => navigate('/archives')} 
       />
 
-      {/* BARRACKS (Red) - Placeholder */}
+      {/* THE BAZAAR */}
       <MapLocation 
-        label="Barracks" 
-        icon={User} 
-        color="red" 
-        x="30%" 
-        y="65%" 
+        label="The Bazaar" 
+        x="70%" 
+        y="35%" 
         delay={0.8}
         onClick={() => navigate('/barracks')} 
       />
