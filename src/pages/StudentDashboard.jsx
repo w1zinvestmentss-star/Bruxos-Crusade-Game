@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Scroll, Users, User, BookOpen, LogOut } from 'lucide-react';
+import { User, LogOut } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const StudentDashboard = () => {
@@ -79,7 +79,7 @@ const StudentDashboard = () => {
       <MapLocation 
         label="Quest Board" 
         x="20%" 
-        y="37%" 
+        y="40%" 
         delay={0.2}
         onClick={() => navigate('/quests')} 
       />
@@ -87,8 +87,8 @@ const StudentDashboard = () => {
       {/* TOWN SQUARE / LEADERBOARD */}
       <MapLocation 
         label="Town Square" 
-        x="46%" 
-        y="24%" 
+        x="45%" 
+        y="21%" 
         delay={0.4}
         onClick={() => navigate('/leaderboard')} 
       />
@@ -96,7 +96,7 @@ const StudentDashboard = () => {
       {/* THE ARCHIVES */}
       <MapLocation 
         label="The Archives" 
-        x="75%" 
+        x="74%" 
         y="15%" 
         delay={0.6}
         onClick={() => navigate('/archives')} 
@@ -105,8 +105,8 @@ const StudentDashboard = () => {
       {/* THE BAZAAR */}
       <MapLocation 
         label="The Bazaar" 
-        x="70%" 
-        y="35%" 
+        x="68%" 
+        y="38%" 
         delay={0.8}
         onClick={() => navigate('/barracks')} 
       />
