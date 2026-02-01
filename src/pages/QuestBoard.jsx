@@ -4,6 +4,14 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Scroll, Upload, Clock, CheckCircle, Coins, Star, Brain } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
+const VICTORY_QUOTES = [
+  'Your mind is as sharp as a sword!',
+  'A legendary feat!',
+  'The Kingdom grows stronger with your knowledge.',
+  'Knowledge is the ultimate weapon!',
+  'Another victory for the Archives!',
+];
+
 const QuestBoard = () => {
   const navigate = useNavigate();
   const { quests, submitQuest, getQuestStatus, currentUser, attemptQuiz } = useGame();
@@ -11,11 +19,22 @@ const QuestBoard = () => {
   const fileInputRef = useRef(null);
   const selectedQuestRef = useRef(null);
   const [quizAnswers, setQuizAnswers] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalQuote, setModalQuote] = useState('');
+
+  const triggerVictory = (message) => {
+    const randomQuote = VICTORY_QUOTES[Math.floor(Math.random() * VICTORY_QUOTES.length)];
+    setModalMessage(message);
+    setModalQuote(randomQuote);
+    setShowModal(true);
+  };
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file && selectedQuestRef.current) {
       submitQuest(selectedQuestRef.current, file);
+      triggerVictory('File Uploaded! +50 Gold');
     }
   };
 
@@ -31,7 +50,11 @@ const QuestBoard = () => {
   const handleQuizSubmit = async (questId) => {
     const answer = quizAnswers[questId] || '';
     const result = await attemptQuiz(questId, answer);
-    alert(result.message);
+    if (result.correct) {
+      triggerVictory(result.message);
+    } else {
+      alert(result.message);
+    }
   };
 
   return (
@@ -129,6 +152,22 @@ const QuestBoard = () => {
           })}
         </div>
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <div className="bg-stone-900 border-2 border-yellow-500 rounded-lg p-8 text-center max-w-sm mx-auto">
+            <h2 className="text-3xl font-bold text-yellow-500 mb-4" style={{ fontFamily: "'Press Start 2P', cursive" }}>QUEST COMPLETE</h2>
+            <p className="text-lg text-white mb-4">{modalMessage}</p>
+            <p className="text-md text-stone-300 italic mb-6">"{modalQuote}"</p>
+            <button
+              onClick={() => setShowModal(false)}
+              className="px-6 py-2 bg-yellow-600 text-black rounded-lg hover:bg-yellow-500 shadow-lg border-2 border-yellow-400 text-lg font-bold"
+            >
+              Huzzah!
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
