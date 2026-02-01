@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { User, LogOut } from 'lucide-react';
@@ -6,7 +6,14 @@ import { useGame } from '../context/GameContext';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
-  const { currentUser, setUserRole } = useGame();
+  const { currentUser, setUserRole, clearNotifications } = useGame();
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+
+  useEffect(() => {
+    if (currentUser?.notifications?.length > 0) {
+      setShowWelcomeModal(true);
+    }
+  }, [currentUser]);
 
   // Fantasy Map Background
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
@@ -14,6 +21,11 @@ const StudentDashboard = () => {
   const handleLogout = () => {
     setUserRole(null);
     navigate('/');
+  };
+
+  const handleClaimRewards = () => {
+    clearNotifications();
+    setShowWelcomeModal(false);
   };
 
   // Reusable Map Pin Component
@@ -38,7 +50,35 @@ const StudentDashboard = () => {
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-stone-900">
-      
+
+      {/* Welcome Back Modal */}
+      {showWelcomeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90">
+          <div className="bg-stone-900 border-2 border-yellow-500 rounded-lg shadow-xl p-8 max-w-lg w-full m-4">
+            <h2 className="text-2xl font-bold font-mono uppercase text-yellow-400 mb-4">
+              REPORT FROM THE KINGDOM
+            </h2>
+            <div className="space-y-4 max-h-60 overflow-y-auto pr-4">
+              {currentUser.notifications.map((notif, index) => (
+                <div key={index} className="border-b border-stone-700 pb-2">
+                  <h3 className="font-bold text-lg text-white">{notif.title}</h3>
+                  <p className="text-sm text-green-400">
+                    + {notif.xp} XP & {notif.gold} Gold
+                  </p>
+                  <p className="text-sm text-stone-400 italic mt-1">"{notif.quote}"</p>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={handleClaimRewards}
+              className="mt-6 w-full bg-yellow-500 text-stone-900 font-bold py-2 px-4 rounded hover:bg-yellow-400 transition-colors"
+            >
+              CLAIM REWARDS
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* 1. Background Map Layer */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-black/30 z-0" />

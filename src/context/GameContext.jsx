@@ -3,11 +3,11 @@ import React, { createContext, useContext, useState } from 'react';
 const GameContext = createContext();
 
 const INITIAL_STUDENTS = [
-  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png' },
-  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 880, finalGPA: 900, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png' },
-  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 600, finalGPA: 700, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png' },
-  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 920, finalGPA: null, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png' },
-  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png' },
+  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png', notifications: [] },
+  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 880, finalGPA: 900, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png', notifications: [] },
+  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 600, finalGPA: 700, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png', notifications: [] },
+  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 920, finalGPA: null, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png', notifications: [] },
+  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png', notifications: [] },
 ];
 
 const INITIAL_QUESTS = [
@@ -15,6 +15,14 @@ const INITIAL_QUESTS = [
   { id: 102, title: "Science Project", description: "Submit a picture of your science fair poster.", xp: 100, gold: 50, type: 'upload' },
   { id: 103, title: "Math Speed Run", description: "What is 12 x 12?", correctAnswer: "144", xp: 50, gold: 20, type: 'quiz' },
   { id: 104, title: "History Check", description: "What year did WWII end?", correctAnswer: "1945", xp: 50, gold: 20, type: 'quiz' },
+];
+
+const VICTORY_QUOTES = [
+  'Your mind is as sharp as a sword!',
+  'A legendary feat!',
+  'The Kingdom grows stronger with your knowledge.',
+  'Knowledge is the ultimate weapon!',
+  'Another victory for the Archives!',
 ];
 
 export function GameProvider({ children }) {
@@ -52,10 +60,18 @@ export function GameProvider({ children }) {
 
     setStudents(prev => prev.map(student => {
       if (student.id === submission.studentId) {
+        const newNotification = {
+          id: Date.now(),
+          title: quest.title,
+          xp: quest.xp,
+          gold: quest.gold,
+          quote: VICTORY_QUOTES[Math.floor(Math.random() * VICTORY_QUOTES.length)]
+        };
         return {
           ...student,
           xp: student.xp + quest.xp,
-          gold: student.gold + quest.gold
+          gold: student.gold + quest.gold,
+          notifications: [...student.notifications, newNotification]
         };
       }
       return student;
@@ -109,7 +125,7 @@ export function GameProvider({ children }) {
       };
       setSubmissions(prev => [...prev, newSubmission]);
 
-      return { success: true, message: "Correct! Rewards claimed." };
+      return { success: true, message: `+${quest.xp} XP, +${quest.gold} Gold` };
     } else {
       return { success: false, message: "Incorrect answer. Try again!" };
     }
@@ -216,6 +232,13 @@ export function GameProvider({ children }) {
     }));
   };
 
+  const clearNotifications = () => {
+    if (!currentUser) return;
+    const updatedUser = { ...currentUser, notifications: [] };
+    setCurrentUser(updatedUser);
+    setStudents(prev => prev.map(s => s.id === currentUser.id ? updatedUser : s));
+  };
+
   const value = {
     students, quests, submissions,
     createQuest, submitQuest, approveSubmission, getQuestStatus,
@@ -226,7 +249,8 @@ export function GameProvider({ children }) {
     calculateScholarScore,
     calculateComebackScore,
     updateStudentStats,
-    attemptQuiz
+    attemptQuiz,
+    clearNotifications
   };
 
   return (

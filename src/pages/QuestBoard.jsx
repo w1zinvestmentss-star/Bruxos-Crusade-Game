@@ -34,7 +34,7 @@ const QuestBoard = () => {
     const file = e.target.files[0];
     if (file && selectedQuestRef.current) {
       submitQuest(selectedQuestRef.current, file);
-      triggerVictory('File Uploaded! +50 Gold');
+      alert('Proof Submitted! Awaiting Teacher Review.');
     }
   };
 
@@ -50,7 +50,7 @@ const QuestBoard = () => {
   const handleQuizSubmit = async (questId) => {
     const answer = quizAnswers[questId] || '';
     const result = await attemptQuiz(questId, answer);
-    if (result.correct) {
+    if (result.success) {
       triggerVictory(result.message);
     } else {
       alert(result.message);
