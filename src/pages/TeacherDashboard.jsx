@@ -16,14 +16,40 @@ const TeacherDashboard = () => {
   } = useGame();
   
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [newQuest, setNewQuest] = useState({ title: '', description: '', xp: 50, gold: 20 });
+  const [newQuest, setNewQuest] = useState({
+    title: '',
+    description: '',
+    xp: 50,
+    gold: 20,
+    type: 'upload', // 'upload' or 'quiz'
+    frequency: 'once', // 'once' or 'daily'
+    unlockDate: '',
+    correctAnswer: ''
+  });
   const [gradeInputs, setGradeInputs] = useState({});
 
   const handleCreate = (e) => {
     e.preventDefault();
-    createQuest(newQuest);
+    
+    // Default unlockDate to today if empty
+    const questToCreate = {
+      ...newQuest,
+      unlockDate: newQuest.unlockDate || new Date().toISOString().split('T')[0],
+    };
+
+    createQuest(questToCreate);
     setShowCreateForm(false);
-    setNewQuest({ title: '', description: '', xp: 50, gold: 20 });
+    // Reset state to include new fields
+    setNewQuest({
+      title: '',
+      description: '',
+      xp: 50,
+      gold: 20,
+      type: 'upload',
+      frequency: 'once',
+      unlockDate: '',
+      correctAnswer: ''
+    });
   };
 
   const handleLogout = () => {
@@ -130,12 +156,42 @@ const TeacherDashboard = () => {
             {showCreateForm && (
               <div className="bg-white p-6 rounded-xl shadow-lg border border-yellow-400 mb-6">
                 <h3 className="font-bold mb-4 text-lg border-b pb-2">Create New Quest</h3>
-                <form onSubmit={handleCreate} className="space-y-3">
-                  <input type="text" placeholder="Quest Title" className="w-full p-2 border rounded" value={newQuest.title} onChange={e => setNewQuest({...newQuest, title: e.target.value})} />
-                  <textarea placeholder="Instructions..." className="w-full p-2 border rounded" value={newQuest.description} onChange={e => setNewQuest({...newQuest, description: e.target.value})} />
+                <form onSubmit={handleCreate} className="space-y-4">
+                  <input type="text" placeholder="Quest Title" className="w-full p-2 border rounded bg-stone-100 border-stone-300" value={newQuest.title} onChange={e => setNewQuest({...newQuest, title: e.target.value})} required />
+                  <textarea placeholder="Instructions..." className="w-full p-2 border rounded bg-stone-100 border-stone-300" value={newQuest.description} onChange={e => setNewQuest({...newQuest, description: e.target.value})} />
+                  
                   <div className="flex gap-4">
-                    <input type="number" placeholder="XP" className="w-full p-2 border rounded" value={newQuest.xp} onChange={e => setNewQuest({...newQuest, xp: Number(e.target.value)})} />
-                    <input type="number" placeholder="Gold" className="w-full p-2 border rounded" value={newQuest.gold} onChange={e => setNewQuest({...newQuest, gold: Number(e.target.value)})} />
+                    <div className="w-1/2">
+                      <label className="block text-sm font-bold text-stone-600 mb-1">Quest Type</label>
+                      <select value={newQuest.type} onChange={e => setNewQuest({ ...newQuest, type: e.target.value })} className="w-full p-2 border rounded bg-stone-100 border-stone-300">
+                        <option value="upload">Upload</option>
+                        <option value="quiz">Quiz</option>
+                      </select>
+                    </div>
+                    <div className="w-1/2">
+                      <label className="block text-sm font-bold text-stone-600 mb-1">Frequency</label>
+                      <select value={newQuest.frequency} onChange={e => setNewQuest({ ...newQuest, frequency: e.target.value })} className="w-full p-2 border rounded bg-stone-100 border-stone-300">
+                        <option value="once">One-Time</option>
+                        <option value="daily">Daily</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {newQuest.type === 'quiz' && (
+                    <div>
+                      <label className="block text-sm font-bold text-stone-600 mb-1">Correct Answer</label>
+                      <input type="text" placeholder="Required for Quiz type" className="w-full p-2 border rounded bg-stone-100 border-stone-300" value={newQuest.correctAnswer} onChange={e => setNewQuest({ ...newQuest, correctAnswer: e.target.value })} required />
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-sm font-bold text-stone-600 mb-1">Unlock Date (Optional)</label>
+                    <input type="date" className="w-full p-2 border rounded bg-stone-100 border-stone-300" value={newQuest.unlockDate} onChange={e => setNewQuest({ ...newQuest, unlockDate: e.target.value })} />
+                  </div>
+
+                  <div className="flex gap-4">
+                    <input type="number" placeholder="XP" className="w-full p-2 border rounded bg-stone-100 border-stone-300" value={newQuest.xp} onChange={e => setNewQuest({...newQuest, xp: Number(e.target.value)})} required />
+                    <input type="number" placeholder="Gold" className="w-full p-2 border rounded bg-stone-100 border-stone-300" value={newQuest.gold} onChange={e => setNewQuest({...newQuest, gold: Number(e.target.value)})} required />
                   </div>
                   <button type="submit" className="w-full bg-yellow-600 text-white font-bold py-2 rounded hover:bg-yellow-700">PUBLISH</button>
                 </form>
