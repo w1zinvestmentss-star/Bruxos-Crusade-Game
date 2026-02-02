@@ -118,8 +118,8 @@ const StudentDashboard = () => {
       {/* QUEST BOARD */}
       <MapLocation 
         label="Quest Board" 
-        x="20%" 
-        y="37%" 
+        x="18%" 
+        y="45%" 
         delay={0.2}
         onClick={() => navigate('/quests')} 
       />
@@ -127,7 +127,7 @@ const StudentDashboard = () => {
       {/* TOWN SQUARE / LEADERBOARD */}
       <MapLocation 
         label="Town Square" 
-        x="43%" 
+        x="45%" 
         y="24%" 
         delay={0.4}
         onClick={() => navigate('/leaderboard')} 
@@ -136,8 +136,8 @@ const StudentDashboard = () => {
       {/* THE ARCHIVES */}
       <MapLocation 
         label="The Archives" 
-        x="75%" 
-        y="15%" 
+        x="74%" 
+        y="13%" 
         delay={0.6}
         onClick={() => navigate('/archives')} 
       />
@@ -145,8 +145,8 @@ const StudentDashboard = () => {
       {/* THE BAZAAR */}
       <MapLocation 
         label="The Bazaar" 
-        x="70%" 
-        y="35%" 
+        x="68%" 
+        y="41%" 
         delay={0.8}
         onClick={() => navigate('/barracks')} 
       />
