@@ -10,13 +10,6 @@ const INITIAL_STUDENTS = [
   { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png', notifications: [] },
 ];
 
-const INITIAL_QUESTS = [
-  { id: 101, title: "Math Worksheet", description: "Upload a photo of your completed algebra sheet.", xp: 50, gold: 20, type: 'upload' },
-  { id: 102, title: "Science Project", description: "Submit a picture of your science fair poster.", xp: 100, gold: 50, type: 'upload' },
-  { id: 103, title: "Math Speed Run", description: "What is 12 x 12?", correctAnswer: "144", xp: 50, gold: 20, type: 'quiz' },
-  { id: 104, title: "History Check", description: "What year did WWII end?", correctAnswer: "1945", xp: 50, gold: 20, type: 'quiz' },
-];
-
 const VICTORY_QUOTES = [
   'Your mind is as sharp as a sword!',
   'A legendary feat!',
@@ -26,6 +19,22 @@ const VICTORY_QUOTES = [
 ];
 
 export function GameProvider({ children }) {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayString = yesterday.toISOString().split('T')[0];
+
+  const nextYear = new Date();
+  nextYear.setFullYear(nextYear.getFullYear() + 1);
+  const nextYearString = nextYear.toISOString().split('T')[0];
+
+  const INITIAL_QUESTS = [
+    { id: 101, title: "Math Worksheet", description: "Upload a photo of your completed algebra sheet.", xp: 50, gold: 20, type: 'upload', frequency: 'once', unlockDate: null },
+    { id: 102, title: "Science Project", description: "Submit a picture of your science fair poster.", xp: 100, gold: 50, type: 'upload', frequency: 'once', unlockDate: null },
+    { id: 103, title: "Math Speed Run", description: "What is 12 x 12?", correctAnswer: "144", xp: 50, gold: 20, type: 'quiz', frequency: 'daily', unlockDate: null },
+    { id: 104, title: "History Check", description: "What year did WWII end?", correctAnswer: "1945", xp: 50, gold: 20, type: 'quiz', frequency: 'once', unlockDate: yesterdayString },
+    { id: 105, title: "Future Test", description: "This quest is from the future!", correctAnswer: "flux capacitor", xp: 500, gold: 200, type: 'quiz', frequency: 'once', unlockDate: nextYearString },
+  ];
+
   const [students, setStudents] = useState(INITIAL_STUDENTS);
   const [quests, setQuests] = useState(INITIAL_QUESTS);
   const [submissions, setSubmissions] = useState([]);
@@ -133,9 +142,35 @@ export function GameProvider({ children }) {
 
   const getQuestStatus = (questId) => {
     if (!currentUser) return 'available';
-    const sub = submissions.find(s => s.questId === questId && s.studentId === currentUser.id);
-    if (!sub) return 'available';
-    return sub.status;
+
+    const quest = quests.find(q => q.id === questId);
+    if (!quest) return 'unavailable'; 
+
+    // 1. Check if the quest is time-locked
+    if (quest.unlockDate && Date.now() < new Date(quest.unlockDate).getTime()) {
+      return 'locked';
+    }
+
+    const userSubmissions = submissions
+      .filter(s => s.questId === questId && s.studentId === currentUser.id)
+      .sort((a, b) => b.id - a.id); 
+
+    if (userSubmissions.length === 0) {
+      return 'available';
+    }
+
+    const mostRecentSubmission = userSubmissions[0];
+    
+    if (quest.frequency === 'daily') {
+      const todayString = new Date().toLocaleDateString();
+      if (mostRecentSubmission.timestamp === todayString) {
+        return mostRecentSubmission.status;
+      } else {
+        return 'available';
+      }
+    }
+
+    return mostRecentSubmission.status;
   };
 
   const buyItem = (item) => {
