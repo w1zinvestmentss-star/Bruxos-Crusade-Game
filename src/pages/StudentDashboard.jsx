@@ -15,7 +15,6 @@ const StudentDashboard = () => {
     }
   }, [currentUser]);
 
-  // Fantasy Map Background
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
 
   const handleLogout = () => {
@@ -28,25 +27,33 @@ const StudentDashboard = () => {
     setShowWelcomeModal(false);
   };
 
-  // Reusable Map Pin Component
-  const MapLocation = ({ label, onClick, x, y, delay }) => (
-    <motion.button
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ delay, type: "spring", stiffness: 260, damping: 20 }}
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.9 }}
-      onClick={onClick}
-      className="absolute z-10 bg-black/80 border-2 border-yellow-500/50 text-white font-bold font-mono uppercase tracking-widest px-4 py-2 hover:border-yellow-400 hover:bg-black/90 transition-colors"
-      style={{
-        left: x,
-        top: y,
-        transform: 'translate(-50%, -50%)',
-      }}
-    >
-      {label}
-    </motion.button>
-  );
+  const MapLocation = ({ label, onClick, x, y, delay, variant = 'default' }) => {
+    const baseClasses = "absolute z-10 bg-black/80 border-2 text-white font-bold font-mono uppercase tracking-widest px-4 py-2 hover:bg-black/90 transition-colors";
+    
+    const variants = {
+      default: 'border-yellow-500/50 hover:border-yellow-400',
+      danger: 'border-red-900/80 hover:border-red-600'
+    };
+
+    return (
+        <motion.button
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay, type: "spring", stiffness: 260, damping: 20 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={onClick}
+            className={`${baseClasses} ${variants[variant]}`}
+            style={{
+                left: x,
+                top: y,
+                transform: 'translate(-50%, -50%)',
+            }}
+        >
+            {label}
+        </motion.button>
+    );
+  };
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-stone-900">
@@ -142,17 +149,27 @@ const StudentDashboard = () => {
         onClick={() => navigate('/archives')} 
       />
 
-      {/* THE BAZAAR */}
+      {/* THE BARRACKS */}
       <MapLocation 
-        label="The Bazaar" 
+        label="The Barracks" 
         x="68%" 
         y="41%" 
         delay={0.8}
         onClick={() => navigate('/barracks')} 
       />
 
+       {/* THE DUNGEON */}
+      <MapLocation 
+        label="The Dungeon"
+        x="50%" 
+        y="65%" 
+        delay={1.0}
+        onClick={() => navigate('/dungeon')}
+        variant="danger"
+      />
+
       <div className="absolute bottom-4 right-4 text-white/50 font-mono text-xs z-10">
-        Map v1.2
+        Map v1.3
       </div>
     </div>
   );

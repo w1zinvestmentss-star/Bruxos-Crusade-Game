@@ -12,6 +12,7 @@ import QuestBoard from './pages/QuestBoard';
 import Leaderboard from './pages/Leaderboard';
 import Barracks from './pages/Barracks';
 import Archives from './pages/Archives';
+import Dungeon from './pages/Dungeon';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/barracks" element={<Barracks />} />
           <Route path="/archives" element={<Archives />} />
+          <Route path="/dungeon" element={<Dungeon />} />
         </Routes>
       </HashRouter>
     </GameProvider>

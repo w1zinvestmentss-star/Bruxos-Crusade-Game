@@ -3,11 +3,16 @@ import React, { createContext, useContext, useState } from 'react';
 const GameContext = createContext();
 
 const INITIAL_STUDENTS = [
-  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png', notifications: [] },
-  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 880, finalGPA: 900, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png', notifications: [] },
-  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 600, finalGPA: 700, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png', notifications: [] },
-  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 920, finalGPA: null, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png', notifications: [] },
-  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png', notifications: [] },
+  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png', notifications: [], loginStreak: 3, defeatedBosses: [], questsCompleted: 5 },
+  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 880, finalGPA: 900, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png', notifications: [], loginStreak: 3, defeatedBosses: [], questsCompleted: 5 },
+  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 600, finalGPA: 700, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png', notifications: [], loginStreak: 3, defeatedBosses: [], questsCompleted: 5 },
+  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 920, finalGPA: null, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png', notifications: [], loginStreak: 3, defeatedBosses: [], questsCompleted: 5 },
+  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png', notifications: [], loginStreak: 3, defeatedBosses: [], questsCompleted: 5 },
+];
+
+const BOSSES = [
+    { id: 1, name: 'Slime of Sloth', image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/slime.png', requirement: 'streak', target: 3, rewardGold: 50, description: 'Login 3 days in a row' },
+    { id: 2, name: 'Goblin of Grades', image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/goblin.png', requirement: 'quests', target: 10, rewardGold: 100, description: 'Complete 10 Quests' },
 ];
 
 const VICTORY_QUOTES = [
@@ -146,7 +151,6 @@ export function GameProvider({ children }) {
     const quest = quests.find(q => q.id === questId);
     if (!quest) return 'unavailable'; 
 
-    // 1. Check if the quest is time-locked
     if (quest.unlockDate && Date.now() < new Date(quest.unlockDate).getTime()) {
       return 'locked';
     }
@@ -240,6 +244,44 @@ export function GameProvider({ children }) {
       }
       return student;
     }));
+  }; 
+
+    const fightBoss = (bossId) => {
+    if (!currentUser) return { success: false, message: "Not logged in!" };
+
+    const boss = BOSSES.find(b => b.id === bossId);
+    if (!boss) return { success: false, message: "Boss not found!" };
+
+    if (currentUser.defeatedBosses.includes(bossId)) {
+      return { success: false, message: "You have already defeated this boss." };
+    }
+
+    let requirementMet = false;
+    if (boss.requirement === 'streak') {
+      if (currentUser.loginStreak >= boss.target) {
+        requirementMet = true;
+      }
+    } else if (boss.requirement === 'quests') {
+        const completedQuests = submissions.filter(s => s.studentId === currentUser.id && s.status === 'approved').length;
+      if (completedQuests >= boss.target) {
+        requirementMet = true;
+      }
+    }
+
+    if (requirementMet) {
+      const updatedUser = {
+        ...currentUser,
+        gold: currentUser.gold + boss.rewardGold,
+        defeatedBosses: [...currentUser.defeatedBosses, bossId]
+      };
+      setCurrentUser(updatedUser);
+      
+      setStudents(prev => prev.map(s => s.id === currentUser.id ? updatedUser : s));
+
+      return { success: true, reward: boss.rewardGold };
+    } else {
+      return { success: false, message: "You are not strong enough yet!" };
+    }
   };
   
   const calculateScholarScore = (student) => {
@@ -275,7 +317,7 @@ export function GameProvider({ children }) {
   };
 
   const value = {
-    students, quests, submissions,
+    students, quests, submissions, BOSSES,
     createQuest, submitQuest, approveSubmission, getQuestStatus,
     userRole, setUserRole, currentUser, setCurrentUser,
     buyItem,
@@ -285,7 +327,8 @@ export function GameProvider({ children }) {
     calculateComebackScore,
     updateStudentStats,
     attemptQuiz,
-    clearNotifications
+    clearNotifications,
+    fightBoss
   };
 
   return (
