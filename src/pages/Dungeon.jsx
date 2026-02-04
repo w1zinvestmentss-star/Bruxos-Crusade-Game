@@ -1,7 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
-import { ArrowLeft, Sword, Shield } from 'lucide-react';
+import { ArrowLeft, Sword, Shield, Coins } from 'lucide-react';
+import { Star } from 'lucide-react';
 
 const Dungeon = () => {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ const Dungeon = () => {
   const handleFightBoss = (bossId) => {
     const result = fightBoss(bossId);
     if (result.success) {
-      alert(`Victory! You defeated the boss and earned ${result.reward} Gold!`);
+      alert(`Victory! You defeated the boss and earned ${result.rewardGold} Gold and ${result.rewardXp} XP!`);
     } else {
       alert(`Defeat: ${result.message}`);
     }
@@ -73,7 +74,18 @@ const Dungeon = () => {
                   </div>
                   <h2 className="text-2xl font-['Press_Start_2P'] text-red-500 text-center mb-2">{boss.name}</h2>
                   <p className="font-['VT323'] text-stone-400 text-lg text-center mb-4">{boss.description}</p>
-                  
+
+                   <div className="flex justify-center gap-2 my-4">
+                        <div className="flex items-center gap-2 text-sm font-mono px-3 py-1 rounded-full bg-yellow-900/50 text-yellow-300 border border-yellow-700">
+                            <Coins size={14} />
+                            <span>{boss.rewardGold} G</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm font-mono px-3 py-1 rounded-full bg-blue-900/50 text-blue-300 border border-blue-700">
+                            <Star size={14} />
+                            <span>{boss.rewardXp} XP</span>
+                        </div>
+                    </div>
+
                   {/*- Progress Bar -*/}
                   <div className='mb-4'>
                     <div className="flex justify-between font-mono text-sm mb-1">

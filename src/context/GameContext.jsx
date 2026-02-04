@@ -11,8 +11,8 @@ const INITIAL_STUDENTS = [
 ];
 
 const BOSSES = [
-    { id: 1, name: 'Slime of Sloth', image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/slime.png?v=1', requirement: 'streak', target: 3, rewardGold: 50, description: 'Login 3 days in a row' },
-    { id: 2, name: 'Goblin of Grades', image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Goblin.png?v=1', requirement: 'quests', target: 10, rewardGold: 100, description: 'Complete 10 Quests' },
+    { id: 1, name: 'Slime of Sloth', image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/slime.png?v=1', requirement: 'streak', target: 3, rewardGold: 50, rewardXp: 100, description: 'Login 3 days in a row' },
+    { id: 2, name: 'Goblin of Grades', image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Goblin.png?v=1', requirement: 'quests', target: 10, rewardGold: 100, rewardXp: 250, description: 'Complete 10 Quests' },
 ];
 
 const VICTORY_QUOTES = [
@@ -272,13 +272,14 @@ export function GameProvider({ children }) {
       const updatedUser = {
         ...currentUser,
         gold: currentUser.gold + boss.rewardGold,
+        xp: currentUser.xp + boss.rewardXp,
         defeatedBosses: [...currentUser.defeatedBosses, bossId]
       };
       setCurrentUser(updatedUser);
       
       setStudents(prev => prev.map(s => s.id === currentUser.id ? updatedUser : s));
 
-      return { success: true, reward: boss.rewardGold };
+      return { success: true, rewardGold: boss.rewardGold, rewardXp: boss.rewardXp };
     } else {
       return { success: false, message: "You are not strong enough yet!" };
     }
