@@ -45,7 +45,7 @@ const PodiumSpot = ({ student, rank, scoreDisplay }) => {
       className={`flex flex-col items-center text-center ${styles.marginTop} w-40`}
     >
       <div className="relative mb-2">
-        <div className={`${styles.size} rounded-full bg-stone-800 border-4 ${styles.avatarBorder} overflow-hidden flex items-center justify-center shadow-lg`}>
+        <div className={`${styles.size} rounded-full bg-black border-4 ${styles.avatarBorder} overflow-hidden flex items-center justify-center shadow-lg`}>
           <img
             src={student.currentBodySprite}
             alt={`${student.heroName}'s avatar`}
@@ -186,7 +186,7 @@ const Leaderboard = () => {
                   <span className="font-['VT323'] text-2xl text-slate-500">#{index + 4}</span>
                 </div>
 
-                <div className="w-12 h-12 rounded-full bg-stone-800 border border-stone-600 overflow-hidden flex items-center justify-center mr-4">
+                <div className="w-12 h-12 rounded-full bg-black border border-stone-600 overflow-hidden flex items-center justify-center mr-4">
                   <img 
                     src={student.currentBodySprite} 
                     alt={`${student.heroName}'s avatar`}

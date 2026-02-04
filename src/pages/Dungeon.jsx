@@ -68,7 +68,7 @@ const Dungeon = () => {
             return (
               <div key={boss.id} className="bg-stone-900 border-2 border-red-900/50 rounded-xl p-4 flex flex-col justify-between shadow-2xl shadow-red-900/20">
                 <div>
-                  <div className="h-48 w-full bg-stone-800 rounded mb-4 relative overflow-hidden">
+                  <div className="h-48 w-full bg-black rounded mb-4 relative overflow-hidden">
                      <img src={boss.image} alt={boss.name} className="absolute inset-0 w-full h-full object-contain"/>
                   </div>
                   <h2 className="text-2xl font-['Press_Start_2P'] text-red-500 text-center mb-2">{boss.name}</h2>

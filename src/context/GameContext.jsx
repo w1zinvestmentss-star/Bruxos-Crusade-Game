@@ -11,8 +11,8 @@ const INITIAL_STUDENTS = [
 ];
 
 const BOSSES = [
-    { id: 1, name: 'Slime of Sloth', image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/slime.png', requirement: 'streak', target: 3, rewardGold: 50, description: 'Login 3 days in a row' },
-    { id: 2, name: 'Goblin of Grades', image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/goblin.png', requirement: 'quests', target: 10, rewardGold: 100, description: 'Complete 10 Quests' },
+    { id: 1, name: 'Slime of Sloth', image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/slime.png?v=1', requirement: 'streak', target: 3, rewardGold: 50, description: 'Login 3 days in a row' },
+    { id: 2, name: 'Goblin of Grades', image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Goblin.png?v=1', requirement: 'quests', target: 10, rewardGold: 100, description: 'Complete 10 Quests' },
 ];
 
 const VICTORY_QUOTES = [
