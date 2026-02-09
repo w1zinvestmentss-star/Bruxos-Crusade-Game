@@ -38,6 +38,7 @@ export function GameProvider({ children }) {
     { id: 103, title: "Math Speed Run", description: "What is 12 x 12?", correctAnswer: "144", xp: 50, gold: 20, type: 'quiz', frequency: 'daily', unlockDate: null },
     { id: 104, title: "History Check", description: "What year did WWII end?", correctAnswer: "1945", xp: 50, gold: 20, type: 'quiz', frequency: 'once', unlockDate: yesterdayString },
     { id: 105, title: "Future Test", description: "This quest is from the future!", correctAnswer: "flux capacitor", xp: 500, gold: 200, type: 'quiz', frequency: 'once', unlockDate: nextYearString },
+    { id: 106, title: "Weekly Reflection", description: "Write a short paragraph about what you learned this week.", xp: 100, gold: 50, type: 'journal', frequency: 'weekly', unlockDate: '2025-01-01' },
   ];
 
   const [students, setStudents] = useState(INITIAL_STUDENTS);
@@ -50,19 +51,23 @@ export function GameProvider({ children }) {
     setQuests(prev => [...prev, { ...newQuest, id: Date.now() }]);
   };
 
-  const submitQuest = (questId, proofFile) => {
-    const proofUrl = proofFile ? URL.createObjectURL(proofFile) : null;
-    
+  const submitQuest = (questId, content, type) => {
     const newSubmission = {
       id: Date.now(),
       questId,
       studentId: currentUser.id,
       studentName: currentUser.heroName,
-      proofImage: proofUrl,
       status: 'pending',
-      timestamp: new Date().toLocaleDateString()
+      timestamp: new Date().toLocaleDateString(),
+      type,
     };
-    
+
+    if (type === 'upload') {
+      newSubmission.proofImage = content ? URL.createObjectURL(content) : null;
+    } else if (type === 'journal') {
+      newSubmission.journalText = content;
+    }
+
     setSubmissions(prev => [...prev, newSubmission]);
   };
 
@@ -165,7 +170,7 @@ export function GameProvider({ children }) {
 
     const mostRecentSubmission = userSubmissions[0];
     
-    if (quest.frequency === 'daily') {
+    if (quest.frequency === 'daily' || quest.frequency === 'weekly') {
       const todayString = new Date().toLocaleDateString();
       if (mostRecentSubmission.timestamp === todayString) {
         return mostRecentSubmission.status;

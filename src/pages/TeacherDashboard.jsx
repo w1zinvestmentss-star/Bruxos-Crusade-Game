@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Plus, Check, Search, Image as ImageIcon, BookCopy, Save } from 'lucide-react';
+import { LogOut, Plus, Check, Search, Image as ImageIcon, BookCopy, Save, Upload } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const TeacherDashboard = () => {
@@ -12,7 +12,8 @@ const TeacherDashboard = () => {
     createQuest, 
     approveSubmission, 
     setUserRole, 
-    updateStudentStats 
+    updateStudentStats,
+    importQuestions
   } = useGame();
   
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -21,17 +22,18 @@ const TeacherDashboard = () => {
     description: '',
     xp: 50,
     gold: 20,
-    type: 'upload', // 'upload' or 'quiz'
-    frequency: 'once', // 'once' or 'daily'
+    type: 'upload', // 'upload', 'quiz', or 'journal'
+    frequency: 'once', // 'once', 'daily', or 'weekly'
     unlockDate: '',
     correctAnswer: ''
   });
   const [gradeInputs, setGradeInputs] = useState({});
+  const fileInputRef = useRef(null);
+  const selectedQuestRef = useRef(null);
 
   const handleCreate = (e) => {
     e.preventDefault();
     
-    // Default unlockDate to today if empty
     const questToCreate = {
       ...newQuest,
       unlockDate: newQuest.unlockDate || new Date().toISOString().split('T')[0],
@@ -39,7 +41,6 @@ const TeacherDashboard = () => {
 
     createQuest(questToCreate);
     setShowCreateForm(false);
-    // Reset state to include new fields
     setNewQuest({
       title: '',
       description: '',
@@ -50,6 +51,33 @@ const TeacherDashboard = () => {
       unlockDate: '',
       correctAnswer: ''
     });
+  };
+  
+  const handleImportClick = (questId) => {
+    selectedQuestRef.current = questId;
+    fileInputRef.current.click();
+  };
+
+  const handleFileImport = (e) => {
+    const file = e.target.files[0];
+    if (!file || !selectedQuestRef.current) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target.result;
+      const lines = text.split('\n').filter(line => line.trim() !== '');
+      const parsedData = lines.map(line => {
+        const [q, a] = line.split(',');
+        return { q: q.trim(), a: a.trim() };
+      });
+
+      importQuestions(selectedQuestRef.current, parsedData);
+      alert(`Successfully imported ${parsedData.length} questions!`);
+    };
+    reader.readAsText(file);
+    
+    // Reset file input
+    e.target.value = null;
   };
 
   const handleLogout = () => {
@@ -62,7 +90,7 @@ const TeacherDashboard = () => {
       ...prev,
       [studentId]: {
         ...prev[studentId],
-        [type]: value, // Keep it as a string for the input field
+        [type]: value,
       },
     }));
   };
@@ -71,7 +99,6 @@ const TeacherDashboard = () => {
     const inputs = gradeInputs[studentId];
     if (!inputs) return;
 
-    // Convert to number and update if the value is a non-empty string
     if (inputs.midterm && inputs.midterm !== '') {
       updateStudentStats(studentId, 'midterm', Number(inputs.midterm));
     }
@@ -79,7 +106,6 @@ const TeacherDashboard = () => {
       updateStudentStats(studentId, 'final', Number(inputs.final));
     }
 
-    // Clear inputs for this student after saving
     setGradeInputs(prev => ({
         ...prev,
         [studentId]: { midterm: '', final: '' },
@@ -90,8 +116,14 @@ const TeacherDashboard = () => {
 
   return (
     <div className="min-h-screen bg-stone-100 text-stone-900 font-sans">
-      
-      {/* Navbar */}
+      <input
+        type="file"
+        accept=".csv"
+        ref={fileInputRef}
+        className="hidden"
+        onChange={handleFileImport}
+      />
+
       <div className="bg-red-900 text-white p-4 flex justify-between items-center shadow-md">
         <h1 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "'Press Start 2P', cursive" }}>
           <span className="text-yellow-400">👑</span> GAME MASTER
@@ -103,7 +135,6 @@ const TeacherDashboard = () => {
 
       <div className="max-w-7xl mx-auto p-6 space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* LEFT COLUMN: INBOX */}
           <div>
             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 text-stone-800">
               <Search className="text-blue-600" /> Pending Approvals ({pendingSubmissions.length})
@@ -130,14 +161,21 @@ const TeacherDashboard = () => {
                           <Check size={16} /> APPROVE
                         </button>
                       </div>
-                      <div className="bg-stone-100 rounded-lg p-2 border border-stone-200">
-                        <p className="text-xs font-bold text-stone-500 mb-2 flex items-center gap-1"><ImageIcon size={12} /> PROOF OF WORK:</p>
-                        {sub.proofImage ? (
-                          <img src={sub.proofImage} alt="Proof" className="w-full h-48 object-cover rounded border border-stone-300" />
-                        ) : (
-                          <div className="h-20 flex items-center justify-center text-stone-400 text-sm">No image attached</div>
-                        )}
-                      </div>
+                      {sub.type === 'journal' ? (
+                        <div className="bg-stone-100 p-4 rounded border-l-4 border-yellow-500 text-stone-800 font-serif italic">
+                           <p className="text-xs font-bold text-stone-500 mb-2 flex items-center gap-1"><BookCopy size={12} /> JOURNAL ENTRY:</p>
+                           <p className="text-stone-800 font-serif italic">{sub.journalText}</p>
+                        </div>
+                      ) : (
+                        <div className="bg-stone-100 rounded-lg p-2 border border-stone-200">
+                          <p className="text-xs font-bold text-stone-500 mb-2 flex items-center gap-1"><ImageIcon size={12} /> PROOF OF WORK:</p>
+                          {sub.proofImage ? (
+                            <img src={sub.proofImage} alt="Proof" className="w-full h-48 object-cover rounded border border-stone-300" />
+                          ) : (
+                            <div className="h-20 flex items-center justify-center text-stone-400 text-sm">No image attached</div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   );
                 })
@@ -145,7 +183,6 @@ const TeacherDashboard = () => {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: CREATE QUEST */}
           <div>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-stone-800">Active Quests</h2>
@@ -166,6 +203,7 @@ const TeacherDashboard = () => {
                       <select value={newQuest.type} onChange={e => setNewQuest({ ...newQuest, type: e.target.value })} className="w-full p-2 border rounded bg-stone-100 border-stone-300">
                         <option value="upload">Upload</option>
                         <option value="quiz">Quiz</option>
+                        <option value="journal">Journal</option>
                       </select>
                     </div>
                     <div className="w-1/2">
@@ -173,6 +211,7 @@ const TeacherDashboard = () => {
                       <select value={newQuest.frequency} onChange={e => setNewQuest({ ...newQuest, frequency: e.target.value })} className="w-full p-2 border rounded bg-stone-100 border-stone-300">
                         <option value="once">One-Time</option>
                         <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
                       </select>
                     </div>
                   </div>
@@ -180,7 +219,7 @@ const TeacherDashboard = () => {
                   {newQuest.type === 'quiz' && (
                     <div>
                       <label className="block text-sm font-bold text-stone-600 mb-1">Correct Answer</label>
-                      <input type="text" placeholder="Required for Quiz type" className="w-full p-2 border rounded bg-stone-100 border-stone-300" value={newQuest.correctAnswer} onChange={e => setNewQuest({ ...newQuest, correctAnswer: e.target.value })} required />
+                      <input type="text" placeholder="Required for Static Quiz" className="w-full p-2 border rounded bg-stone-100 border-stone-300" value={newQuest.correctAnswer} onChange={e => setNewQuest({ ...newQuest, correctAnswer: e.target.value })} />
                     </div>
                   )}
 
@@ -200,22 +239,33 @@ const TeacherDashboard = () => {
             <div className="space-y-2 max-h-[40vh] overflow-y-auto pr-2">
               {quests.map(q => (
                 <div key={q.id} className="bg-white p-3 rounded shadow-sm border border-stone-200 flex justify-between items-center">
-                  <span className="font-bold text-stone-700">{q.title}</span>
-                  <span className="text-xs text-stone-400 bg-stone-100 px-2 py-1 rounded">{q.xp} XP / {q.gold} G</span>
+                  <div>
+                    <span className="font-bold text-stone-700">{q.title}</span>
+                    <span className="text-xs text-stone-400 ml-2 bg-stone-100 px-2 py-1 rounded">{q.type}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-stone-500 bg-yellow-100 px-2 py-1 rounded">{q.xp} XP / {q.gold} G</span>
+                    {q.type === 'quiz' && (
+                      <button 
+                        onClick={() => handleImportClick(q.id)}
+                        className="bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 text-xs font-semibold flex items-center gap-1"
+                      >
+                        <Upload size={12} /> Import
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* NEW SECTION: ATTRIBUTE MANAGEMENT */}
         <div>
           <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 text-stone-800">
             <BookCopy className="text-purple-600" /> Attribute Management
           </h2>
           <div className="bg-white p-4 rounded-xl shadow-md border border-stone-200">
             <div className="space-y-3">
-              {/* Header */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 font-bold text-sm text-stone-500 border-b pb-2">
                 <div className="md:col-span-1">Student</div>
                 <div className="md:col-span-1">Midterm Grade</div>
@@ -223,7 +273,6 @@ const TeacherDashboard = () => {
                 <div className="md:col-span-1">Actions</div>
               </div>
 
-              {/* Student Rows */}
               {students.map(student => (
                 <div key={student.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center p-2 rounded-lg hover:bg-stone-50">
                   <div className="font-semibold text-stone-800">{student.name}</div>

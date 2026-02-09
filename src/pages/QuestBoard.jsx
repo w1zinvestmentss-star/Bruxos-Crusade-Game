@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Scroll, Upload, Clock, CheckCircle, Coins, Star, Brain } from 'lucide-react';
+import { ArrowLeft, Scroll, Upload, Clock, CheckCircle, Coins, Star, Brain, BookText } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const VICTORY_QUOTES = [
@@ -19,6 +19,7 @@ const QuestBoard = () => {
   const fileInputRef = useRef(null);
   const selectedQuestRef = useRef(null);
   const [quizAnswers, setQuizAnswers] = useState({});
+  const [journalTexts, setJournalTexts] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [modalQuote, setModalQuote] = useState('');
@@ -35,7 +36,7 @@ const QuestBoard = () => {
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file && selectedQuestRef.current) {
-      submitQuest(selectedQuestRef.current, file);
+      submitQuest(selectedQuestRef.current, file, 'upload');
       alert('Proof Submitted! Awaiting Teacher Review.');
     }
   };
@@ -47,6 +48,20 @@ const QuestBoard = () => {
 
   const handleQuizAnswerChange = (questId, answer) => {
     setQuizAnswers(prev => ({ ...prev, [questId]: answer }));
+  };
+
+  const handleJournalTextChange = (questId, text) => {
+    setJournalTexts(prev => ({ ...prev, [questId]: text }));
+  };
+
+  const handleJournalSubmit = (questId) => {
+    const text = journalTexts[questId] || '';
+    if (text.trim() === '') {
+      alert('Please write something in your journal.');
+      return;
+    }
+    submitQuest(questId, text, 'journal');
+    alert('Journal entry submitted! Awaiting Teacher Review.');
   };
 
   const handleQuizSubmit = async (questId) => {
@@ -104,7 +119,7 @@ const QuestBoard = () => {
                   <div className="flex justify-between items-start">
                     <div className="font-['VT323'] text-xl">
                       <h3 className="text-2xl mb-2 flex items-center gap-2 text-white">
-                        {quest.type === 'quiz' ? <Brain size={20} /> : <Scroll size={20} />}
+                        {quest.type === 'quiz' ? <Brain size={20} /> : quest.type === 'journal' ? <BookText size={20} /> : <Scroll size={20} />}
                         {quest.title}
                       </h3>
                       <p className="text-stone-300 mb-4 text-lg">{quest.description}</p>
@@ -115,7 +130,7 @@ const QuestBoard = () => {
                     </div>
 
                     {status === 'available' && (
-                      <>
+                      <div className="flex-shrink-0 w-1/2 ml-4">
                         {quest.type === 'quiz' ? (
                           <div className="flex items-center gap-2">
                             <input
@@ -123,13 +138,28 @@ const QuestBoard = () => {
                               placeholder="> enter solution..."
                               value={quizAnswers[quest.id] || ''}
                               onChange={(e) => handleQuizAnswerChange(quest.id, e.target.value)}
-                              className="bg-black/80 border border-stone-600 rounded-md p-2 w-48 text-green-400 font-mono placeholder-green-800 focus:outline-none focus:ring-1 focus:ring-green-500"
+                              className="bg-black/80 border border-stone-600 rounded-md p-2 w-full text-green-400 font-mono placeholder-green-800 focus:outline-none focus:ring-1 focus:ring-green-500"
                             />
                             <button
                               onClick={() => handleQuizSubmit(quest.id)}
                               className="px-3 py-2 bg-yellow-600 text-black rounded-lg hover:bg-yellow-500 shadow-lg font-['VT323'] text-lg"
                             >
                               EXECUTE
+                            </button>
+                          </div>
+                        ) : quest.type === 'journal' ? (
+                          <div className="flex flex-col items-end gap-2">
+                            <textarea
+                              placeholder="Write your reflection..."
+                              value={journalTexts[quest.id] || ''}
+                              onChange={(e) => handleJournalTextChange(quest.id, e.target.value)}
+                              className="bg-black/80 border border-stone-600 rounded-md p-2 w-full h-24 text-stone-200 font-mono placeholder-stone-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                            <button
+                              onClick={() => handleJournalSubmit(quest.id)}
+                              className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 shadow-lg flex items-center gap-2 font-['VT323'] text-xl"
+                            >
+                              <Upload size={18} /> SUBMIT
                             </button>
                           </div>
                         ) : (
@@ -140,7 +170,7 @@ const QuestBoard = () => {
                             <Upload size={18} /> SUBMIT
                           </button>
                         )}
-                      </>
+                      </div>
                     )}
                     {status === 'pending' && (
                       <div className="px-4 py-2 bg-yellow-900/30 text-yellow-500 rounded-lg border border-yellow-700 flex items-center gap-2 font-['VT323'] text-lg">
