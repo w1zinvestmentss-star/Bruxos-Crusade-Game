@@ -35,7 +35,23 @@ export function GameProvider({ children }) {
   const INITIAL_QUESTS = [
     { id: 101, title: "Math Worksheet", description: "Upload a photo of your completed algebra sheet.", xp: 50, gold: 20, type: 'upload', frequency: 'once', unlockDate: null },
     { id: 102, title: "Science Project", description: "Submit a picture of your science fair poster.", xp: 100, gold: 50, type: 'upload', frequency: 'once', unlockDate: null },
-    { id: 103, title: "Math Speed Run", description: "What is 12 x 12?", correctAnswer: "144", xp: 50, gold: 20, type: 'quiz', frequency: 'daily', unlockDate: null },
+    { 
+      id: 103, 
+      title: "Math Speed Run", 
+      description: "Answer the question before the timer runs out!", 
+      xp: 50, 
+      gold: 20, 
+      type: 'quiz', 
+      frequency: 'daily', 
+      unlockDate: null,
+      timeLimit: 30,
+      questionBank: [
+        { q: "What is 5 x 5?", a: "25" },
+        { q: "What is 120 / 10?", a: "12" },
+        { q: "What is 9 + 10?", a: "19" },
+        { q: "Solve: 3 x 3 - 2", a: "7" }
+      ]
+    },
     { id: 104, title: "History Check", description: "What year did WWII end?", correctAnswer: "1945", xp: 50, gold: 20, type: 'quiz', frequency: 'once', unlockDate: yesterdayString },
     { id: 105, title: "Future Test", description: "This quest is from the future!", correctAnswer: "flux capacitor", xp: 500, gold: 200, type: 'quiz', frequency: 'once', unlockDate: nextYearString },
     { id: 106, title: "Weekly Reflection", description: "Write a short paragraph about what you learned this week.", xp: 100, gold: 50, type: 'journal', frequency: 'weekly', unlockDate: '2025-01-01' },
@@ -49,6 +65,20 @@ export function GameProvider({ children }) {
 
   const createQuest = (newQuest) => {
     setQuests(prev => [...prev, { ...newQuest, id: Date.now() }]);
+  };
+
+  const importQuestions = (questId, newQuestions) => {
+    setQuests(prevQuests =>
+      prevQuests.map(quest => {
+        if (quest.id === questId && quest.hasOwnProperty('questionBank')) {
+          return {
+            ...quest,
+            questionBank: [...quest.questionBank, ...newQuestions],
+          };
+        }
+        return quest;
+      })
+    );
   };
 
   const submitQuest = (questId, content, type) => {
@@ -109,12 +139,17 @@ export function GameProvider({ children }) {
     }
   };
 
-  const attemptQuiz = (questId, userAnswer) => {
+  const attemptQuiz = (questId, userAnswer, dynamicCorrectAnswer = null) => {
     const quest = quests.find(q => q.id === questId);
-
     if (!quest) return { success: false, message: "Quest not found!" };
 
-    if (userAnswer.trim().toLowerCase() === quest.correctAnswer.trim().toLowerCase()) {
+    const correctAnswer = dynamicCorrectAnswer !== null ? dynamicCorrectAnswer : quest.correctAnswer;
+
+    if (typeof correctAnswer !== 'string') {
+      return { success: false, message: "Incorrect answer. Try again!" };
+    }
+
+    if (userAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase()) {
       const updatedStudents = students.map(student => {
         if (student.id === currentUser.id) {
           return {
@@ -324,7 +359,7 @@ export function GameProvider({ children }) {
 
   const value = {
     students, quests, submissions, BOSSES,
-    createQuest, submitQuest, approveSubmission, getQuestStatus,
+    createQuest, importQuestions, submitQuest, approveSubmission, getQuestStatus,
     userRole, setUserRole, currentUser, setCurrentUser,
     buyItem,
     equipOutfit,

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Plus, Check, Search, Image as ImageIcon, BookCopy, Save, Upload } from 'lucide-react';
+import { LogOut, Plus, Check, Search, Image as ImageIcon, BookCopy, Save, Upload, Clock } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const TeacherDashboard = () => {
@@ -22,10 +22,11 @@ const TeacherDashboard = () => {
     description: '',
     xp: 50,
     gold: 20,
-    type: 'upload', // 'upload', 'quiz', or 'journal'
-    frequency: 'once', // 'once', 'daily', or 'weekly'
+    type: 'upload',
+    frequency: 'once',
     unlockDate: '',
-    correctAnswer: ''
+    correctAnswer: '',
+    timeLimit: 30,
   });
   const [gradeInputs, setGradeInputs] = useState({});
   const fileInputRef = useRef(null);
@@ -34,10 +35,20 @@ const TeacherDashboard = () => {
   const handleCreate = (e) => {
     e.preventDefault();
     
-    const questToCreate = {
-      ...newQuest,
-      unlockDate: newQuest.unlockDate || new Date().toISOString().split('T')[0],
-    };
+    let questToCreate = { ...newQuest };
+
+    if (questToCreate.type === 'quiz') {
+      // If it is a dynamic quiz, we initialize an empty question bank.
+      if (!questToCreate.correctAnswer) {
+        questToCreate.questionBank = [];
+      }
+    } else {
+      // For non-quiz quests, no need to store these fields.
+      delete questToCreate.correctAnswer;
+      delete questToCreate.timeLimit;
+    }
+
+    questToCreate.unlockDate = questToCreate.unlockDate || new Date().toISOString().split('T')[0];
 
     createQuest(questToCreate);
     setShowCreateForm(false);
@@ -49,7 +60,8 @@ const TeacherDashboard = () => {
       type: 'upload',
       frequency: 'once',
       unlockDate: '',
-      correctAnswer: ''
+      correctAnswer: '',
+      timeLimit: 30,
     });
   };
   
@@ -64,19 +76,22 @@ const TeacherDashboard = () => {
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      const text = event.target.result;
-      const lines = text.split('\n').filter(line => line.trim() !== '');
-      const parsedData = lines.map(line => {
-        const [q, a] = line.split(',');
-        return { q: q.trim(), a: a.trim() };
-      });
+      try {
+        const text = event.target.result;
+        const lines = text.split('\n').filter(line => line.trim() !== '');
+        const parsedData = lines.map(line => {
+          const [q, a] = line.split(',');
+          if (!q || !a) throw new Error('Invalid CSV line format.');
+          return { q: q.trim(), a: a.trim() };
+        });
 
-      importQuestions(selectedQuestRef.current, parsedData);
-      alert(`Successfully imported ${parsedData.length} questions!`);
+        importQuestions(selectedQuestRef.current, parsedData);
+        alert(`Successfully imported ${parsedData.length} questions!`);
+      } catch (error) {
+        alert(`Import failed: ${error.message}`)
+      }
     };
     reader.readAsText(file);
-    
-    // Reset file input
     e.target.value = null;
   };
 
@@ -217,10 +232,19 @@ const TeacherDashboard = () => {
                   </div>
 
                   {newQuest.type === 'quiz' && (
-                    <div>
-                      <label className="block text-sm font-bold text-stone-600 mb-1">Correct Answer</label>
-                      <input type="text" placeholder="Required for Static Quiz" className="w-full p-2 border rounded bg-stone-100 border-stone-300" value={newQuest.correctAnswer} onChange={e => setNewQuest({ ...newQuest, correctAnswer: e.target.value })} />
-                    </div>
+                    <>
+                      <div className="border-t pt-4 mt-4">
+                        <label className="block text-sm font-bold text-stone-600 mb-1">Quiz Mode</label>
+                        <p className="text-xs text-stone-500 mb-2">Static quizzes use one answer. Dynamic quizzes use a question bank (CSV) and a timer.</p>
+                        <input type="text" placeholder="Correct Answer (for Static Quiz)" className="w-full p-2 border rounded bg-stone-100 border-stone-300" value={newQuest.correctAnswer} onChange={e => setNewQuest({ ...newQuest, correctAnswer: e.target.value })} />
+                      </div>
+                      {!newQuest.correctAnswer && (
+                        <div className="mt-2">
+                           <label className="block text-sm font-bold text-stone-600 mb-1">Time Limit (seconds)</label>
+                           <input type="number" placeholder="e.g., 30" className="w-full p-2 border rounded bg-stone-100 border-stone-300" value={newQuest.timeLimit} onChange={e => setNewQuest({ ...newQuest, timeLimit: Number(e.target.value) })} />
+                        </div>
+                      )}
+                    </>
                   )}
 
                   <div>
@@ -241,16 +265,16 @@ const TeacherDashboard = () => {
                 <div key={q.id} className="bg-white p-3 rounded shadow-sm border border-stone-200 flex justify-between items-center">
                   <div>
                     <span className="font-bold text-stone-700">{q.title}</span>
-                    <span className="text-xs text-stone-400 ml-2 bg-stone-100 px-2 py-1 rounded">{q.type}</span>
+                    <span className={`text-xs ml-2 px-2 py-1 rounded ${q.type === 'quiz' ? 'bg-purple-100 text-purple-700' : 'bg-stone-100 text-stone-600'}`}>{q.questionBank ? 'Dynamic Quiz' : q.type}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-stone-500 bg-yellow-100 px-2 py-1 rounded">{q.xp} XP / {q.gold} G</span>
-                    {q.type === 'quiz' && (
+                    {q.type === 'quiz' && q.questionBank && (
                       <button 
                         onClick={() => handleImportClick(q.id)}
                         className="bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 text-xs font-semibold flex items-center gap-1"
                       >
-                        <Upload size={12} /> Import
+                        <Upload size={12} /> Import CSV
                       </button>
                     )}
                   </div>
