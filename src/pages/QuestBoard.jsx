@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Scroll, Upload, Clock, CheckCircle, Coins, Star, Brain, BookText, Zap, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Coins, Star, Brain, Zap, AlertTriangle, Upload, Clock, BookText } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const VICTORY_QUOTES = [
@@ -20,18 +20,17 @@ const QuestBoard = () => {
   const selectedQuestRef = useRef(null);
   const [staticQuizAnswers, setStaticQuizAnswers] = useState({});
   const [journalTexts, setJournalTexts] = useState({});
-  
+  const [stepTracker, setStepTracker] = useState({});
+
   const [showVictoryModal, setShowVictoryModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [modalQuote, setModalQuote] = useState('');
 
-  // New state for managing multiple, concurrent quiz sessions
   const [activeSessions, setActiveSessions] = useState({});
   const [sessionAnswers, setSessionAnswers] = useState({});
 
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
 
-  // Unified timer effect for all active sessions
   useEffect(() => {
     const timerId = setInterval(() => {
       setActiveSessions(prev => {
@@ -127,6 +126,28 @@ const QuestBoard = () => {
     }
   };
 
+  const handleMultiStepQuizSubmit = async (questId) => {
+    const currentStepIndex = stepTracker[questId] || 0;
+    const quest = quests.find(q => q.id === questId);
+    const currentStep = quest.steps[currentStepIndex];
+    const answer = staticQuizAnswers[questId] || '';
+    const isLast = currentStepIndex === quest.steps.length - 1;
+
+    const result = await attemptQuiz(questId, answer, currentStep.a, isLast);
+
+    if (result.success) {
+      if (!isLast) {
+        setStepTracker(prev => ({ ...prev, [questId]: currentStepIndex + 1 }));
+        alert('Good job! Keep going...');
+        setStaticQuizAnswers(prev => ({ ...prev, [questId]: '' }));
+      } else {
+        triggerVictory(result.message);
+      }
+    } else {
+      alert(result.message);
+    }
+  };
+
   return (
     <div className="min-h-screen text-stone-200 p-6 relative">
       <img src={MAP_BG} alt="Background Map" className="absolute inset-0 w-full h-full object-cover" />
@@ -146,13 +167,25 @@ const QuestBoard = () => {
             {quests.map((quest) => {
               const status = getQuestStatus(quest.id);
               const isDynamicQuiz = quest.type === 'quiz' && quest.questionBank?.length > 0;
+              const isMultiStep = quest.type === 'multi-step';
               const session = activeSessions[quest.id];
+              const currentStepIndex = stepTracker[quest.id] || 0;
+              const currentStep = isMultiStep ? quest.steps[currentStepIndex] : null;
+
+              const getBorderColor = () => {
+                if (status === 'approved') return 'border-l-green-500 bg-green-900/40';
+                if (isMultiStep) return 'border-l-purple-500';
+                return 'border-l-blue-500';
+              };
 
               return (
-                <motion.div key={quest.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className={`p-6 rounded-xl relative transition-all bg-black/70 backdrop-blur-sm border-y border-r border-white/10 ${status === 'approved' ? 'border-l-4 border-l-green-500 bg-green-900/40' : 'border-l-4 border-l-blue-500'}`}>
+                <motion.div key={quest.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className={`p-6 rounded-xl relative transition-all bg-black/70 backdrop-blur-sm border-y border-r border-white/10 border-l-4 ${getBorderColor()}`}>
                   <div className="flex justify-between items-start">
                     <div className="font-['VT323'] text-xl flex-grow">
-                      <h3 className="text-2xl mb-2 flex items-center gap-2 text-white">{isDynamicQuiz ? <Zap size={20} /> : <Brain size={20} />}{quest.title}</h3>
+                      <h3 className="text-2xl mb-2 flex items-center gap-2 text-white">
+                        {isDynamicQuiz ? <Zap size={20} /> : isMultiStep ? <BookText size={20} /> : <Brain size={20} />}
+                        {quest.title}
+                      </h3>
                       <p className="text-stone-300 mb-4 text-lg">{quest.description}</p>
                       <div className="flex gap-3 text-base"><span className="px-2 py-1 bg-blue-900/50 text-blue-300 rounded border border-blue-800">+{quest.xp} XP</span><span className="px-2 py-1 bg-yellow-900/50 text-yellow-300 rounded border border-yellow-800">+{quest.gold} Gold</span></div>
                     </div>
@@ -170,6 +203,13 @@ const QuestBoard = () => {
                           ) : (
                             <button onClick={() => startDynamicQuiz(quest)} className="w-full px-4 py-3 bg-gradient-to-r from-red-700 to-yellow-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm hover:from-red-600 hover:to-yellow-500 flex items-center justify-center gap-2"><Zap size={18} />START SPEED RUN ({quest.timeLimit}s)</button>
                           )
+                        ) : isMultiStep ? (
+                          <div className="space-y-3">
+                            <div className="text-sm text-stone-400">Step {currentStepIndex + 1} of {quest.steps.length}</div>
+                            <div className="w-full bg-stone-700 rounded-full h-2.5"><div className="bg-purple-600 h-2.5 rounded-full" style={{ width: `${((currentStepIndex + 1) / quest.steps.length) * 100}%` }}></div></div>
+                            <p className="text-lg text-white">{currentStep.q}</p>
+                            <div className="flex items-center gap-2"><input type="text" placeholder="> answer" value={staticQuizAnswers[quest.id] || ''} onChange={(e) => handleStaticQuizAnswerChange(quest.id, e.target.value)} className="bg-black/80 border border-stone-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-green-500" /><button onClick={() => handleMultiStepQuizSubmit(quest.id)} className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 font-['VT323'] text-lg">CHECK STEP</button></div>
+                          </div>
                         ) : quest.type === 'quiz' ? (
                           <div className="flex items-center gap-2"><input type="text" placeholder="> enter solution..." value={staticQuizAnswers[quest.id] || ''} onChange={(e) => handleStaticQuizAnswerChange(quest.id, e.target.value)} className="bg-black/80 border border-stone-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-green-500" /><button onClick={() => handleStaticQuizSubmit(quest.id)} className="px-3 py-2 bg-yellow-600 text-black rounded-lg hover:bg-yellow-500 font-['VT323'] text-lg">EXECUTE</button></div>
                         ) : quest.type === 'journal' ? (

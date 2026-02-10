@@ -55,6 +55,22 @@ export function GameProvider({ children }) {
     { id: 104, title: "History Check", description: "What year did WWII end?", correctAnswer: "1945", xp: 50, gold: 20, type: 'quiz', frequency: 'once', unlockDate: yesterdayString },
     { id: 105, title: "Future Test", description: "This quest is from the future!", correctAnswer: "flux capacitor", xp: 500, gold: 200, type: 'quiz', frequency: 'once', unlockDate: nextYearString },
     { id: 106, title: "Weekly Reflection", description: "Write a short paragraph about what you learned this week.", xp: 100, gold: 50, type: 'journal', frequency: 'weekly', unlockDate: '2025-01-01' },
+    { 
+      id: 107, 
+      title: "Long Division Helper",
+      description: "Let's solve 144 / 12 step-by-step.",
+      type: 'multi-step',
+      xp: 150, 
+      gold: 75, 
+      frequency: 'daily', 
+      unlockDate: '2025-01-01',
+      steps: [
+        { q: "Step 1: How many times does 12 go into 14?", a: "1" },
+        { q: "Step 2: What is 1 * 12?", a: "12" },
+        { q: "Step 3: Subtract 14 - 12. What is the remainder?", a: "2" },
+        { q: "Step 4: Bring down the 4. What is 24 / 12?", a: "2" }
+      ]
+    }
   ];
 
   const [students, setStudents] = useState(INITIAL_STUDENTS);
@@ -139,7 +155,7 @@ export function GameProvider({ children }) {
     }
   };
 
-  const attemptQuiz = (questId, userAnswer, dynamicCorrectAnswer = null) => {
+  const attemptQuiz = (questId, userAnswer, dynamicCorrectAnswer = null, isFinalStep = true) => {
     const quest = quests.find(q => q.id === questId);
     if (!quest) return { success: false, message: "Quest not found!" };
 
@@ -150,6 +166,10 @@ export function GameProvider({ children }) {
     }
 
     if (userAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase()) {
+      if (!isFinalStep) {
+        return { success: true, message: "Correct! Keep going..." };
+      }
+
       const updatedStudents = students.map(student => {
         if (student.id === currentUser.id) {
           return {
