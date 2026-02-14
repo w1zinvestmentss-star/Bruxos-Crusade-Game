@@ -25,6 +25,46 @@ const Barracks = () => {
       imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight2.png',
       type: 'outfit',
       icon: Shirt
+    },
+    {
+      id: 103,
+      name: 'Baller Outfit',
+      cost: 50,
+      imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Baller.outfit2.png',
+      type: 'outfit',
+      icon: Shirt
+    },
+    {
+      id: 104,
+      name: 'Vampire Hunter',
+      cost: 150,
+      imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Vamphunter1.png',
+      type: 'outfit',
+      icon: Shirt
+    },
+    {
+      id: 105,
+      name: 'Void Space Suit',
+      cost: 300,
+      imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/deadspace.outfit.png',
+      type: 'outfit',
+      icon: Shirt
+    },
+    {
+      id: 106,
+      name: 'Dark Souls Knight',
+      cost: 600,
+      imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dark.souls1.png',
+      type: 'outfit',
+      icon: Shirt
+    },
+    {
+      id: 107,
+      name: 'Golden God Armor',
+      cost: 1000,
+      imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Powerful.golden.armour.png',
+      type: 'outfit',
+      icon: Shirt
     }
   ];
 
