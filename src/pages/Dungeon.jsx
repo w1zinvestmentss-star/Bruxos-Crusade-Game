@@ -1,12 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
-import { ArrowLeft, Sword, Shield, Coins } from 'lucide-react';
-import { Star } from 'lucide-react';
+import { ArrowLeft, Sword, Shield, Coins, Star } from 'lucide-react';
 
 const Dungeon = () => {
   const navigate = useNavigate();
-  const { currentUser, submissions, BOSSES, fightBoss } = useGame();
+  const { currentUser, BOSSES, fightBoss } = useGame();
 
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
 
@@ -32,7 +31,45 @@ const Dungeon = () => {
     );
   }
 
-  const completedQuests = submissions.filter(s => s.studentId === currentUser.id && s.status === 'approved').length;
+  const getBossProgress = (boss) => {
+    switch (boss.requirement) {
+      case 'uploads':
+        return currentUser.uploadQuestsCompleted || 0;
+      case 'quizzes':
+        return currentUser.quizQuestsCompleted || 0;
+      case 'multistep':
+        return currentUser.multiStepQuestsCompleted || 0;
+      case 'streak':
+        return currentUser.loginStreak || 0;
+      default:
+        return 0;
+    }
+  };
+
+  const getRequirementLabel = (requirement) => {
+    switch (requirement) {
+      case 'uploads': return "Homework Uploads";
+      case 'quizzes': return "Quizzes Aced";
+      case 'multistep': return "Complex Problems";
+      case 'streak': return "Days in a Row";
+      default: return "Requirement";
+    }
+  };
+
+  const sortedBosses = [...BOSSES].sort((a, b) => {
+    const aProgress = getBossProgress(a);
+    const bProgress = getBossProgress(b);
+    const aDefeated = currentUser.defeatedBosses.includes(a.id);
+    const bDefeated = currentUser.defeatedBosses.includes(b.id);
+    const aUnlocked = aProgress >= a.target;
+    const bUnlocked = bProgress >= b.target;
+
+    if (aDefeated && !bDefeated) return 1;
+    if (!aDefeated && bDefeated) return -1;
+    if (aUnlocked && !bUnlocked) return -1;
+    if (!aUnlocked && bUnlocked) return 1;
+    return 0;
+  });
 
   return (
     <div className="min-h-screen text-stone-200 p-4 sm:p-6 md:p-8 relative">
@@ -49,23 +86,11 @@ const Dungeon = () => {
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {BOSSES.map((boss) => {
+          {sortedBosses.map((boss) => {
             const isDefeated = currentUser.defeatedBosses.includes(boss.id);
-            let isLocked = true;
-            let currentProgress = 0;
+            const currentProgress = getBossProgress(boss);
+            const isUnlocked = currentProgress >= boss.target;
 
-            if (boss.requirement === 'streak') {
-              currentProgress = currentUser.loginStreak;
-              if (currentProgress >= boss.target) {
-                isLocked = false;
-              }
-            } else if (boss.requirement === 'quests') {
-              currentProgress = completedQuests;
-              if (currentProgress >= boss.target) {
-                isLocked = false;
-              }
-            }
-            
             return (
               <div key={boss.id} className="bg-stone-900 border-2 border-red-900/50 rounded-xl p-4 flex flex-col justify-between shadow-2xl shadow-red-900/20">
                 <div>
@@ -73,7 +98,6 @@ const Dungeon = () => {
                      <img src={boss.image} alt={boss.name} className="absolute inset-0 w-full h-full object-contain"/>
                   </div>
                   <h2 className="text-2xl font-['Press_Start_2P'] text-red-500 text-center mb-2">{boss.name}</h2>
-                  <p className="font-['VT323'] text-stone-400 text-lg text-center mb-4">{boss.description}</p>
 
                    <div className="flex justify-center gap-2 my-4">
                         <div className="flex items-center gap-2 text-sm font-mono px-3 py-1 rounded-full bg-yellow-900/50 text-yellow-300 border border-yellow-700">
@@ -86,10 +110,9 @@ const Dungeon = () => {
                         </div>
                     </div>
 
-                  {/*- Progress Bar -*/}
                   <div className='mb-4'>
                     <div className="flex justify-between font-mono text-sm mb-1">
-                      <span>{boss.requirement === 'streak' ? 'Streak' : 'Quests'}</span>
+                      <span>{getRequirementLabel(boss.requirement)}</span>
                       <span>{currentProgress} / {boss.target}</span>
                     </div>
                     <div className="w-full bg-black/50 rounded-full h-3 border border-stone-700">
@@ -102,7 +125,7 @@ const Dungeon = () => {
                    <button disabled className="w-full mt-2 py-3 px-4 rounded-lg font-bold font-['Press_Start_2P'] text-lg bg-stone-700 text-stone-500 cursor-not-allowed flex items-center justify-center gap-2">
                      <Shield size={20}/> DEFEATED
                    </button>
-                ) : isLocked ? (
+                ) : !isUnlocked ? (
                    <button disabled className="w-full mt-2 py-3 px-4 rounded-lg font-bold font-['Press_Start_2P'] text-lg bg-gray-800 text-gray-500 cursor-not-allowed">
                      LOCKED
                    </button>

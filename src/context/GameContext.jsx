@@ -3,16 +3,37 @@ import React, { createContext, useContext, useState } from 'react';
 const GameContext = createContext();
 
 const INITIAL_STUDENTS = [
-  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight2.png', notifications: [], loginStreak: 3, defeatedBosses: [], questsCompleted: 5 },
-  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 880, finalGPA: 900, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Vamphunter1.png', notifications: [], loginStreak: 3, defeatedBosses: [], questsCompleted: 5 },
-  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 600, finalGPA: 700, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Baller.outfit2.png', notifications: [], loginStreak: 3, defeatedBosses: [], questsCompleted: 5 },
-  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 920, finalGPA: null, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Powerful.golden.armour.png', notifications: [], loginStreak: 3, defeatedBosses: [], questsCompleted: 5 },
-  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dark.souls1.png', notifications: [], loginStreak: 3, defeatedBosses: [], questsCompleted: 5 },
+  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1 },
+  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 880, finalGPA: 900, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Vamphunter1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1 },
+  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 600, finalGPA: 700, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Baller.outfit2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1 },
+  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 920, finalGPA: null, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Powerful.golden.armour.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1 },
+  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dark.souls1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1 },
 ];
 
 const BOSSES = [
-    { id: 1, name: 'Slime of Sloth', image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/slime.png?v=1', requirement: 'streak', target: 3, rewardGold: 50, rewardXp: 100, description: 'Login 3 days in a row' },
-    { id: 2, name: 'Goblin of Grades', image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Goblin.png?v=1', requirement: 'quests', target: 10, rewardGold: 100, rewardXp: 250, description: 'Complete 10 Quests' },
+  // Track 1: Uploads
+  { id: 201, name: 'Paper Minion', requirement: 'uploads', target: 10, rewardGold: 50, rewardXp: 100, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/paper.monster.png' },
+  { id: 202, name: 'Scroll Guardian', requirement: 'uploads', target: 25, rewardGold: 100, rewardXp: 250, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/scroll.guardian.png' },
+  { id: 203, name: 'Tome Construct', requirement: 'uploads', target: 50, rewardGold: 250, rewardXp: 500, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/tome.construct.png' },
+  { id: 204, name: 'Library Titan', requirement: 'uploads', target: 100, rewardGold: 500, rewardXp: 1000, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/library.titan.png' },
+
+  // Track 2: Quizzes
+  { id: 301, name: 'Floating Eye', requirement: 'quizzes', target: 10, rewardGold: 50, rewardXp: 100, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/floating.eye.png' },
+  { id: 302, name: 'Mind Flayer', requirement: 'quizzes', target: 25, rewardGold: 100, rewardXp: 250, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/mind.flayer.png' },
+  { id: 303, name: 'Psychic Lich', requirement: 'quizzes', target: 50, rewardGold: 250, rewardXp: 500, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/psychic.lich.png' },
+  { id: 304, name: 'Cosmic Brain', requirement: 'quizzes', target: 100, rewardGold: 500, rewardXp: 1000, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/cosmic.brain.png' },
+
+  // Track 3: Multi-step Quests
+  { id: 401, name: 'Shadow Snake', requirement: 'multistep', target: 10, rewardGold: 75, rewardXp: 150, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/shadow.snake.png' },
+  { id: 402, name: 'Twin-Head Viper', requirement: 'multistep', target: 25, rewardGold: 150, rewardXp: 300, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/twin.viper.png' },
+  { id: 403, name: 'Dark Drake', requirement: 'multistep', target: 50, rewardGold: 300, rewardXp: 600, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/dark.drake.png' },
+  { id: 404, name: 'Void Hydra', requirement: 'multistep', target: 100, rewardGold: 600, rewardXp: 1200, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/void.hydra.png' },
+
+  // Track 4: Login Streaks
+  { id: 501, name: 'Clockwork Beetle', requirement: 'streak', target: 5, rewardGold: 50, rewardXp: 50, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/clockwork.beetle.png' },
+  { id: 502, name: 'Timekeeper Knight', requirement: 'streak', target: 10, rewardGold: 100, rewardXp: 100, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/time.knight.png' },
+  { id: 503, name: 'Hourglass Golem', requirement: 'streak', target: 15, rewardGold: 200, rewardXp: 200, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/hourglass.golem.png' },
+  { id: 504, name: 'Chronos Titan', requirement: 'streak', target: 20, rewardGold: 400, rewardXp: 400, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/chronos.titan.png' },
 ];
 
 const VICTORY_QUOTES = [
@@ -122,6 +143,7 @@ export function GameProvider({ children }) {
     if (!submission) return;
 
     const quest = quests.find(q => q.id === submission.questId);
+    if (!quest) return;
 
     setStudents(prev => prev.map(student => {
       if (student.id === submission.studentId) {
@@ -136,7 +158,8 @@ export function GameProvider({ children }) {
           ...student,
           xp: student.xp + quest.xp,
           gold: student.gold + quest.gold,
-          notifications: [...student.notifications, newNotification]
+          notifications: [...student.notifications, newNotification],
+          uploadQuestsCompleted: submission.type === 'upload' ? (student.uploadQuestsCompleted || 0) + 1 : student.uploadQuestsCompleted,
         };
       }
       return student;
@@ -150,7 +173,8 @@ export function GameProvider({ children }) {
        setCurrentUser(prev => ({
           ...prev,
           xp: prev.xp + quest.xp,
-          gold: prev.gold + quest.gold
+          gold: prev.gold + quest.gold,
+          uploadQuestsCompleted: submission.type === 'upload' ? (prev.uploadQuestsCompleted || 0) + 1 : prev.uploadQuestsCompleted,
        }));
     }
   };
@@ -175,7 +199,9 @@ export function GameProvider({ children }) {
           return {
             ...student,
             xp: student.xp + quest.xp,
-            gold: student.gold + quest.gold
+            gold: student.gold + quest.gold,
+            quizQuestsCompleted: quest.type === 'quiz' ? (student.quizQuestsCompleted || 0) + 1 : student.quizQuestsCompleted,
+            multiStepQuestsCompleted: quest.type === 'multi-step' ? (student.multiStepQuestsCompleted || 0) + 1 : student.multiStepQuestsCompleted,
           };
         }
         return student;
@@ -185,7 +211,9 @@ export function GameProvider({ children }) {
       const updatedCurrentUser = {
         ...currentUser,
         xp: currentUser.xp + quest.xp,
-        gold: currentUser.gold + quest.gold
+        gold: currentUser.gold + quest.gold,
+        quizQuestsCompleted: quest.type === 'quiz' ? (currentUser.quizQuestsCompleted || 0) + 1 : currentUser.quizQuestsCompleted,
+        multiStepQuestsCompleted: quest.type === 'multi-step' ? (currentUser.multiStepQuestsCompleted || 0) + 1 : currentUser.multiStepQuestsCompleted,
       };
       setCurrentUser(updatedCurrentUser);
 
@@ -306,7 +334,7 @@ export function GameProvider({ children }) {
     }));
   }; 
 
-    const fightBoss = (bossId) => {
+  const fightBoss = (bossId) => {
     if (!currentUser) return { success: false, message: "Not logged in!" };
 
     const boss = BOSSES.find(b => b.id === bossId);
@@ -317,15 +345,21 @@ export function GameProvider({ children }) {
     }
 
     let requirementMet = false;
-    if (boss.requirement === 'streak') {
-      if (currentUser.loginStreak >= boss.target) {
-        requirementMet = true;
-      }
-    } else if (boss.requirement === 'quests') {
-        const completedQuests = submissions.filter(s => s.studentId === currentUser.id && s.status === 'approved').length;
-      if (completedQuests >= boss.target) {
-        requirementMet = true;
-      }
+    switch (boss.requirement) {
+      case 'uploads':
+        requirementMet = (currentUser.uploadQuestsCompleted || 0) >= boss.target;
+        break;
+      case 'quizzes':
+        requirementMet = (currentUser.quizQuestsCompleted || 0) >= boss.target;
+        break;
+      case 'multistep':
+        requirementMet = (currentUser.multiStepQuestsCompleted || 0) >= boss.target;
+        break;
+      case 'streak':
+        requirementMet = (currentUser.loginStreak || 0) >= boss.target;
+        break;
+      default:
+        requirementMet = false;
     }
 
     if (requirementMet) {
