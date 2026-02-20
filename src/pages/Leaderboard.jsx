@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BookOpen, Star, TrendingUp, Coins } from 'lucide-react';
+import { ArrowLeft, BookOpen, Star, TrendingUp, Swords } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const PodiumSpot = ({ student, rank, scoreDisplay }) => {
@@ -65,7 +65,7 @@ const PodiumSpot = ({ student, rank, scoreDisplay }) => {
 
 const Leaderboard = () => {
   const navigate = useNavigate();
-  const { students, calculateScholarScore, calculateComebackScore } = useGame();
+  const { students, calculateScholarScore, calculateComebackScore, getSlayerPoints, calculateSlayerScore } = useGame();
   const [activeTab, setActiveTab] = useState('scholar');
 
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
@@ -76,11 +76,11 @@ const Leaderboard = () => {
             case 'scholar': return calculateScholarScore(b) - calculateScholarScore(a);
             case 'grinder': return b.xp - a.xp;
             case 'comeback': return calculateComebackScore(b) - calculateComebackScore(a);
-            case 'wealthy': return b.gold - a.gold;
+            case 'slayer': return calculateSlayerScore(b) - calculateSlayerScore(a);
             default: return 0;
         }
     });
-  }, [students, activeTab, calculateScholarScore, calculateComebackScore]);
+  }, [students, activeTab, calculateScholarScore, calculateComebackScore, calculateSlayerScore]);
 
   const topThree = sortedStudents.slice(0, 3);
   const restOfStudents = sortedStudents.slice(3);
@@ -109,9 +109,12 @@ const Leaderboard = () => {
         return (
           <div className={`${scoreBaseStyle} ${color}`}>{score >= 0 ? `+${score}`:score}<span className="text-sm text-slate-400 ml-2">pts</span></div>
         );
-      case 'wealthy':
+      case 'slayer':
         return (
-          <div className={`${scoreBaseStyle} text-yellow-400`}>{student.gold}<span className="text-sm text-yellow-600 ml-2">G</span></div>
+          <div>
+            <div className="font-['VT323'] text-lg font-bold text-red-500">{getSlayerPoints(student)} Slayer Pts</div>
+            <div className="text-xs text-stone-500">{student.xp} XP</div>
+          </div>
         );
       default: return null;
     }
@@ -121,7 +124,7 @@ const Leaderboard = () => {
     { id: 'scholar', label: 'Scholar', icon: BookOpen },
     { id: 'grinder', label: 'Grinder', icon: Star },
     { id: 'comeback', label: 'Comeback', icon: TrendingUp },
-    { id: 'wealthy', label: 'Wealthy', icon: Coins },
+    { id: 'slayer', label: 'The Slayer', icon: Swords },
   ];
 
   return (
