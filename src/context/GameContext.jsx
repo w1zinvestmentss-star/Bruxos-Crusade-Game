@@ -77,18 +77,16 @@ export function GameProvider({ children }) {
     {
       id: 108, // New ID
       title: "The Crossroads",
-      description: "You encounter a troll blocking a bridge. What do you do?",
+      description: "A series of critical choices await.",
       type: 'scenario',
       xp: 50,
       gold: 25,
       frequency: 'once',
-      options: [
-        'Fight the troll',
-        'Pay the toll',
-        'Try to reason with it',
-        'Swim across the river'
-      ],
-      correctAnswer: 'Pay the toll'
+      questionBank: [
+          { q: "You encounter a troll. What do you do?", options: ["Pay toll", "Attack", "Flee"], a: "Pay toll" },
+          { q: "A merchant offers a glowing potion. Do you:", options: ["Drink it", "Inspect it", "Ignore it"], a: "Inspect it" },
+          { q: "You find a locked chest. Do you:", options: ["Smash it", "Pick lock", "Leave it"], a: "Pick lock" }
+      ]
     },
     { id: 106, title: "Weekly Reflection", description: "Write a short paragraph about what you learned this week.", xp: 100, gold: 50, type: 'journal', frequency: 'weekly', unlockDate: '2025-01-01' },
     { 
@@ -248,11 +246,11 @@ export function GameProvider({ children }) {
     }
   };
 
-  const attemptScenario = (questId, selectedOption) => {
+  const attemptScenario = (questId, isCorrect) => {
     const quest = quests.find(q => q.id === questId);
     if (!quest) return { success: false, message: "Quest not found!" };
 
-    if (selectedOption === quest.correctAnswer) {
+    if (isCorrect) {
       const updatedStudents = students.map(student => {
         if (student.id === currentUser.id) {
           return {
@@ -287,7 +285,8 @@ export function GameProvider({ children }) {
 
       return { success: true };
     } else {
-      return { success: false, message: "Wrong choice. The troll laughs at you!" };
+      // This case might not be needed if validation is purely UI-side
+      return { success: false, message: "Incorrect choice made." };
     }
   };
 

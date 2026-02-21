@@ -28,6 +28,8 @@ const QuestBoard = () => {
 
   const [activeSessions, setActiveSessions] = useState({});
   const [sessionAnswers, setSessionAnswers] = useState({});
+  const [activeScenarios, setActiveScenarios] = useState({});
+
 
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
 
@@ -97,12 +99,25 @@ const QuestBoard = () => {
     }
   };
 
-  const handleScenarioSubmit = async (questId, option) => {
-    const result = await attemptScenario(questId, option);
-    if (result.success) {
-        triggerVictory(`+${quests.find(q=>q.id===questId).xp} XP, +${quests.find(q=>q.id===questId).gold} Gold`);
+  const rollScenario = (quest) => {
+    const randomScenario = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
+    setActiveScenarios(prev => ({ ...prev, [quest.id]: randomScenario }));
+  };
+
+  const handleScenarioSubmit = async (questId, chosenOption) => {
+    const scenario = activeScenarios[questId];
+    const isCorrect = chosenOption === scenario.a;
+    
+    if (isCorrect) {
+        const result = await attemptScenario(questId, true);
+        if (result.success) {
+            triggerVictory(`+${quests.find(q => q.id === questId).xp} XP, +${quests.find(q => q.id === questId).gold} Gold`);
+            setActiveScenarios(prev => ({ ...prev, [questId]: null }));
+        }
     } else {
-      alert(result.message);
+        alert("Wrong choice! The scenario shifts...");
+        const quest = quests.find(q => q.id === questId);
+        rollScenario(quest);
     }
   };
 
@@ -179,6 +194,7 @@ const QuestBoard = () => {
               const isMultiStep = quest.type === 'multi-step';
               const isScenario = quest.type === 'scenario';
               const session = activeSessions[quest.id];
+              const currentScenario = activeScenarios[quest.id];
               const currentStepIndex = stepTracker[quest.id] || 0;
               const currentStep = isMultiStep ? quest.steps[currentStepIndex] : null;
 
@@ -222,17 +238,22 @@ const QuestBoard = () => {
                             <div className="flex items-center gap-2"><input type="text" placeholder="> answer" value={staticQuizAnswers[quest.id] || ''} onChange={(e) => handleStaticQuizAnswerChange(quest.id, e.target.value)} className="bg-black/80 border border-stone-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-green-500" /><button onClick={() => handleMultiStepQuizSubmit(quest.id)} className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 font-['VT323'] text-lg">CHECK STEP</button></div>
                           </div>
                         ) : quest.type === 'scenario' ? (
-                            <div>
-                                {quest.options.map(option => (
-                                    <button 
-                                        key={option} 
-                                        onClick={() => handleScenarioSubmit(quest.id, option)}
-                                        className="w-full text-left p-3 mb-2 bg-stone-800 border border-stone-600 rounded hover:bg-stone-700 hover:border-yellow-500 transition-colors text-stone-200"
-                                    >
-                                        {option}
-                                    </button>
-                                ))}
-                            </div>
+                            !currentScenario ? (
+                                <button onClick={() => rollScenario(quest)} className="w-full px-4 py-3 bg-gradient-to-r from-orange-700 to-yellow-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm hover:from-orange-600 hover:to-yellow-500 flex items-center justify-center gap-2">Face a Scenario</button>
+                            ) : (
+                                <div>
+                                    <p className="text-lg text-white mb-3">{currentScenario.q}</p>
+                                    {currentScenario.options.map(option => (
+                                        <button 
+                                            key={option} 
+                                            onClick={() => handleScenarioSubmit(quest.id, option)}
+                                            className="w-full text-left p-3 mb-2 bg-stone-800 border border-stone-600 rounded hover:bg-stone-700 hover:border-yellow-500 transition-colors text-stone-200"
+                                        >
+                                            {option}
+                                        </button>
+                                    ))}
+                                </div>
+                            )
                         ) : quest.type === 'quiz' ? (
                           <div className="flex items-center gap-2"><input type="text" placeholder="> enter solution..." value={staticQuizAnswers[quest.id] || ''} onChange={(e) => handleStaticQuizAnswerChange(quest.id, e.target.value)} className="bg-black/80 border border-stone-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-green-500" /><button onClick={() => handleStaticQuizSubmit(quest.id)} className="px-3 py-2 bg-yellow-600 text-black rounded-lg hover:bg-yellow-500 font-['VT323'] text-lg">EXECUTE</button></div>
                         ) : quest.type === 'journal' ? (

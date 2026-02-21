@@ -47,10 +47,8 @@ const TeacherDashboard = () => {
     
     let questToCreate = { ...newQuest };
 
-    if (questToCreate.type === 'quiz') {
-      if (!questToCreate.correctAnswer) {
+    if (questToCreate.type === 'quiz' || questToCreate.type === 'scenario') {
         questToCreate.questionBank = [];
-      }
     } else {
       delete questToCreate.correctAnswer;
       delete questToCreate.timeLimit;
@@ -73,20 +71,38 @@ const TeacherDashboard = () => {
 
   const handleFileImport = (e) => {
     const file = e.target.files[0];
-    if (!file || !selectedQuestRef.current) return;
+    const questId = selectedQuestRef.current;
+    if (!file || !questId) return;
+
+    const targetQuest = quests.find(q => q.id === questId);
+    if (!targetQuest) {
+        alert('Target quest not found!');
+        return;
+    }
 
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
         const text = event.target.result;
         const lines = text.split('\n').filter(line => line.trim() !== '');
+        
         const parsedData = lines.map(line => {
-          const [q, a] = line.split(',');
-          if (!q || !a) throw new Error('Invalid CSV line format.');
-          return { q: q.trim(), a: a.trim() };
-        });
+            const cols = line.split(',').map(c => c.trim());
+            if (targetQuest.type === 'quiz') {
+                if (cols.length < 2 || !cols[0] || !cols[1]) return null;
+                return { q: cols[0], a: cols[1] };
+            } else if (targetQuest.type === 'scenario') {
+                if (cols.length < 5 || !cols[0] || !cols[4]) return null;
+                return { q: cols[0], options: [cols[1], cols[2], cols[3]], a: cols[4] };
+            }
+            return null;
+        }).filter(Boolean);
 
-        importQuestions(selectedQuestRef.current, parsedData);
+        if (parsedData.length === 0) {
+            throw new Error('No valid data found in CSV.');
+        }
+
+        importQuestions(questId, parsedData);
         alert(`Successfully imported ${parsedData.length} questions!`);
       } catch (error) {
         alert(`Import failed: ${error.message}`);
@@ -235,6 +251,7 @@ const TeacherDashboard = () => {
                       <select value={newQuest.type} onChange={e => setNewQuest({ ...newQuest, type: e.target.value })} className="w-full p-2 border rounded bg-stone-800 border-stone-700 text-white">
                         <option value="upload">Upload</option>
                         <option value="quiz">Quiz</option>
+                        <option value="scenario">Scenario</option>
                         <option value="journal">Journal</option>
                       </select>
                     </div>
@@ -282,11 +299,13 @@ const TeacherDashboard = () => {
                 <div key={q.id} className="bg-stone-800/80 p-3 rounded shadow-md border border-stone-700 flex justify-between items-center">
                   <div>
                     <span className="font-bold text-stone-300">{q.title}</span>
-                    <span className={`text-xs ml-2 px-2 py-1 rounded ${q.type === 'quiz' ? 'bg-purple-900/80 text-purple-300' : 'bg-stone-700/80 text-stone-400'}`}>{q.questionBank ? 'Dynamic Quiz' : q.type}</span>
+                    <span className={`text-xs ml-2 px-2 py-1 rounded ${q.type === 'quiz' ? 'bg-purple-900/80 text-purple-300' : q.type === 'scenario' ? 'bg-orange-900/80 text-orange-300' : 'bg-stone-700/80 text-stone-400'}`}>
+                        {q.type}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs bg-yellow-400/20 text-yellow-300 px-2 py-1 rounded">{q.xp} XP / {q.gold} G</span>
-                    {q.type === 'quiz' && q.questionBank && (
+                    {(q.type === 'quiz' || q.type === 'scenario') && q.questionBank && (
                       <button 
                         onClick={() => handleImportClick(q.id)}
                         className="bg-blue-900/80 text-blue-300 px-2 py-1 rounded hover:bg-blue-800/80 text-xs font-semibold flex items-center gap-1"
