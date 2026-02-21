@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, CheckCircle, Coins, Star, Brain, Zap, AlertTriangle, Upload, Clock, BookText } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Coins, Star, Brain, Zap, AlertTriangle, Upload, Clock, BookText, MessageSquare } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const VICTORY_QUOTES = [
@@ -136,7 +136,7 @@ const QuestBoard = () => {
 
   const handleDynamicQuizSubmit = async (questId) => {
     const session = activeSessions[questId];
-    const answer = sessionAnswers[questId];
+    const answer = sessionAnswers[questId] || '';
     if (!session || !session.isActive) return;
 
     const result = await attemptQuiz(questId, answer, session.currentQuestion.a);
@@ -145,7 +145,7 @@ const QuestBoard = () => {
       triggerVictory(result.message);
       setActiveSessions(prev => ({...prev, [questId]: { isActive: false } }));
     } else {
-      alert('Incorrect! -5 seconds.');
+      alert('The spell fizzled! Check punctuation. -5 seconds.');
       setActiveSessions(prev => ({...prev, [questId]: {...prev[questId], timeLeft: Math.max(0, prev[questId].timeLeft - 5)}}));
     }
   };
@@ -172,6 +172,15 @@ const QuestBoard = () => {
     }
   };
 
+  const getQuestIcon = (quest) => {
+    switch(quest.type) {
+        case 'incantation': return <MessageSquare size={20} />;
+        case 'quiz': return quest.questionBank?.length > 0 ? <Zap size={20} /> : <Brain size={20} />;
+        case 'multi-step': return <BookText size={20} />;
+        default: return <Brain size={20} />;
+    }
+  }
+
   return (
     <div className="min-h-screen text-stone-200 p-6 relative">
       <img src={MAP_BG} alt="Background Map" className="absolute inset-0 w-full h-full object-cover" />
@@ -190,10 +199,11 @@ const QuestBoard = () => {
           <div className="grid gap-4">
             {quests.map((quest) => {
               const status = getQuestStatus(quest.id);
-              const isDynamicQuiz = quest.type === 'quiz' && quest.questionBank?.length > 0;
+              const isTimedChallenge = (quest.type === 'quiz' || quest.type === 'incantation') && quest.questionBank?.length > 0;
               const isMultiStep = quest.type === 'multi-step';
               const isScenario = quest.type === 'scenario';
               const session = activeSessions[quest.id];
+              const currentAnswer = sessionAnswers[quest.id] || '';
               const currentScenario = activeScenarios[quest.id];
               const currentStepIndex = stepTracker[quest.id] || 0;
               const currentStep = isMultiStep ? quest.steps[currentStepIndex] : null;
@@ -202,6 +212,7 @@ const QuestBoard = () => {
                 if (status === 'approved') return 'border-l-green-500 bg-green-900/40';
                 if (isMultiStep) return 'border-l-purple-500';
                 if (isScenario) return 'border-l-orange-500';
+                if (quest.type === 'incantation') return 'border-l-cyan-500';
                 return 'border-l-blue-500';
               };
 
@@ -210,7 +221,7 @@ const QuestBoard = () => {
                   <div className="flex justify-between items-start">
                     <div className="font-['VT323'] text-xl flex-grow">
                       <h3 className="text-2xl mb-2 flex items-center gap-2 text-white">
-                        {isDynamicQuiz ? <Zap size={20} /> : isMultiStep ? <BookText size={20} /> : <Brain size={20} />}
+                        {getQuestIcon(quest)}
                         {quest.title}
                       </h3>
                       <p className="text-stone-300 mb-4 text-lg">{quest.description}</p>
@@ -218,17 +229,35 @@ const QuestBoard = () => {
                     </div>
                     <div className="flex-shrink-0 w-1/2 ml-4">
                       {status === 'available' ? (
-                        isDynamicQuiz ? (
+                        isTimedChallenge ? (
                           session?.isActive && session.timeLeft > 0 ? (
                             <div className="space-y-3">
-                              <div className="text-center font-bold text-4xl text-red-500 font-mono">{session.timeLeft}s</div>
-                              <p className="text-lg text-center text-white">{session.currentQuestion.q}</p>
-                              <div className="flex items-center gap-2"><input type="text" value={sessionAnswers[quest.id] || ''} onChange={(e) => setSessionAnswers(p => ({...p, [quest.id]: e.target.value}))} onKeyPress={(e) => e.key === 'Enter' && handleDynamicQuizSubmit(quest.id)} placeholder="> answer" className="bg-black/80 border border-stone-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-green-500" autoFocus /><button onClick={() => handleDynamicQuizSubmit(quest.id)} className="px-3 py-2 bg-yellow-600 text-black rounded-lg hover:bg-yellow-500 font-['VT323'] text-lg">CHECK</button></div>
-                            </div>
+                               <div className="text-center font-bold text-4xl text-red-500 font-mono">{session.timeLeft}s</div>
+                               <p className={`text-lg text-center text-white transition-opacity duration-500 ${(quest.type === 'incantation' && currentAnswer.length > 0) ? 'opacity-0' : 'opacity-100'}`}>
+                                   {session.currentQuestion.q}
+                               </p>
+                               <div className="flex items-center gap-2">
+                                   <input 
+                                       type="text" 
+                                       value={currentAnswer}
+                                       onChange={(e) => setSessionAnswers(p => ({...p, [quest.id]: e.target.value}))} 
+                                       onKeyPress={(e) => e.key === 'Enter' && handleDynamicQuizSubmit(quest.id)} 
+                                       onPaste={(e) => quest.type === 'incantation' && e.preventDefault()} 
+                                       placeholder="> type here..."
+                                       className="bg-black/80 border border-stone-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-green-500" 
+                                       autoFocus 
+                                   />
+                                   <button onClick={() => handleDynamicQuizSubmit(quest.id)} className="px-3 py-2 bg-yellow-600 text-black rounded-lg hover:bg-yellow-500 font-['VT323'] text-lg">
+                                       {quest.type === 'incantation' ? 'CAST' : 'CHECK'}
+                                   </button>
+                               </div>
+                           </div>
                           ) : session?.isActive && session.timeLeft === 0 ? (
                             <div className="text-center"><div className="p-2 bg-red-900/50 text-red-400 rounded-lg flex items-center justify-center gap-2 font-bold"><AlertTriangle size={18}/>Time's Up!</div><button onClick={() => startDynamicQuiz(quest)} className="mt-2 w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 font-['Press_Start_2P'] text-xs">TRY AGAIN</button></div>
                           ) : (
-                            <button onClick={() => startDynamicQuiz(quest)} className="w-full px-4 py-3 bg-gradient-to-r from-red-700 to-yellow-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm hover:from-red-600 hover:to-yellow-500 flex items-center justify-center gap-2"><Zap size={18} />START SPEED RUN ({quest.timeLimit}s)</button>
+                            <button onClick={() => startDynamicQuiz(quest)} className="w-full px-4 py-3 bg-gradient-to-r from-red-700 to-yellow-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm hover:from-red-600 hover:to-yellow-500 flex items-center justify-center gap-2">
+                                <Zap size={18} /> {quest.type === 'incantation' ? 'START INCANTATION' : `START SPEED RUN (${quest.timeLimit}s)`}
+                            </button>
                           )
                         ) : isMultiStep ? (
                           <div className="space-y-3">

@@ -3,11 +3,11 @@ import React, { createContext, useContext, useState } from 'react';
 const GameContext = createContext();
 
 const INITIAL_STUDENTS = [
-  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0 },
-  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 880, finalGPA: 900, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Vamphunter1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0 },
-  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 600, finalGPA: 700, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Baller.outfit2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0 },
-  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 920, finalGPA: null, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Powerful.golden.armour.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0 },
-  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dark.souls1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0 },
+  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0 },
+  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 880, finalGPA: 900, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Vamphunter1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0 },
+  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 600, finalGPA: 700, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Baller.outfit2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0 },
+  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 920, finalGPA: null, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Powerful.golden.armour.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0 },
+  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dark.souls1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0 },
 ];
 
 const BOSSES = [
@@ -34,6 +34,10 @@ const BOSSES = [
   { id: 402, name: 'Timekeeper Knight', requirement: 'streak', target: 10, rewardGold: 100, rewardXp: 100, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Timekeeper.Knight.png', tier: 2 },
   { id: 403, name: 'Hourglass Golem', requirement: 'streak', target: 15, rewardGold: 200, rewardXp: 200, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Hourglass.Golem.png', tier: 3 },
   { id: 404, name: 'Chronos Titan', requirement: 'streak', target: 20, rewardGold: 400, rewardXp: 400, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Chronos.Titan.png', tier: 5 },
+
+  // Track 5: Spectral Scribes (Incantations)
+  { id: 901, name: 'Haunted Quill', requirement: 'incantations', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/slime.png' },
+  { id: 902, name: 'Spectral Typist', requirement: 'incantations', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Goblin.png' },
 ];
 
 const VICTORY_QUOTES = [
@@ -88,9 +92,23 @@ export function GameProvider({ children }) {
           { q: "You find a locked chest. Do you:", options: ["Smash it", "Pick lock", "Leave it"], a: "Pick lock" }
       ]
     },
+    { 
+        id: 107,
+        title: "The Memory Spell",
+        description: "Memorize the phrase, then type it perfectly before time runs out!",
+        type: 'incantation',
+        xp: 60,
+        gold: 20,
+        frequency: 'daily',
+        timeLimit: 45,
+        questionBank: [
+            { q: "To be, or not to be, that is the question.", a: "To be, or not to be, that is the question." },
+            { q: "The quick brown fox jumps over the lazy dog.", a: "The quick brown fox jumps over the lazy dog." }
+        ]
+    },
     { id: 106, title: "Weekly Reflection", description: "Write a short paragraph about what you learned this week.", xp: 100, gold: 50, type: 'journal', frequency: 'weekly', unlockDate: '2025-01-01' },
     { 
-      id: 107, 
+      id: 109, 
       title: "Long Division Helper",
       description: "Let's solve 144 / 12 step-by-step.",
       type: 'multi-step',
@@ -197,12 +215,18 @@ export function GameProvider({ children }) {
     if (!quest) return { success: false, message: "Quest not found!" };
 
     const correctAnswer = dynamicCorrectAnswer !== null ? dynamicCorrectAnswer : quest.correctAnswer;
+    let isCorrect = false;
 
-    if (typeof correctAnswer !== 'string') {
-      return { success: false, message: "Incorrect answer. Try again!" };
+    if (quest.type === 'incantation') {
+        isCorrect = userAnswer.trim() === correctAnswer.trim();
+    } else {
+        if (typeof correctAnswer !== 'string') {
+            return { success: false, message: "Incorrect answer. Try again!" };
+        }
+        isCorrect = userAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
     }
 
-    if (userAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase()) {
+    if (isCorrect) {
       if (!isFinalStep) {
         return { success: true, message: "Correct! Keep going..." };
       }
@@ -215,6 +239,7 @@ export function GameProvider({ children }) {
             gold: student.gold + quest.gold,
             quizQuestsCompleted: quest.type === 'quiz' ? (student.quizQuestsCompleted || 0) + 1 : student.quizQuestsCompleted,
             multiStepQuestsCompleted: quest.type === 'multi-step' ? (student.multiStepQuestsCompleted || 0) + 1 : student.multiStepQuestsCompleted,
+            incantationQuestsCompleted: quest.type === 'incantation' ? (student.incantationQuestsCompleted || 0) + 1 : student.incantationQuestsCompleted,
           };
         }
         return student;
@@ -227,6 +252,7 @@ export function GameProvider({ children }) {
         gold: currentUser.gold + quest.gold,
         quizQuestsCompleted: quest.type === 'quiz' ? (currentUser.quizQuestsCompleted || 0) + 1 : currentUser.quizQuestsCompleted,
         multiStepQuestsCompleted: quest.type === 'multi-step' ? (currentUser.multiStepQuestsCompleted || 0) + 1 : currentUser.multiStepQuestsCompleted,
+        incantationQuestsCompleted: quest.type === 'incantation' ? (currentUser.incantationQuestsCompleted || 0) + 1 : currentUser.incantationQuestsCompleted,
       };
       setCurrentUser(updatedCurrentUser);
 
@@ -411,6 +437,9 @@ export function GameProvider({ children }) {
         break;
       case 'multistep':
         requirementMet = (currentUser.multiStepQuestsCompleted || 0) >= boss.target;
+        break;
+      case 'incantations':
+        requirementMet = (currentUser.incantationQuestsCompleted || 0) >= boss.target;
         break;
       case 'streak':
         requirementMet = (currentUser.loginStreak || 0) >= boss.target;

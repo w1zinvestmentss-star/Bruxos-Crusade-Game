@@ -47,7 +47,7 @@ const TeacherDashboard = () => {
     
     let questToCreate = { ...newQuest };
 
-    if (questToCreate.type === 'quiz' || questToCreate.type === 'scenario') {
+    if (questToCreate.type === 'quiz' || questToCreate.type === 'scenario' || questToCreate.type === 'incantation') {
         questToCreate.questionBank = [];
     } else {
       delete questToCreate.correctAnswer;
@@ -94,6 +94,9 @@ const TeacherDashboard = () => {
             } else if (targetQuest.type === 'scenario') {
                 if (cols.length < 5 || !cols[0] || !cols[4]) return null;
                 return { q: cols[0], options: [cols[1], cols[2], cols[3]], a: cols[4] };
+            } else if (targetQuest.type === 'incantation') {
+                if (cols.length < 1 || !cols[0]) return null;
+                return { q: cols[0], a: cols[0] };
             }
             return null;
         }).filter(Boolean);
@@ -252,6 +255,7 @@ const TeacherDashboard = () => {
                         <option value="upload">Upload</option>
                         <option value="quiz">Quiz</option>
                         <option value="scenario">Scenario</option>
+                        <option value="incantation">Incantation</option>
                         <option value="journal">Journal</option>
                       </select>
                     </div>
@@ -299,13 +303,13 @@ const TeacherDashboard = () => {
                 <div key={q.id} className="bg-stone-800/80 p-3 rounded shadow-md border border-stone-700 flex justify-between items-center">
                   <div>
                     <span className="font-bold text-stone-300">{q.title}</span>
-                    <span className={`text-xs ml-2 px-2 py-1 rounded ${q.type === 'quiz' ? 'bg-purple-900/80 text-purple-300' : q.type === 'scenario' ? 'bg-orange-900/80 text-orange-300' : 'bg-stone-700/80 text-stone-400'}`}>
+                     <span className={`text-xs ml-2 px-2 py-1 rounded ${q.type === 'quiz' ? 'bg-purple-900/80 text-purple-300' : q.type === 'scenario' ? 'bg-orange-900/80 text-orange-300' : q.type === 'incantation' ? 'bg-cyan-900/80 text-cyan-300' : 'bg-stone-700/80 text-stone-400'}`}>
                         {q.type}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs bg-yellow-400/20 text-yellow-300 px-2 py-1 rounded">{q.xp} XP / {q.gold} G</span>
-                    {(q.type === 'quiz' || q.type === 'scenario') && q.questionBank && (
+                    {(q.type === 'quiz' || q.type === 'scenario' || q.type === 'incantation') && q.questionBank && (
                       <button 
                         onClick={() => handleImportClick(q.id)}
                         className="bg-blue-900/80 text-blue-300 px-2 py-1 rounded hover:bg-blue-800/80 text-xs font-semibold flex items-center gap-1"
