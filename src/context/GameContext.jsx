@@ -3,11 +3,11 @@ import React, { createContext, useContext, useState } from 'react';
 const GameContext = createContext();
 
 const INITIAL_STUDENTS = [
-  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0 },
-  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 880, finalGPA: 900, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Vamphunter1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0 },
-  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 600, finalGPA: 700, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Baller.outfit2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0 },
-  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 920, finalGPA: null, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Powerful.golden.armour.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0 },
-  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dark.souls1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0 },
+  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0 },
+  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 880, finalGPA: 900, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Vamphunter1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0 },
+  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 600, finalGPA: 700, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Baller.outfit2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0 },
+  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 920, finalGPA: null, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Powerful.golden.armour.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0 },
+  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dark.souls1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0 },
 ];
 
 const BOSSES = [
@@ -38,6 +38,14 @@ const BOSSES = [
   // Track 5: Spectral Scribes (Incantations)
   { id: 901, name: 'Haunted Quill', requirement: 'incantations', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/slime.png' },
   { id: 902, name: 'Spectral Typist', requirement: 'incantations', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Goblin.png' },
+
+  // Track 7: Colossi (Sports)
+  { id: 701, name: 'Earth Elemental', requirement: 'sports', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Goblin.png' },
+  { id: 702, name: 'Mountain Titan', requirement: 'sports', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/slime.png' },
+
+  // Track 8: Muses (Arts)
+  { id: 801, name: 'Crystal Butterfly', requirement: 'arts', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/slime.png' },
+  { id: 802, name: 'Prism Weaver', requirement: 'arts', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Goblin.png' },
 ];
 
 const VICTORY_QUOTES = [
@@ -79,7 +87,7 @@ export function GameProvider({ children }) {
     },
     { id: 104, title: "History Check", description: "What year did WWII end?", correctAnswer: "1945", xp: 50, gold: 20, type: 'quiz', frequency: 'once', unlockDate: yesterdayString },
     {
-      id: 108, // New ID
+      id: 110, // New ID
       title: "The Crossroads",
       description: "A series of critical choices await.",
       type: 'scenario',
@@ -108,7 +116,7 @@ export function GameProvider({ children }) {
     },
     { id: 106, title: "Weekly Reflection", description: "Write a short paragraph about what you learned this week.", xp: 100, gold: 50, type: 'journal', frequency: 'weekly', unlockDate: '2025-01-01' },
     { 
-      id: 109, 
+      id: 111, 
       title: "Long Division Helper",
       description: "Let's solve 144 / 12 step-by-step.",
       type: 'multi-step',
@@ -122,7 +130,9 @@ export function GameProvider({ children }) {
         { q: "Step 3: Subtract 14 - 12. What is the remainder?", a: "2" },
         { q: "Step 4: Bring down the 4. What is 24 / 12?", a: "2" }
       ]
-    }
+    },
+    { id: 108, title: "Scout Report: Athletics", description: "Complete a 1-mile walk and upload a photo of your route/shoes.", type: 'scout-sports', xp: 100, gold: 40, frequency: 'daily' },
+    { id: 109, title: "Scout Report: The Arts", description: "Draw a sketch of a castle and upload a picture of it.", type: 'scout-arts', xp: 100, gold: 40, frequency: 'weekly' },
   ];
 
   const [students, setStudents] = useState(INITIAL_STUDENTS);
@@ -185,13 +195,23 @@ export function GameProvider({ children }) {
           gold: quest.gold,
           quote: VICTORY_QUOTES[Math.floor(Math.random() * VICTORY_QUOTES.length)]
         };
-        return {
+        
+        const updatedStudent = {
           ...student,
           xp: student.xp + quest.xp,
           gold: student.gold + quest.gold,
           notifications: [...student.notifications, newNotification],
-          uploadQuestsCompleted: submission.type === 'upload' ? (student.uploadQuestsCompleted || 0) + 1 : student.uploadQuestsCompleted,
         };
+
+        if (quest.type === 'upload') {
+            updatedStudent.uploadQuestsCompleted = (student.uploadQuestsCompleted || 0) + 1;
+        } else if (quest.type === 'scout-sports') {
+            updatedStudent.sportsQuestsCompleted = (student.sportsQuestsCompleted || 0) + 1;
+        } else if (quest.type === 'scout-arts') {
+            updatedStudent.artsQuestsCompleted = (student.artsQuestsCompleted || 0) + 1;
+        }
+        
+        return updatedStudent;
       }
       return student;
     }));
@@ -201,12 +221,20 @@ export function GameProvider({ children }) {
     ));
     
     if (currentUser && currentUser.id === submission.studentId) {
-       setCurrentUser(prev => ({
-          ...prev,
-          xp: prev.xp + quest.xp,
-          gold: prev.gold + quest.gold,
-          uploadQuestsCompleted: submission.type === 'upload' ? (prev.uploadQuestsCompleted || 0) + 1 : prev.uploadQuestsCompleted,
-       }));
+       setCurrentUser(prev => {
+           const updatedUser = { ...prev };
+            updatedUser.xp += quest.xp;
+            updatedUser.gold += quest.gold;
+
+           if (quest.type === 'upload') {
+                updatedUser.uploadQuestsCompleted = (prev.uploadQuestsCompleted || 0) + 1;
+            } else if (quest.type === 'scout-sports') {
+                updatedUser.sportsQuestsCompleted = (prev.sportsQuestsCompleted || 0) + 1;
+            } else if (quest.type === 'scout-arts') {
+                updatedUser.artsQuestsCompleted = (prev.artsQuestsCompleted || 0) + 1;
+            }
+            return updatedUser;
+       });
     }
   };
 
@@ -440,6 +468,12 @@ export function GameProvider({ children }) {
         break;
       case 'incantations':
         requirementMet = (currentUser.incantationQuestsCompleted || 0) >= boss.target;
+        break;
+      case 'sports':
+        requirementMet = (currentUser.sportsQuestsCompleted || 0) >= boss.target;
+        break;
+      case 'arts':
+        requirementMet = (currentUser.artsQuestsCompleted || 0) >= boss.target;
         break;
       case 'streak':
         requirementMet = (currentUser.loginStreak || 0) >= boss.target;

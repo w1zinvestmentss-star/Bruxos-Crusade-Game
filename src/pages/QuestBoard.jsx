@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, CheckCircle, Coins, Star, Brain, Zap, AlertTriangle, Upload, Clock, BookText, MessageSquare } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Coins, Star, Brain, Zap, AlertTriangle, Upload, Clock, BookText, MessageSquare, Swords, Palette } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const VICTORY_QUOTES = [
@@ -60,8 +60,10 @@ const QuestBoard = () => {
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
-    if (file && selectedQuestRef.current) {
-      submitQuest(selectedQuestRef.current, file, 'upload');
+    const questId = selectedQuestRef.current
+    if (file && questId) {
+      const quest = quests.find(q => q.id === questId);
+      submitQuest(questId, file, quest.type);
       alert('Proof Submitted! Awaiting Teacher Review.');
     }
   };
@@ -177,6 +179,8 @@ const QuestBoard = () => {
         case 'incantation': return <MessageSquare size={20} />;
         case 'quiz': return quest.questionBank?.length > 0 ? <Zap size={20} /> : <Brain size={20} />;
         case 'multi-step': return <BookText size={20} />;
+        case 'scout-sports': return <Swords size={20} />;
+        case 'scout-arts': return <Palette size={20} />;
         default: return <Brain size={20} />;
     }
   }
@@ -202,6 +206,7 @@ const QuestBoard = () => {
               const isTimedChallenge = (quest.type === 'quiz' || quest.type === 'incantation') && quest.questionBank?.length > 0;
               const isMultiStep = quest.type === 'multi-step';
               const isScenario = quest.type === 'scenario';
+              const isUpload = ['upload', 'scout-sports', 'scout-arts'].includes(quest.type);
               const session = activeSessions[quest.id];
               const currentAnswer = sessionAnswers[quest.id] || '';
               const currentScenario = activeScenarios[quest.id];
@@ -213,6 +218,8 @@ const QuestBoard = () => {
                 if (isMultiStep) return 'border-l-purple-500';
                 if (isScenario) return 'border-l-orange-500';
                 if (quest.type === 'incantation') return 'border-l-cyan-500';
+                if (quest.type === 'scout-sports') return 'border-l-orange-400';
+                if (quest.type === 'scout-arts') return 'border-l-pink-500';
                 return 'border-l-blue-500';
               };
 
@@ -287,9 +294,9 @@ const QuestBoard = () => {
                           <div className="flex items-center gap-2"><input type="text" placeholder="> enter solution..." value={staticQuizAnswers[quest.id] || ''} onChange={(e) => handleStaticQuizAnswerChange(quest.id, e.target.value)} className="bg-black/80 border border-stone-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-green-500" /><button onClick={() => handleStaticQuizSubmit(quest.id)} className="px-3 py-2 bg-yellow-600 text-black rounded-lg hover:bg-yellow-500 font-['VT323'] text-lg">EXECUTE</button></div>
                         ) : quest.type === 'journal' ? (
                           <div className="flex flex-col items-end gap-2"><textarea placeholder="Write your reflection..." value={journalTexts[quest.id] || ''} onChange={(e) => handleJournalTextChange(quest.id, e.target.value)} className="bg-black/80 border border-stone-600 rounded-md p-2 w-full h-24 text-stone-200 font-mono focus:ring-1 focus:ring-blue-500" /><button onClick={() => handleJournalSubmit(quest.id)} className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2 font-['VT323'] text-xl"><Upload size={18} /> SUBMIT</button></div>
-                        ) : (
-                          <button onClick={() => triggerUpload(quest.id)} className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2 font-['VT323'] text-xl"><Upload size={18} /> SUBMIT</button>
-                        )
+                        ) : isUpload ? (
+                          <button onClick={() => triggerUpload(quest.id)} className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2 font-['VT323'] text-xl"><Upload size={18} /> SUBMIT PROOF</button>
+                        ) : null
                       ) : status === 'pending' ? (
                         <div className="px-4 py-2 bg-yellow-900/30 text-yellow-500 rounded-lg border border-yellow-700 flex items-center justify-center gap-2 font-['VT323'] text-lg w-full h-full"><Clock size={18} /> PENDING</div>
                       ) : (
