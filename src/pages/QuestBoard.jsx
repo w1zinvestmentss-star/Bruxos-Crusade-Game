@@ -14,7 +14,7 @@ const VICTORY_QUOTES = [
 
 const QuestBoard = () => {
   const navigate = useNavigate();
-  const { quests, submitQuest, getQuestStatus, currentUser, attemptQuiz } = useGame();
+  const { quests, submitQuest, getQuestStatus, currentUser, attemptQuiz, attemptScenario } = useGame();
   
   const fileInputRef = useRef(null);
   const selectedQuestRef = useRef(null);
@@ -97,6 +97,15 @@ const QuestBoard = () => {
     }
   };
 
+  const handleScenarioSubmit = async (questId, option) => {
+    const result = await attemptScenario(questId, option);
+    if (result.success) {
+        triggerVictory(`+${quests.find(q=>q.id===questId).xp} XP, +${quests.find(q=>q.id===questId).gold} Gold`);
+    } else {
+      alert(result.message);
+    }
+  };
+
   const startDynamicQuiz = (quest) => {
     if (quest.questionBank && quest.questionBank.length > 0) {
       const randIdx = Math.floor(Math.random() * quest.questionBank.length);
@@ -168,6 +177,7 @@ const QuestBoard = () => {
               const status = getQuestStatus(quest.id);
               const isDynamicQuiz = quest.type === 'quiz' && quest.questionBank?.length > 0;
               const isMultiStep = quest.type === 'multi-step';
+              const isScenario = quest.type === 'scenario';
               const session = activeSessions[quest.id];
               const currentStepIndex = stepTracker[quest.id] || 0;
               const currentStep = isMultiStep ? quest.steps[currentStepIndex] : null;
@@ -175,6 +185,7 @@ const QuestBoard = () => {
               const getBorderColor = () => {
                 if (status === 'approved') return 'border-l-green-500 bg-green-900/40';
                 if (isMultiStep) return 'border-l-purple-500';
+                if (isScenario) return 'border-l-orange-500';
                 return 'border-l-blue-500';
               };
 
@@ -210,6 +221,18 @@ const QuestBoard = () => {
                             <p className="text-lg text-white">{currentStep.q}</p>
                             <div className="flex items-center gap-2"><input type="text" placeholder="> answer" value={staticQuizAnswers[quest.id] || ''} onChange={(e) => handleStaticQuizAnswerChange(quest.id, e.target.value)} className="bg-black/80 border border-stone-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-green-500" /><button onClick={() => handleMultiStepQuizSubmit(quest.id)} className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 font-['VT323'] text-lg">CHECK STEP</button></div>
                           </div>
+                        ) : quest.type === 'scenario' ? (
+                            <div>
+                                {quest.options.map(option => (
+                                    <button 
+                                        key={option} 
+                                        onClick={() => handleScenarioSubmit(quest.id, option)}
+                                        className="w-full text-left p-3 mb-2 bg-stone-800 border border-stone-600 rounded hover:bg-stone-700 hover:border-yellow-500 transition-colors text-stone-200"
+                                    >
+                                        {option}
+                                    </button>
+                                ))}
+                            </div>
                         ) : quest.type === 'quiz' ? (
                           <div className="flex items-center gap-2"><input type="text" placeholder="> enter solution..." value={staticQuizAnswers[quest.id] || ''} onChange={(e) => handleStaticQuizAnswerChange(quest.id, e.target.value)} className="bg-black/80 border border-stone-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-green-500" /><button onClick={() => handleStaticQuizSubmit(quest.id)} className="px-3 py-2 bg-yellow-600 text-black rounded-lg hover:bg-yellow-500 font-['VT323'] text-lg">EXECUTE</button></div>
                         ) : quest.type === 'journal' ? (

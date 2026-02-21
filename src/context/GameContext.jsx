@@ -3,11 +3,11 @@ import React, { createContext, useContext, useState } from 'react';
 const GameContext = createContext();
 
 const INITIAL_STUDENTS = [
-  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1 },
-  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 880, finalGPA: 900, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Vamphunter1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1 },
-  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 600, finalGPA: 700, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Baller.outfit2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1 },
-  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 920, finalGPA: null, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Powerful.golden.armour.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1 },
-  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dark.souls1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1 },
+  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0 },
+  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 880, finalGPA: 900, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Vamphunter1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0 },
+  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 600, finalGPA: 700, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Baller.outfit2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0 },
+  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 920, finalGPA: null, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Powerful.golden.armour.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0 },
+  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dark.souls1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0 },
 ];
 
 const BOSSES = [
@@ -74,7 +74,22 @@ export function GameProvider({ children }) {
       ]
     },
     { id: 104, title: "History Check", description: "What year did WWII end?", correctAnswer: "1945", xp: 50, gold: 20, type: 'quiz', frequency: 'once', unlockDate: yesterdayString },
-    { id: 105, title: "Future Test", description: "This quest is from the future!", correctAnswer: "flux capacitor", xp: 500, gold: 200, type: 'quiz', frequency: 'once', unlockDate: nextYearString },
+    {
+      id: 108, // New ID
+      title: "The Crossroads",
+      description: "You encounter a troll blocking a bridge. What do you do?",
+      type: 'scenario',
+      xp: 50,
+      gold: 25,
+      frequency: 'once',
+      options: [
+        'Fight the troll',
+        'Pay the toll',
+        'Try to reason with it',
+        'Swim across the river'
+      ],
+      correctAnswer: 'Pay the toll'
+    },
     { id: 106, title: "Weekly Reflection", description: "Write a short paragraph about what you learned this week.", xp: 100, gold: 50, type: 'journal', frequency: 'weekly', unlockDate: '2025-01-01' },
     { 
       id: 107, 
@@ -230,6 +245,49 @@ export function GameProvider({ children }) {
       return { success: true, message: `+${quest.xp} XP, +${quest.gold} Gold` };
     } else {
       return { success: false, message: "Incorrect answer. Try again!" };
+    }
+  };
+
+  const attemptScenario = (questId, selectedOption) => {
+    const quest = quests.find(q => q.id === questId);
+    if (!quest) return { success: false, message: "Quest not found!" };
+
+    if (selectedOption === quest.correctAnswer) {
+      const updatedStudents = students.map(student => {
+        if (student.id === currentUser.id) {
+          return {
+            ...student,
+            xp: student.xp + quest.xp,
+            gold: student.gold + quest.gold,
+            scenarioQuestsCompleted: (student.scenarioQuestsCompleted || 0) + 1,
+          };
+        }
+        return student;
+      });
+      setStudents(updatedStudents);
+
+      const updatedCurrentUser = {
+        ...currentUser,
+        xp: currentUser.xp + quest.xp,
+        gold: currentUser.gold + quest.gold,
+        scenarioQuestsCompleted: (currentUser.scenarioQuestsCompleted || 0) + 1,
+      };
+      setCurrentUser(updatedCurrentUser);
+
+      const newSubmission = {
+        id: Date.now(),
+        questId,
+        studentId: currentUser.id,
+        studentName: currentUser.heroName,
+        status: 'approved',
+        timestamp: new Date().toLocaleDateString(),
+        type: 'scenario',
+      };
+      setSubmissions(prev => [...prev, newSubmission]);
+
+      return { success: true };
+    } else {
+      return { success: false, message: "Wrong choice. The troll laughs at you!" };
     }
   };
 
@@ -438,6 +496,7 @@ export function GameProvider({ children }) {
     calculateComebackScore,
     updateStudentStats,
     attemptQuiz,
+    attemptScenario,
     clearNotifications,
     fightBoss,
     getSlayerPoints,
