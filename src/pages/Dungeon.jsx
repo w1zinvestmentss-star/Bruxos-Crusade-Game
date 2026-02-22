@@ -39,6 +39,12 @@ const Dungeon = () => {
         return currentUser.quizQuestsCompleted || 0;
       case 'multistep':
         return currentUser.multiStepQuestsCompleted || 0;
+      case 'incantations':
+        return currentUser.incantationQuestsCompleted || 0;
+      case 'sports':
+        return currentUser.sportsQuestsCompleted || 0;
+      case 'arts':
+        return currentUser.artsQuestsCompleted || 0;
       case 'streak':
         return currentUser.loginStreak || 0;
       default:
@@ -51,6 +57,9 @@ const Dungeon = () => {
       case 'uploads': return "Homework Uploads";
       case 'quizzes': return "Quizzes Aced";
       case 'multistep': return "Complex Problems";
+      case 'incantations': return "Incantations Recited";
+      case 'sports': return "Athletics Missions";
+      case 'arts': return "Creative Missions";
       case 'streak': return "Days in a Row";
       default: return "Requirement";
     }
