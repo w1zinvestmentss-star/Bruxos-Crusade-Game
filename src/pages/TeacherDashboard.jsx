@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Plus, Check, Search, Image as ImageIcon, BookCopy, Save, Upload, Clock, Shield, Star, DollarSign, Swords, Skull } from 'lucide-react';
+import { LogOut, Plus, Check, Search, Image as ImageIcon, BookCopy, Save, Upload, Clock, Shield, Star, DollarSign, Swords, Skull, Heart } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const TeacherDashboard = () => {
@@ -148,6 +148,16 @@ const TeacherDashboard = () => {
   };
 
   const pendingSubmissions = submissions.filter(s => s.status === 'pending');
+  const wellnessLogs = submissions.filter(s => s.type === 'wellness');
+
+  const getFeelingClass = (feeling) => {
+    switch(feeling) {
+        case 'Strong': return 'border-l-green-500 bg-green-900/30';
+        case 'Weary': return 'border-l-yellow-500 bg-yellow-900/30';
+        case 'Wounded': return 'border-l-red-500 bg-red-900/30';
+        default: return 'border-l-stone-500';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-stone-950 text-stone-200 font-sans">
@@ -183,9 +193,9 @@ const TeacherDashboard = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Approvals Section */}
-          <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-6">
+          <div className="lg:col-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-6">
             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 text-stone-200">
               <Search className="text-blue-400" /> Pending Approvals ({pendingSubmissions.length})
             </h2>
@@ -233,8 +243,32 @@ const TeacherDashboard = () => {
             </div>
           </div>
 
+          {/* Wellness Logs Section */}
+          <div className="lg:col-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-6">
+            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 text-stone-200">
+                <Heart className="text-red-400" /> Tavern Logs (Wellness)
+            </h2>
+            <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                {wellnessLogs.length === 0 ? (
+                    <div className="p-8 bg-black/20 rounded-xl border border-white/10 text-center text-stone-400 italic">
+                        No wellness check-ins yet.
+                    </div>
+                ) : (
+                    wellnessLogs.map(log => (
+                        <div key={log.id} className={`p-3 rounded-lg flex justify-between items-center border-l-4 ${getFeelingClass(log.feeling)}`}>
+                            <div>
+                                <p className="font-bold text-stone-100">{log.studentName}</p>
+                                <p className="text-xs text-stone-400">{log.timestamp}</p>
+                            </div>
+                            <p className="font-bold text-lg">{log.feeling}</p>
+                        </div>
+                    ))
+                )}
+            </div>
+          </div>
+
           {/* Quests Section */}
-          <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-6">
+          <div className="lg:col-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-stone-200">Active Quests</h2>
               <button onClick={() => setShowCreateForm(!showCreateForm)} className="bg-yellow-500 text-black px-3 py-1 rounded hover:bg-yellow-400 flex items-center gap-2 text-sm font-bold">

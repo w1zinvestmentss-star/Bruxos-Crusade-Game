@@ -45,6 +45,8 @@ const Dungeon = () => {
         return currentUser.sportsQuestsCompleted || 0;
       case 'arts':
         return currentUser.artsQuestsCompleted || 0;
+      case 'wellness':
+        return currentUser.wellnessQuestsCompleted || 0;
       case 'streak':
         return currentUser.loginStreak || 0;
       default:
@@ -60,6 +62,7 @@ const Dungeon = () => {
       case 'incantations': return "Incantations Recited";
       case 'sports': return "Athletics Missions";
       case 'arts': return "Creative Missions";
+      case 'wellness': return "Tavern Rests";
       case 'streak': return "Days in a Row";
       default: return "Requirement";
     }

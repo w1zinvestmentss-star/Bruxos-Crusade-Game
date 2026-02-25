@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, CheckCircle, Coins, Star, Brain, Zap, AlertTriangle, Upload, Clock, BookText, MessageSquare, Swords, Palette } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Coins, Star, Brain, Zap, AlertTriangle, Upload, Clock, BookText, MessageSquare, Swords, Palette, Heart } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const VICTORY_QUOTES = [
@@ -14,7 +14,7 @@ const VICTORY_QUOTES = [
 
 const QuestBoard = () => {
   const navigate = useNavigate();
-  const { quests, submitQuest, getQuestStatus, currentUser, attemptQuiz, attemptScenario } = useGame();
+  const { quests, submitQuest, getQuestStatus, currentUser, attemptQuiz, attemptScenario, submitWellnessCheck } = useGame();
   
   const fileInputRef = useRef(null);
   const selectedQuestRef = useRef(null);
@@ -101,6 +101,15 @@ const QuestBoard = () => {
     }
   };
 
+  const handleWellnessSubmit = async (questId, feeling) => {
+    const result = await submitWellnessCheck(questId, feeling);
+    if (result.success) {
+      const quest = quests.find(q => q.id === questId);
+      triggerVictory(`+${quest.xp} XP, +${quest.gold} Gold`);
+      alert('The tavern keeper slides you a warm drink. Rest well!');
+    }
+  };
+
   const rollScenario = (quest) => {
     const randomScenario = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
     setActiveScenarios(prev => ({ ...prev, [quest.id]: randomScenario }));
@@ -181,6 +190,7 @@ const QuestBoard = () => {
         case 'multi-step': return <BookText size={20} />;
         case 'scout-sports': return <Swords size={20} />;
         case 'scout-arts': return <Palette size={20} />;
+        case 'wellness': return <Heart size={20} />;
         default: return <Brain size={20} />;
     }
   }
@@ -207,6 +217,7 @@ const QuestBoard = () => {
               const isMultiStep = quest.type === 'multi-step';
               const isScenario = quest.type === 'scenario';
               const isUpload = ['upload', 'scout-sports', 'scout-arts'].includes(quest.type);
+              const isWellness = quest.type === 'wellness';
               const session = activeSessions[quest.id];
               const currentAnswer = sessionAnswers[quest.id] || '';
               const currentScenario = activeScenarios[quest.id];
@@ -214,12 +225,13 @@ const QuestBoard = () => {
               const currentStep = isMultiStep ? quest.steps[currentStepIndex] : null;
 
               const getBorderColor = () => {
-                if (status === 'approved') return 'border-l-green-500 bg-green-900/40';
+                if (status === 'approved' || status === 'read_only') return 'border-l-green-500 bg-green-900/40';
                 if (isMultiStep) return 'border-l-purple-500';
                 if (isScenario) return 'border-l-orange-500';
                 if (quest.type === 'incantation') return 'border-l-cyan-500';
                 if (quest.type === 'scout-sports') return 'border-l-orange-400';
                 if (quest.type === 'scout-arts') return 'border-l-pink-500';
+                if (isWellness) return 'border-l-red-500';
                 return 'border-l-blue-500';
               };
 
@@ -292,6 +304,12 @@ const QuestBoard = () => {
                             )
                         ) : quest.type === 'quiz' ? (
                           <div className="flex items-center gap-2"><input type="text" placeholder="> enter solution..." value={staticQuizAnswers[quest.id] || ''} onChange={(e) => handleStaticQuizAnswerChange(quest.id, e.target.value)} className="bg-black/80 border border-stone-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-green-500" /><button onClick={() => handleStaticQuizSubmit(quest.id)} className="px-3 py-2 bg-yellow-600 text-black rounded-lg hover:bg-yellow-500 font-['VT323'] text-lg">EXECUTE</button></div>
+                        ) : isWellness ? (
+                            <div className="flex items-center justify-around gap-2">
+                                <button onClick={() => handleWellnessSubmit(quest.id, 'Strong')} className="px-3 py-2 rounded-lg bg-green-900/50 text-green-400 hover:bg-green-800 font-bold">🟢 Strong</button>
+                                <button onClick={() => handleWellnessSubmit(quest.id, 'Weary')} className="px-3 py-2 rounded-lg bg-yellow-900/50 text-yellow-400 hover:bg-yellow-800 font-bold">🟡 Weary</button>
+                                <button onClick={() => handleWellnessSubmit(quest.id, 'Wounded')} className="px-3 py-2 rounded-lg bg-red-900/50 text-red-400 hover:bg-red-800 font-bold">🔴 Wounded</button>
+                            </div>
                         ) : quest.type === 'journal' ? (
                           <div className="flex flex-col items-end gap-2"><textarea placeholder="Write your reflection..." value={journalTexts[quest.id] || ''} onChange={(e) => handleJournalTextChange(quest.id, e.target.value)} className="bg-black/80 border border-stone-600 rounded-md p-2 w-full h-24 text-stone-200 font-mono focus:ring-1 focus:ring-blue-500" /><button onClick={() => handleJournalSubmit(quest.id)} className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2 font-['VT323'] text-xl"><Upload size={18} /> SUBMIT</button></div>
                         ) : isUpload ? (
