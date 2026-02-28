@@ -16,7 +16,8 @@ const Barracks = () => {
       cost: 20,
       imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/base.body.ninja2.png',
       type: 'outfit',
-      icon: Shirt
+      icon: Shirt,
+      reqLevel: 1
     },
     {
       id: 102,
@@ -24,7 +25,8 @@ const Barracks = () => {
       cost: 20,
       imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight2.png',
       type: 'outfit',
-      icon: Shirt
+      icon: Shirt,
+      reqLevel: 1
     },
     {
       id: 103,
@@ -32,7 +34,8 @@ const Barracks = () => {
       cost: 50,
       imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Baller.outfit2.png',
       type: 'outfit',
-      icon: Shirt
+      icon: Shirt,
+      reqLevel: 3
     },
     {
       id: 104,
@@ -40,7 +43,8 @@ const Barracks = () => {
       cost: 150,
       imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Vamphunter1.png',
       type: 'outfit',
-      icon: Shirt
+      icon: Shirt,
+      reqLevel: 5
     },
     {
       id: 105,
@@ -48,7 +52,8 @@ const Barracks = () => {
       cost: 300,
       imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/deadspace.outfit.png',
       type: 'outfit',
-      icon: Shirt
+      icon: Shirt,
+      reqLevel: 7
     },
     {
       id: 106,
@@ -56,7 +61,8 @@ const Barracks = () => {
       cost: 600,
       imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dark.souls1.png',
       type: 'outfit',
-      icon: Shirt
+      icon: Shirt,
+      reqLevel: 10
     },
     {
       id: 107,
@@ -64,7 +70,8 @@ const Barracks = () => {
       cost: 1000,
       imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Powerful.golden.armour.png',
       type: 'outfit',
-      icon: Shirt
+      icon: Shirt,
+      reqLevel: 15
     }
   ];
 
@@ -90,6 +97,8 @@ const Barracks = () => {
     );
   }
 
+  const currentLevel = Math.floor(currentUser.xp / 1000) + 1;
+
   return (
     <div className="min-h-screen p-4 md:p-8 relative">
       <img src={MAP_BG} alt="Background Map" className="absolute inset-0 w-full h-full object-cover" />
@@ -113,7 +122,7 @@ const Barracks = () => {
             
             <div className="text-center mb-6">
               <div className="text-3xl text-white mb-1 font-['VT323']">{currentUser.heroName}</div>
-              <div className="text-xl text-stone-300 font-['VT323']">Level {currentUser.level}</div>
+              <div className="text-xl text-stone-300 font-['VT323']">Level {currentLevel}</div>
               <div className="flex items-center justify-center text-2xl text-yellow-400 font-['VT323'] mt-1">
                 <span>{currentUser.gold}</span>
                 <span className="ml-2 text-yellow-500">G</span>
@@ -168,6 +177,7 @@ const Barracks = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {shopItems.map((item) => {
                 const alreadyOwned = ownsItem(item.id);
+                const isLevelLocked = currentLevel < item.reqLevel;
                 return (
                   <div key={item.id} className="bg-white/5 border border-white/10 rounded-lg p-4 hover:border-yellow-400/50 transition-colors flex flex-col justify-between">
                     <div className="flex flex-col items-center text-center mb-3">
@@ -179,12 +189,12 @@ const Barracks = () => {
                     </div>
                     <button
                       onClick={() => handleBuyItem(item)}
-                      disabled={alreadyOwned || currentUser.gold < item.cost}
+                      disabled={alreadyOwned || currentUser.gold < item.cost || isLevelLocked}
                       className={`w-full py-2 px-4 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
-                        alreadyOwned ? 'bg-stone-600 text-stone-400 cursor-not-allowed' : currentUser.gold < item.cost ? 'bg-red-900/50 text-red-300 cursor-not-allowed' : 'bg-yellow-600 hover:bg-yellow-500 text-white'
+                        isLevelLocked ? 'bg-stone-800 text-stone-500 cursor-not-allowed' : alreadyOwned ? 'bg-stone-600 text-stone-400 cursor-not-allowed' : currentUser.gold < item.cost ? 'bg-red-900/50 text-red-300 cursor-not-allowed' : 'bg-yellow-600 hover:bg-yellow-500 text-white'
                       }`}
                     >
-                      {alreadyOwned ? 'OWNED' : 'BUY'}
+                      {isLevelLocked ? `Lvl ${item.reqLevel} Req` : alreadyOwned ? 'OWNED' : 'BUY'}
                     </button>
                   </div>
                 );
