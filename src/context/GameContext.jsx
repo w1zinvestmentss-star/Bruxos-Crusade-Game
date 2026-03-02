@@ -39,10 +39,6 @@ const BOSSES = [
   { id: 903, name: 'Haunted Quill', requirement: 'incantations', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/slime.png' },
   { id: 904, name: 'Spectral Typist', requirement: 'incantations', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Goblin.png' },
 
-  // Track 7: Colossi (Sports)
-  { id: 701, name: 'Earth Elemental', requirement: 'sports', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Goblin.png' },
-  { id: 702, name: 'Mountain Titan', requirement: 'sports', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/slime.png' },
-
   // Track 8: Muses (Arts)
   { id: 801, name: 'Crystal Butterfly', requirement: 'arts', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/slime.png' },
   { id: 802, name: 'Prism Weaver', requirement: 'arts', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Goblin.png' },
@@ -50,6 +46,12 @@ const BOSSES = [
   // Track 9: Guardian Spirits (Wellness)
   { id: 901, name: 'Warm Wisp', requirement: 'wellness', target: 5, rewardXp: 100, rewardGold: 50, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/slime.png' },
   { id: 902, name: 'Hearth Spirit', requirement: 'wellness', target: 15, rewardXp: 300, rewardGold: 150, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Goblin.png' },
+
+  // Track 8: Sports / Ancient Colossi
+  { id: 801, name: 'The Stone Minotaur', requirement: 'sports', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Stone.Minotaur.png' },
+  { id: 802, name: 'The Desert Worm', requirement: 'sports', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Desert.Worm.png' },
+  { id: 803, name: 'The Armored Beast', requirement: 'sports', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Armored.Beast.png' },
+  { id: 804, name: 'The Ivory Leviathan', requirement: 'sports', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ivory.Leviathan.png' }
 ];
 
 const VICTORY_QUOTES = [
