@@ -39,6 +39,8 @@ const Dungeon = () => {
         return currentUser.quizQuestsCompleted || 0;
       case 'multistep':
         return currentUser.multiStepQuestsCompleted || 0;
+      case 'scenarios':
+        return currentUser.scenarioQuestsCompleted || 0;
       case 'incantations':
         return currentUser.incantationQuestsCompleted || 0;
       case 'sports':
@@ -59,6 +61,7 @@ const Dungeon = () => {
       case 'uploads': return "Homework Uploads";
       case 'quizzes': return "Quizzes Aced";
       case 'multistep': return "Complex Problems";
+      case 'scenarios': return "Scenarios Cleared";
       case 'incantations': return "Incantations Recited";
       case 'sports': return "Athletics Missions";
       case 'arts': return "Creative Missions";
