@@ -53,6 +53,8 @@ const Dungeon = () => {
         return currentUser.loginStreak || 0;
       case 'journal':
         return currentUser.journalQuestsCompleted || 0;
+      case 'ciphers':
+        return currentUser.cipherQuestsCompleted || 0;
       default:
         return 0;
     }
@@ -70,6 +72,7 @@ const Dungeon = () => {
       case 'wellness': return "Tavern Rests";
       case 'streak': return "Days in a Row";
       case 'journal': return "Reflections Written";
+      case 'ciphers': return "Riddles Solved";
       default: return "Requirement";
     }
   };

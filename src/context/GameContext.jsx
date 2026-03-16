@@ -3,11 +3,11 @@ import React, { createContext, useContext, useState } from 'react';
 const GameContext = createContext();
 
 const INITIAL_STUDENTS = [
-  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0 },
-  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 880, finalGPA: 900, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Vamphunter1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0 },
-  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 600, finalGPA: 700, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Baller.outfit2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0 },
-  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 920, finalGPA: null, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Powerful.golden.armour.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0 },
-  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dark.souls1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0 },
+  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0 },
+  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 880, finalGPA: 900, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Vamphunter1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0 },
+  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 600, finalGPA: 700, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Baller.outfit2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0 },
+  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 920, finalGPA: null, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Powerful.golden.armour.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0 },
+  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dark.souls1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0 },
 ];
 
 const BOSSES = [
@@ -67,7 +67,13 @@ const BOSSES = [
   { id: 701, name: 'The Haunted Quill', requirement: 'incantations', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Haunted.Quill.png' },
   { id: 702, name: 'The Spectral Typist', requirement: 'incantations', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Spectral.Typist.png' },
   { id: 703, name: 'The Boundless Tome', requirement: 'incantations', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Boundless.Tome.png' },
-  { id: 704, name: 'The Spectral Archivist', requirement: 'incantations', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Spectral.Archivist.png' }
+  { id: 704, name: 'The Spectral Archivist', requirement: 'incantations', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Spectral.Archivist.png' },
+
+  // Track 6: The Shapeshifters / Ciphers
+  { id: 601, name: 'The Phantom Mask', requirement: 'ciphers', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Phantom.Mask.png' },
+  { id: 602, name: 'The Mirror Fiend', requirement: 'ciphers', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mirror.Fiend.png' },
+  { id: 603, name: 'The Faceless One', requirement: 'ciphers', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Faceless.One.png' },
+  { id: 604, name: 'The Shattered Sovereign', requirement: 'ciphers', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shattered.Sovereign.png' }
 ];
 
 const VICTORY_QUOTES = [
@@ -350,6 +356,7 @@ export function GameProvider({ children }) {
            if(quest.type === 'quiz') updatedStudent.quizQuestsCompleted = (student.quizQuestsCompleted || 0) + 1;
            if(quest.type === 'multi-step') updatedStudent.multiStepQuestsCompleted = (student.multiStepQuestsCompleted || 0) + 1;
            if(quest.type === 'incantation') updatedStudent.incantationQuestsCompleted = (student.incantationQuestsCompleted || 0) + 1;
+           if(quest.type === 'cipher') updatedStudent.cipherQuestsCompleted = (student.cipherQuestsCompleted || 0) + 1;
            return updatedStudent;
         }
         return student;
@@ -360,6 +367,7 @@ export function GameProvider({ children }) {
         if(quest.type === 'quiz') updatedUser.quizQuestsCompleted = (prev.quizQuestsCompleted || 0) + 1;
         if(quest.type === 'multi-step') updatedUser.multiStepQuestsCompleted = (prev.multiStepQuestsCompleted || 0) + 1;
         if(quest.type === 'incantation') updatedUser.incantationQuestsCompleted = (prev.incantationQuestsCompleted || 0) + 1;
+        if(quest.type === 'cipher') updatedUser.cipherQuestsCompleted = (prev.cipherQuestsCompleted || 0) + 1;
         return updatedUser
       });
 
@@ -556,6 +564,9 @@ export function GameProvider({ children }) {
         break;
       case 'journal':
         requirementMet = (currentUser.journalQuestsCompleted || 0) >= boss.target;
+        break;
+      case 'ciphers':
+        requirementMet = (currentUser.cipherQuestsCompleted || 0) >= boss.target;
         break;
       default:
         requirementMet = false;
