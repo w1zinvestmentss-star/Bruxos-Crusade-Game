@@ -719,7 +719,7 @@ export function GameProvider({ children }) {
   };
 
   const value = {
-    students, quests, submissions, BOSSES,
+    students, quests, submissions, BOSSES, ACHIEVEMENTS,
     createQuest, importQuestions, submitQuest, approveSubmission, getQuestStatus, submitWellnessCheck,
     userRole, setUserRole, currentUser, setCurrentUser,
     buyItem,
@@ -747,3 +747,6 @@ export function GameProvider({ children }) {
 export function useGame() {
   return useContext(GameContext);
 }
+
+// Triggering Vite HMR update
+

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, LogOut } from 'lucide-react';
+import { User, LogOut, Trophy } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const StudentDashboard = () => {
@@ -27,12 +27,13 @@ const StudentDashboard = () => {
     setShowWelcomeModal(false);
   };
 
-  const MapLocation = ({ label, onClick, x, y, delay, variant = 'default' }) => {
-    const baseClasses = "absolute z-10 bg-black/80 border-2 text-white font-bold font-mono uppercase tracking-widest px-4 py-2 hover:bg-black/90 transition-colors";
+  const MapLocation = ({ label, icon: Icon, onClick, x, y, delay, variant = 'default' }) => {
+    const baseClasses = "absolute z-10 bg-black/80 border-2 text-white flex items-center gap-2 font-bold font-mono uppercase tracking-widest px-4 py-2 hover:bg-black/90 transition-colors";
     
     const variants = {
       default: 'border-yellow-500/50 hover:border-yellow-400',
-      danger: 'border-red-900/80 hover:border-red-600'
+      danger: 'border-red-900/80 hover:border-red-600',
+      gold: 'border-yellow-400 text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)] bg-black hover:bg-yellow-900/30'
     };
 
     return (
@@ -50,7 +51,8 @@ const StudentDashboard = () => {
                 transform: 'translate(-50%, -50%)',
             }}
         >
-            {label}
+            {Icon && <Icon size={18} />}
+            <span>{label}</span>
         </motion.button>
     );
   };
@@ -166,6 +168,17 @@ const StudentDashboard = () => {
         delay={1.0}
         onClick={() => navigate('/dungeon')}
         variant="danger"
+      />
+
+      {/* HALL OF TRIUMPHS */}
+      <MapLocation 
+        label="Hall of Triumphs"
+        icon={Trophy}
+        x="50%" 
+        y="80%" 
+        delay={1.2}
+        onClick={() => navigate('/trophies')}
+        variant="gold"
       />
 
       <div className="absolute bottom-4 right-4 text-white/50 font-mono text-xs z-10">
