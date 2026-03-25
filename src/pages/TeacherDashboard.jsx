@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Plus, Check, Search, Image as ImageIcon, BookCopy, Save, Upload, Clock, Shield, Star, DollarSign, Swords, Skull, Heart } from 'lucide-react';
+import { LogOut, Plus, Check, Search, Image as ImageIcon, BookCopy, Save, Upload, Clock, Shield, Star, DollarSign, Swords, Skull, Heart, Gift } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const TeacherDashboard = () => {
@@ -13,7 +13,8 @@ const TeacherDashboard = () => {
     approveSubmission, 
     setUserRole, 
     updateStudentStats,
-    importQuestions
+    importQuestions,
+    fulfillPrize
   } = useGame();
   
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -41,6 +42,8 @@ const TeacherDashboard = () => {
 
   const totalGoldEarned = students.reduce((sum, student) =>
     sum + (student.gold || 0), 0);
+
+  const studentsWithPrizes = students.filter(s => s.pendingPrizes && s.pendingPrizes.length > 0);
 
   const handleCreate = (e) => {
     e.preventDefault();
@@ -438,6 +441,41 @@ const TeacherDashboard = () => {
                   </tbody>
               </table>
           </div>
+        </div>
+
+        {/* Prize Fulfillment Center */}
+        <div className="bg-black/60 backdrop-blur-md border border-white/10 rounded-xl p-6 mt-8">
+          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-stone-200">
+            <Gift className="text-yellow-400" /> Prize Fulfillment Center
+          </h2>
+          {studentsWithPrizes.length === 0 ? (
+             <div className="p-8 bg-black/20 rounded-xl border border-white/10 text-center text-stone-400 italic">
+               No pending prizes to hand out.
+             </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {studentsWithPrizes.map(student => (
+                student.pendingPrizes.map((prize, index) => (
+                  <div key={`${student.id}-${index}`} className="bg-stone-800/80 p-5 rounded-xl border-2 border-yellow-500 shadow-lg shadow-yellow-900/20 flex flex-col justify-between">
+                    <div>
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-bold text-lg text-white font-['Press_Start_2P'] text-xs leading-relaxed">{student.heroName}</h3>
+                        <span className="bg-yellow-500/20 text-yellow-500 text-[10px] font-bold px-2 py-1 rounded border border-yellow-500/50">PENDING</span>
+                      </div>
+                      <p className="text-2xl text-yellow-400 font-['VT323'] mb-1">{prize.name}</p>
+                      <p className="text-sm text-stone-400 italic mb-4">Reason: "{prize.achievement}"</p>
+                    </div>
+                    <button 
+                      onClick={() => fulfillPrize(student.id, index)}
+                      className="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-500 shadow-md flex items-center justify-center gap-2 font-bold transition-colors mt-2"
+                    >
+                      <Check size={18} /> Mark as Delivered
+                    </button>
+                  </div>
+                ))
+              ))}
+            </div>
+          )}
         </div>
 
       </div>

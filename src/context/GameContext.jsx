@@ -711,6 +711,21 @@ export function GameProvider({ children }) {
     }));
   };
 
+  const fulfillPrize = (studentId, prizeIndex) => {
+    setStudents(prevStudents => prevStudents.map(student => {
+      if (student.id === studentId) {
+        const updatedPending = (student.pendingPrizes || []).filter((_, idx) => idx !== prizeIndex);
+        
+        const updatedStudent = { ...student, pendingPrizes: updatedPending };
+        if (currentUser && currentUser.id === studentId) {
+           setCurrentUser(prevUser => ({ ...prevUser, pendingPrizes: updatedPending }));
+        }
+        return updatedStudent;
+      }
+      return student;
+    }));
+  };
+
   const clearNotifications = () => {
     if (!currentUser) return;
     const updatedUser = { ...currentUser, notifications: [] };
@@ -734,7 +749,8 @@ export function GameProvider({ children }) {
     fightBoss,
     getSlayerPoints,
     calculateSlayerScore,
-    awardRewards
+    awardRewards,
+    fulfillPrize
   };
 
   return (
