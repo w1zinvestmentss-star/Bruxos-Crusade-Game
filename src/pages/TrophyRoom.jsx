@@ -5,7 +5,7 @@ import { ArrowLeft, Trophy, Lock, Coins, Star, Gift } from 'lucide-react';
 
 const TrophyRoom = () => {
   const navigate = useNavigate();
-  const { currentUser, ACHIEVEMENTS } = useGame();
+  const { currentUser, ACHIEVEMENTS, students } = useGame();
 
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
 
@@ -42,6 +42,7 @@ const TrophyRoom = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {(ACHIEVEMENTS || []).map((achievement) => {
             const isUnlocked = currentUser.unlockedAchievements?.includes(achievement.id);
+            const claimedCount = students.filter(s => s.unlockedAchievements && s.unlockedAchievements.includes(achievement.id)).length;
 
             return (
               <div 
@@ -96,6 +97,20 @@ const TrophyRoom = () => {
                         <span className="font-bold font-mono text-sm uppercase tracking-wider">Real-World Prize</span>
                       </div>
                       <p className="text-stone-200 text-lg font-['VT323']">{achievement.realWorldPrize}</p>
+                      
+                      {achievement.limit && (
+                        <div className="mt-3 border-t border-stone-700/50 pt-3">
+                          <p className="font-bold font-mono text-xs text-orange-400">
+                            Prizes Claimed: {claimedCount} / {achievement.limit}
+                          </p>
+                          {claimedCount >= achievement.limit && (
+                            <p className="font-bold italic text-xs text-red-400 mt-1">
+                              Physical Prizes Exhausted! Backup Reward: {achievement.fallbackGold} Gold
+                            </p>
+                          )}
+                        </div>
+                      )}
+
                       {isUnlocked && (
                         <div className="mt-3 text-green-400 text-sm font-bold bg-green-900/30 p-2 rounded border border-green-800/50 animate-pulse">
                           Prize Status: Check with Game Master!
