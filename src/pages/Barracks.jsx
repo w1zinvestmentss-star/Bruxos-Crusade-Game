@@ -9,70 +9,44 @@ const Barracks = () => {
 
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
 
-  const shopItems = [
-    {
-      id: 101,
-      name: 'Ninja Outfit',
-      cost: 20,
-      imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/base.body.ninja2.png',
-      type: 'outfit',
-      icon: Shirt,
-      reqLevel: 1
-    },
-    {
-      id: 102,
-      name: 'Knight Outfit',
-      cost: 20,
-      imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight2.png',
-      type: 'outfit',
-      icon: Shirt,
-      reqLevel: 1
-    },
-    {
-      id: 103,
-      name: 'Baller Outfit',
-      cost: 50,
-      imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Baller.outfit2.png',
-      type: 'outfit',
-      icon: Shirt,
-      reqLevel: 3
-    },
-    {
-      id: 104,
-      name: 'Vampire Hunter',
-      cost: 150,
-      imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Vamphunter1.png',
-      type: 'outfit',
-      icon: Shirt,
-      reqLevel: 5
-    },
-    {
-      id: 105,
-      name: 'Void Space Suit',
-      cost: 300,
-      imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/deadspace.outfit.png',
-      type: 'outfit',
-      icon: Shirt,
-      reqLevel: 7
-    },
-    {
-      id: 106,
-      name: 'Dark Souls Knight',
-      cost: 600,
-      imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dark.souls1.png',
-      type: 'outfit',
-      icon: Shirt,
-      reqLevel: 10
-    },
-    {
-      id: 107,
-      name: 'Golden God Armor',
-      cost: 1000,
-      imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Powerful.golden.armour.png',
-      type: 'outfit',
-      icon: Shirt,
-      reqLevel: 15
-    }
+  const shopItems =[
+    // LEVEL 1: The Survivor Collection (Cost: 50, Level Req: 1)
+    { id: 1001, name: 'Deprived Wanderer', cost: 50, reqLevel: 1, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Deprived.Wanderer.png' },
+    { id: 1002, name: 'Exiled Monk', cost: 50, reqLevel: 1, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Exiled.Monk.png' },
+    { id: 1003, name: 'Grave Robber', cost: 50, reqLevel: 1, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Grave.Robber.png' },
+    { id: 1004, name: 'Holy Villager', cost: 50, reqLevel: 1, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Holy.Villager.png' },
+    { id: 1005, name: 'Shinobi Apprentice', cost: 50, reqLevel: 1, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shinobi.Apprentice.png' },
+    { id: 1006, name: 'Survivalist', cost: 50, reqLevel: 1, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Survivalist.png' },
+    { id: 1007, name: 'Yharnam Traveler', cost: 50, reqLevel: 1, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Yharnam.Traveler.png' },
+
+    // LEVEL 2: The Hunter Collection (Cost: 300, Level Req: 5)
+    { id: 1008, name: 'Beast Hunter', cost: 300, reqLevel: 5, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Beast.Hunter.png' },
+    { id: 1009, name: 'Cursed Swordsman', cost: 300, reqLevel: 5, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Cursed.Swordsman.png' },
+    { id: 1010, name: 'Elite Knight', cost: 300, reqLevel: 5, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Elite.Knight.png' },
+    { id: 1011, name: 'Inquisitor', cost: 300, reqLevel: 5, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Inquisitor.png' },
+    { id: 1012, name: 'Shadow Ninja', cost: 300, reqLevel: 5, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shadow.Ninja.png' },
+    { id: 1013, name: 'Tactical Mercenary', cost: 300, reqLevel: 5, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Tactical.Mercenary.png' },
+    { id: 1014, name: 'Vampire Killer', cost: 300, reqLevel: 5, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Vampire.Killer.png' },
+
+    // LEVEL 3: The Slayer Collection (Cost: 1500, Level Req: 10)
+    { id: 1015, name: 'Bio-Weapon', cost: 1500, reqLevel: 10, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Bio-Weapon.png' },
+    { id: 1016, name: 'Blood Knight', cost: 1500, reqLevel: 10, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Blood.Knight.png' },
+    { id: 1017, name: 'Crow Assassin', cost: 1500, reqLevel: 10, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Crow.Assassin.png' },
+    { id: 1018, name: 'Cyber-Demon Ninja', cost: 1500, reqLevel: 10, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Cyber-Demon.Ninja.png' },
+    { id: 1019, name: 'Sun Warrior', cost: 1500, reqLevel: 10, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Sun.Warrior.png' },
+    { id: 1020, name: 'Void Walker', cost: 1500, reqLevel: 10, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Void.Walker.png' },
+
+    // LEVEL 4: The Lord Collection (Cost: 5000, Level Req: 15)
+    { id: 1021, name: 'Abyssal Warden', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Abyssal.Warden.png' },
+    { id: 1022, name: 'Astral Sovereign', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Astral.Sovereign.png' },
+    { id: 1023, name: 'Cosmic Great One', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Cosmic.Great.%20One.png' },
+    { id: 1024, name: 'Crimson King', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Crimson.King.png' },
+    { id: 1025, name: 'Dark Lord', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Dark.Lord.png' },
+    { id: 1026, name: 'Divine Beast', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Divine.Beast.png' },
+    { id: 1027, name: 'Dragon Ninja Master', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Dragon.Ninja%20Master.png' },
+    { id: 1028, name: 'Lord of Cinder', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Lord.of.Cinder.png' },
+    { id: 1029, name: 'Mecha Shogun', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mecha.Shogun.png' },
+    { id: 1030, name: 'Rot Champion', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Rot.Champion.png' }
   ];
 
   const handleBuyItem = (item) => {
