@@ -114,6 +114,13 @@ const BOSSES = [
   { id: 904, name: 'The Prism Weaver', requirement: 'arts', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Prism.Weaver.png' }
 ];
 
+const BOSS_LOOT_OUTFITS = {
+  104: { id: 'loot_104', name: 'Titan Scholar Vestments', type: 'outfit', imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png?placeholder' },
+  204: { id: 'loot_204', name: 'Celestial Armor', type: 'outfit', imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png?placeholder' },
+  304: { id: 'loot_304', name: 'Void Scales', type: 'outfit', imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png?placeholder' },
+  404: { id: 'loot_404', name: 'Chronos Plate', type: 'outfit', imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png?placeholder' }
+};
+
 const VICTORY_QUOTES = [
   'Your mind is as sharp as a sword!',
   'A legendary feat!',
@@ -757,10 +764,41 @@ export function GameProvider({ children }) {
     }
 
     if (requirementMet) {
-      awardRewards(currentUser.id, boss.rewardXp, boss.rewardGold)
+      awardRewards(currentUser.id, boss.rewardXp, boss.rewardGold);
+      const bossLoot = BOSS_LOOT_OUTFITS[bossId];
       
-      setStudents(prev => prev.map(s => s.id === currentUser.id ? { ...s, defeatedBosses: [...s.defeatedBosses, bossId] } : s));
-      setCurrentUser(prev => ({ ...prev, defeatedBosses: [...prev.defeatedBosses, bossId] }));
+      setStudents(prev => prev.map(s => {
+          if (s.id === currentUser.id) {
+              const updatedS = { ...s, defeatedBosses: [...s.defeatedBosses, bossId] };
+              if (bossLoot && !(updatedS.inventory || []).some(item => item.id === bossLoot.id)) {
+                  updatedS.inventory = [...(updatedS.inventory || []), bossLoot];
+                  updatedS.notifications = [...(updatedS.notifications || []), {
+                      id: Date.now() + Math.random(),
+                      title: "EPIC LOOT ACQUIRED: " + bossLoot.name,
+                      quote: 'A powerful artifact from a vanquished foe!',
+                      gold: 0,
+                      xp: 0
+                  }];
+              }
+              return updatedS;
+          }
+          return s;
+      }));
+      
+      setCurrentUser(prev => {
+          const updatedPrev = { ...prev, defeatedBosses: [...prev.defeatedBosses, bossId] };
+          if (bossLoot && !(updatedPrev.inventory || []).some(item => item.id === bossLoot.id)) {
+              updatedPrev.inventory = [...(updatedPrev.inventory || []), bossLoot];
+              updatedPrev.notifications = [...(updatedPrev.notifications || []), {
+                  id: Date.now() + Math.random(),
+                  title: "EPIC LOOT ACQUIRED: " + bossLoot.name,
+                  quote: 'A powerful artifact from a vanquished foe!',
+                  gold: 0,
+                  xp: 0
+              }];
+          }
+          return updatedPrev;
+      });
 
       checkAchievements(currentUser.id);
 

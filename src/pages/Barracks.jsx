@@ -46,7 +46,13 @@ const Barracks = () => {
     { id: 1027, name: 'Dragon Ninja Master', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Dragon.Ninja%20Master.png' },
     { id: 1028, name: 'Lord of Cinder', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Lord.of.Cinder.png' },
     { id: 1029, name: 'Mecha Shogun', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mecha.Shogun.png' },
-    { id: 1030, name: 'Rot Champion', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Rot.Champion.png' }
+    { id: 1030, name: 'Rot Champion', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Rot.Champion.png' },
+
+    // BOSS LOOT (Tier 4 Bosses)
+    { id: 'loot_104', name: 'Titan Scholar Vestments', cost: 0, reqBoss: 'Library Titan', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png?placeholder' },
+    { id: 'loot_204', name: 'Celestial Armor', cost: 0, reqBoss: 'Celestial Owl', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png?placeholder' },
+    { id: 'loot_304', name: 'Void Scales', cost: 0, reqBoss: 'Void Hydra', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png?placeholder' },
+    { id: 'loot_404', name: 'Chronos Plate', cost: 0, reqBoss: 'Chronos Titan', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png?placeholder' }
   ];
 
   const handleBuyItem = (item) => {
@@ -152,6 +158,8 @@ const Barracks = () => {
               {shopItems.map((item) => {
                 const alreadyOwned = ownsItem(item.id);
                 const isLevelLocked = currentLevel < item.reqLevel;
+                const isBossLoot = !!item.reqBoss;
+                
                 return (
                   <div key={item.id} className="bg-white/5 border border-white/10 rounded-lg p-4 hover:border-yellow-400/50 transition-colors flex flex-col justify-between">
                     <div className="flex flex-col items-center text-center mb-3">
@@ -159,17 +167,32 @@ const Barracks = () => {
                          <img src={item.imageLink} alt={item.name} className="h-full w-full object-contain"/>
                       </div>
                       <h3 className="text-xl font-bold text-white font-['VT323'] mb-1">{item.name}</h3>
-                      <div className="text-yellow-400 font-['VT323'] text-xl">{item.cost} G</div>
+                      {isBossLoot ? (
+                        <div className="text-purple-400 font-mono text-sm font-bold">BOSS LOOT</div>
+                      ) : (
+                        <div className="text-yellow-400 font-['VT323'] text-xl">{item.cost} G</div>
+                      )}
                     </div>
-                    <button
-                      onClick={() => handleBuyItem(item)}
-                      disabled={alreadyOwned || currentUser.gold < item.cost || isLevelLocked}
-                      className={`w-full py-2 px-4 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
-                        isLevelLocked ? 'bg-stone-800 text-stone-500 cursor-not-allowed' : alreadyOwned ? 'bg-stone-600 text-stone-400 cursor-not-allowed' : currentUser.gold < item.cost ? 'bg-red-900/50 text-red-300 cursor-not-allowed' : 'bg-yellow-600 hover:bg-yellow-500 text-white'
-                      }`}
-                    >
-                      {isLevelLocked ? `Lvl ${item.reqLevel} Req` : alreadyOwned ? 'OWNED' : 'BUY'}
-                    </button>
+                    {isBossLoot ? (
+                      <button
+                        disabled={true}
+                        className={`w-full py-2 px-4 rounded-lg font-bold font-mono transition-colors ${
+                          alreadyOwned ? 'bg-stone-600 text-stone-400 cursor-not-allowed text-sm' : 'bg-purple-900/50 text-purple-300 border border-purple-700 cursor-not-allowed text-xs'
+                        }`}
+                      >
+                        {alreadyOwned ? 'OWNED' : `Defeat ${item.reqBoss}`}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleBuyItem(item)}
+                        disabled={alreadyOwned || currentUser.gold < item.cost || isLevelLocked}
+                        className={`w-full py-2 px-4 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
+                          isLevelLocked ? 'bg-stone-800 text-stone-500 cursor-not-allowed' : alreadyOwned ? 'bg-stone-600 text-stone-400 cursor-not-allowed' : currentUser.gold < item.cost ? 'bg-red-900/50 text-red-300 cursor-not-allowed' : 'bg-yellow-600 hover:bg-yellow-500 text-white'
+                        }`}
+                      >
+                        {isLevelLocked ? `Lvl ${item.reqLevel} Req` : alreadyOwned ? 'OWNED' : 'BUY'}
+                      </button>
+                    )}
                   </div>
                 );
               })}
