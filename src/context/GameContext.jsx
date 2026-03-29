@@ -10,12 +10,40 @@ const INITIAL_STUDENTS = [
   { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dark.souls1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
 ];
 
-const ACHIEVEMENTS = [
-  { id: 'first_blood', title: 'First Blood', description: 'Defeat your first boss.', rewardXp: 500, rewardTicket: 0, realWorldPrize: null },
-  { id: 'fashionista', title: 'Fashionista', description: 'Purchase an outfit from the Barracks.', rewardXp: 100, rewardTicket: 1, realWorldPrize: null },
-  { id: 'pity_prize', title: 'Perseverance', description: 'Earn 10 Raffle Tickets overall.', rewardXp: 0, rewardTicket: 0, realWorldPrize: '$5 Tim Hortons Gift Card' },
-  { id: 'vanguard', title: 'Realm Vanguard', description: 'Be one of the first 3 heroes to reach Level 10!', rewardXp: 1000, rewardTicket: 2, realWorldPrize: '$15 Cineplex Gift Card', limit: 3, fallbackGold: 2500 },
-  { id: 'quest_master', title: 'Quest Master', description: 'Complete 25 total quests.', rewardXp: 500, rewardTicket: 5, realWorldPrize: '1x Entry for the Monthly Mega-Raffle', limit: null, fallbackGold: 0 }
+const ACHIEVEMENTS =[
+  // PROGRESSION (Levels)
+  { id: 'lvl_5', metric: 'level', target: 5, title: 'Apprentice', desc: 'Reach Level 5.', rewardXp: 200, rewardTicket: 1, limit: null },
+  { id: 'lvl_10', metric: 'level', target: 10, title: 'Journeyman', desc: 'Reach Level 10.', rewardXp: 500, rewardTicket: 2, limit: null },
+  { id: 'lvl_15', metric: 'level', target: 15, title: 'Realm Vanguard', desc: 'First 3 to reach Level 15!', rewardXp: 1500, rewardTicket: 5, realWorldPrize: '$15 Cineplex Card', limit: 3, fallbackGold: 3000 },
+  
+  // CONSISTENCY (Streaks)
+  { id: 'streak_7', metric: 'streak', target: 7, title: 'Dedicated', desc: 'Achieve a 7-day login streak.', rewardXp: 300, rewardTicket: 1, limit: null },
+  { id: 'streak_14', metric: 'streak', target: 14, title: 'Unbreakable', desc: 'Achieve a 14-day login streak.', rewardXp: 800, rewardTicket: 3, limit: null },
+  { id: 'streak_30', metric: 'streak', target: 30, title: 'Relentless', desc: 'Achieve a 30-day login streak!', rewardXp: 2000, rewardTicket: 5, realWorldPrize: '$5 Tim Hortons Card', limit: null },
+
+  // ACADEMICS (Quests by Type)
+  { id: 'math_10', metric: 'quizzes', target: 10, title: 'Mathlete', desc: 'Complete 10 Quiz Quests.', rewardXp: 400, rewardTicket: 1, limit: null },
+  { id: 'journal_5', metric: 'journals', target: 5, title: 'The Scribe', desc: 'Submit 5 Journal Reflections.', rewardXp: 300, rewardTicket: 1, limit: null },
+  { id: 'sports_5', metric: 'sports', target: 5, title: 'The Athlete', desc: 'Complete 5 Physical Education Scout Reports.', rewardXp: 400, rewardTicket: 1, limit: null },
+  { id: 'arts_5', metric: 'arts', target: 5, title: 'The Artist', desc: 'Complete 5 Fine Arts Scout Reports.', rewardXp: 400, rewardTicket: 1, limit: null },
+
+  // VOLUME (Total Quests)
+  { id: 'quests_25', metric: 'total_quests', target: 25, title: 'Quest Master', desc: 'Complete 25 total quests.', rewardXp: 1000, rewardTicket: 2, limit: null },
+  { id: 'quests_50', metric: 'total_quests', target: 50, title: 'Hero of the Realm', desc: 'Complete 50 total quests.', rewardXp: 2500, rewardTicket: 5, limit: null },
+  { id: 'quests_100', metric: 'total_quests', target: 100, title: 'The Legend', desc: 'First to complete 100 quests!', rewardXp: 5000, rewardTicket: 10, realWorldPrize: '$50 Amazon Card', limit: 1, fallbackGold: 10000 },
+
+  // COMBAT (Bosses)
+  { id: 'boss_1', metric: 'bosses', target: 1, title: 'First Blood', desc: 'Defeat your first boss.', rewardXp: 200, rewardTicket: 0, limit: null },
+  { id: 'boss_5', metric: 'bosses', target: 5, title: 'Monster Hunter', desc: 'Defeat 5 bosses.', rewardXp: 1000, rewardTicket: 2, limit: null },
+  { id: 'boss_15', metric: 'bosses', target: 15, title: 'The Slayer', desc: 'Defeat 15 bosses.', rewardXp: 3000, rewardTicket: 5, limit: null },
+
+  // ECONOMY (Shop)
+  { id: 'outfit_1', metric: 'outfits', target: 1, title: 'Fashionista', desc: 'Purchase your first outfit.', rewardXp: 100, rewardTicket: 1, limit: null },
+  { id: 'outfit_5', metric: 'outfits', target: 5, title: 'Wardrobe Wealth', desc: 'Purchase 5 different outfits.', rewardXp: 800, rewardTicket: 2, limit: null },
+
+  // SCHEDULED (Time-Gated Events)
+  { id: 'spring_event', metric: 'total_quests', target: 30, title: 'Spring Awakening', desc: 'Complete 30 quests. Unlocks April 2026!', rewardXp: 1500, rewardTicket: 3, limit: null, unlockDate: '2026-04-01' },
+  { id: 'year_end', metric: 'level', target: 20, title: 'End of Year Champion', desc: 'Reach Level 20. Unlocks June 2026!', rewardXp: 5000, rewardTicket: 10, realWorldPrize: 'End of Year Pizza Party Invite', limit: null, unlockDate: '2026-06-01' }
 ];
 
 const BOSSES = [
@@ -243,42 +271,58 @@ export function GameProvider({ children }) {
       const currentLevel = Math.max(updatedStudent.level || 1, Math.floor(updatedStudent.xp / 1000) + 1);
 
       ACHIEVEMENTS.forEach(achievement => {
-        if (!updatedStudent.unlockedAchievements.includes(achievement.id)) {
-          let reqMet = false;
-          if (achievement.id === 'first_blood' && (updatedStudent.defeatedBosses?.length || 0) > 0) reqMet = true;
-          if (achievement.id === 'fashionista' && (updatedStudent.inventory?.length || 0) > 0) reqMet = true;
-          if (achievement.id === 'pity_prize' && newTotalTickets >= 10) reqMet = true;
-          if (achievement.id === 'quest_master' && totalQuests >= 25) reqMet = true;
-          if (achievement.id === 'vanguard' && currentLevel >= 10) reqMet = true;
+        // Skip if already unlocked
+        if (updatedStudent.unlockedAchievements.includes(achievement.id)) return;
 
-          if (reqMet) {
-            newlyUnlocked = true;
-            updatedStudent.unlockedAchievements.push(achievement.id);
-            totalXp += achievement.rewardXp;
-            newRaffleTickets += achievement.rewardTicket;
-            newTotalTickets += achievement.rewardTicket;
+        // Time Gate Check
+        if (achievement.unlockDate && new Date() < new Date(achievement.unlockDate)) return;
 
-            if (achievement.realWorldPrize) {
-              if (achievement.limit) {
-                const claimCount = prevStudents.filter(s => s.unlockedAchievements?.includes(achievement.id)).length;
-                if (claimCount < achievement.limit) {
-                  newPendingPrizes.push({
-                    name: achievement.realWorldPrize,
-                    achievement: achievement.title,
-                    status: 'pending'
-                  });
-                  newNotifications.push({
-                    id: Date.now() + Math.random(),
-                    title: `Achievement Unlocked: ${achievement.title}`
-                  });
-                } else {
-                  additionalGoldFromFallback += achievement.fallbackGold;
-                  newNotifications.push({
-                    id: Date.now() + Math.random(),
-                    title: `Achievement Unlocked: ${achievement.title}! The physical prizes were claimed, but you received ${achievement.fallbackGold} Gold!`
-                  });
-                }
-              } else {
+        let reqMet = false;
+        
+        // Universal Switch
+        switch (achievement.metric) {
+          case 'level':
+            reqMet = currentLevel >= achievement.target;
+            break;
+          case 'streak':
+            reqMet = (updatedStudent.loginStreak || 0) >= achievement.target;
+            break;
+          case 'quizzes':
+            reqMet = (updatedStudent.quizQuestsCompleted || 0) >= achievement.target;
+            break;
+          case 'journals':
+            reqMet = (updatedStudent.journalQuestsCompleted || 0) >= achievement.target;
+            break;
+          case 'sports':
+            reqMet = (updatedStudent.sportsQuestsCompleted || 0) >= achievement.target;
+            break;
+          case 'arts':
+            reqMet = (updatedStudent.artsQuestsCompleted || 0) >= achievement.target;
+            break;
+          case 'total_quests':
+            reqMet = totalQuests >= achievement.target;
+            break;
+          case 'bosses':
+            reqMet = (updatedStudent.defeatedBosses?.length || 0) >= achievement.target;
+            break;
+          case 'outfits':
+            reqMet = (updatedStudent.inventory?.filter(i => i.type === 'outfit').length || 0) >= achievement.target;
+            break;
+          default:
+            reqMet = false;
+        }
+
+        if (reqMet) {
+          newlyUnlocked = true;
+          updatedStudent.unlockedAchievements.push(achievement.id);
+          totalXp += achievement.rewardXp;
+          newRaffleTickets += achievement.rewardTicket;
+          newTotalTickets += achievement.rewardTicket;
+
+          if (achievement.realWorldPrize) {
+            if (achievement.limit) {
+              const claimCount = prevStudents.filter(s => s.unlockedAchievements?.includes(achievement.id)).length;
+              if (claimCount < achievement.limit) {
                 newPendingPrizes.push({
                   name: achievement.realWorldPrize,
                   achievement: achievement.title,
@@ -288,13 +332,29 @@ export function GameProvider({ children }) {
                   id: Date.now() + Math.random(),
                   title: `Achievement Unlocked: ${achievement.title}`
                 });
+              } else {
+                additionalGoldFromFallback += (achievement.fallbackGold || 0);
+                newNotifications.push({
+                  id: Date.now() + Math.random(),
+                  title: `Achievement Unlocked: ${achievement.title}! The physical prizes were claimed, but you received ${achievement.fallbackGold || 0} Gold!`
+                });
               }
             } else {
+              newPendingPrizes.push({
+                name: achievement.realWorldPrize,
+                achievement: achievement.title,
+                status: 'pending'
+              });
               newNotifications.push({
                 id: Date.now() + Math.random(),
                 title: `Achievement Unlocked: ${achievement.title}`
               });
             }
+          } else {
+            newNotifications.push({
+              id: Date.now() + Math.random(),
+              title: `Achievement Unlocked: ${achievement.title}`
+            });
           }
         }
       });

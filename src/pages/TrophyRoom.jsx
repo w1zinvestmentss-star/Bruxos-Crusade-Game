@@ -41,8 +41,17 @@ const TrophyRoom = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {(ACHIEVEMENTS || []).map((achievement) => {
+            const isFutureGated = achievement.unlockDate && new Date() < new Date(achievement.unlockDate);
             const isUnlocked = currentUser.unlockedAchievements?.includes(achievement.id);
             const claimedCount = students.filter(s => s.unlockedAchievements && s.unlockedAchievements.includes(achievement.id)).length;
+
+            let displayTitle = achievement.title;
+            let displayDesc = achievement.desc || achievement.description;
+
+            if (isFutureGated) {
+              displayTitle = "???";
+              displayDesc = "Unlocks on " + new Date(achievement.unlockDate).toLocaleDateString();
+            }
 
             return (
               <div 
@@ -56,7 +65,7 @@ const TrophyRoom = () => {
                 <div>
                   <div className="flex justify-between items-start mb-4">
                     <h2 className={`text-xl font-['Press_Start_2P'] leading-tight pr-4 ${isUnlocked ? 'text-yellow-400' : 'text-stone-400'}`}>
-                      {achievement.title}
+                      {displayTitle}
                     </h2>
                     {isUnlocked ? (
                       <div className="flex flex-col items-center flex-shrink-0">
@@ -71,10 +80,11 @@ const TrophyRoom = () => {
                     )}
                   </div>
 
-                  <p className="text-stone-300 font-['VT323'] text-2xl mb-6">{achievement.description}</p>
+                  <p className="text-stone-300 font-['VT323'] text-2xl mb-6">{displayDesc}</p>
                 </div>
 
-                <div className="space-y-4">
+                {!isFutureGated && (
+                  <div className="space-y-4">
                    <div className="flex flex-wrap gap-2">
                      {achievement.rewardXp > 0 && (
                         <div className="flex items-center gap-1 text-sm font-mono px-3 py-1 rounded bg-blue-900/30 text-blue-300 border border-blue-800">
@@ -119,6 +129,7 @@ const TrophyRoom = () => {
                     </div>
                   )}
                 </div>
+                )}
               </div>
             );
           })}
