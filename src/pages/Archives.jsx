@@ -70,11 +70,17 @@ const Archives = () => {
 
         {/* Section 1: Avatar & Attributes */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-6">
-          <div className="md:col-span-1 bg-black border border-stone-600 rounded-xl flex items-center justify-center p-2 shadow-2xl">
-            <img src={currentUser.currentBodySprite} alt="Hero Avatar" className="w-full h-auto object-contain max-h-48" />
+          <div className="md:col-span-1">
+            <div className="text-center mb-4">
+              <h2 className="text-2xl text-yellow-400 font-['Press_Start_2P'] mb-2">{currentUser.heroName}</h2>
+              <p className="text-stone-400 font-['VT323'] text-xl">Level {Math.floor(currentUser.xp / 1000) + 1}</p>
+            </div>
+            <div className="relative w-full h-80 lg:h-96 bg-black rounded-xl overflow-hidden border-2 border-stone-700 shadow-inner">
+              <img src={currentUser.currentBodySprite} alt="Hero Avatar" className="absolute inset-0 w-full h-full object-contain" />
+            </div>
           </div>
 
-          <div className="md:col-span-2 bg-black/60 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl p-6">
+          <div className="md:col-span-2 bg-black/60 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl p-6 flex flex-col justify-center">
             <h2 className="font-['Press_Start_2P'] text-yellow-400 text-lg mb-6 flex items-center"><Award className="mr-3 text-yellow-500"/>Attributes</h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 rounded-lg bg-blue-900/20 border-l-4 border-l-blue-500">
