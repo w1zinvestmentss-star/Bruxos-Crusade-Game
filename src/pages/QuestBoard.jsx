@@ -195,6 +195,19 @@ const QuestBoard = () => {
     }
   }
 
+  const QUEST_CATEGORIES = {
+    'upload': { title: 'The Paper Trail', desc: 'Submit physical homework and standard assignments for the Game Master to review.' },
+    'quiz': { title: "The Scholar's Trial", desc: 'Auto-graded tests of knowledge. Answer correctly for instant rewards.' },
+    'multi-step': { title: "The Hydra's Enigma", desc: 'Complex, multi-part problems. Solve them step-by-step.' },
+    'scenario': { title: 'The Crossroads', desc: 'Read the situation and make the right choice to proceed.' },
+    'cipher': { title: "The Sphinx's Riddles", desc: 'Decrypt anagrams and solve riddles to prove your wit.' },
+    'incantation': { title: "The Scribe's Challenge", desc: 'Memorize the text and type it flawlessly before time runs out.' },
+    'scout-sports': { title: 'Athletics & Training', desc: 'Real-world physical challenges. Upload proof of your feats of strength.' },
+    'scout-arts': { title: "The Artisan's Canvas", desc: 'Creative missions. Upload your artwork, music, or creative projects.' },
+    'wellness': { title: 'The Tavern Rest', desc: 'Take a moment to check in with the realm. How fares your spirit today?' },
+    'journal': { title: "The Dreamer's Log", desc: 'Reflect on your journey and write down your thoughts.' }
+  };
+
   return (
     <div className="min-h-screen text-stone-200 p-6 relative">
       <img src={MAP_BG} alt="Background Map" className="absolute inset-0 w-full h-full object-cover" />
@@ -210,8 +223,21 @@ const QuestBoard = () => {
 
         <div className="max-w-3xl mx-auto">
           <h1 className="text-4xl text-yellow-400 mb-10 text-center font-['Press_Start_2P']">QUEST BOARD</h1>
-          <div className="grid gap-4">
-            {quests.map((quest) => {
+          <p className="text-stone-400 text-center max-w-2xl mx-auto mb-10 font-['VT323'] text-xl italic">
+            Welcome to the Bounty Board, Hero. Choose your path, complete tasks to earn Gold and Experience, and awaken the bosses lurking in the Dungeon.
+          </p>
+          <div>
+            {Object.keys(QUEST_CATEGORIES).map(categoryKey => {
+              const categoryQuests = quests.filter(q => q.type === categoryKey);
+              if (categoryQuests.length === 0) return null;
+
+              const categoryInfo = QUEST_CATEGORIES[categoryKey];
+              return (
+                <div key={categoryKey} className="mb-12">
+                  <h2 className="text-2xl text-yellow-500 font-['Press_Start_2P'] border-b border-stone-700 pb-2 mb-2 mt-12">{categoryInfo.title}</h2>
+                  <p className="text-stone-400 mb-6 font-['VT323'] text-xl">{categoryInfo.desc}</p>
+                  <div className="grid gap-4">
+                    {categoryQuests.map((quest) => {
               const status = getQuestStatus(quest.id);
               const isTimedChallenge = (quest.type === 'quiz' || quest.type === 'incantation') && quest.questionBank?.length > 0;
               const isMultiStep = quest.type === 'multi-step';
@@ -323,6 +349,10 @@ const QuestBoard = () => {
                     </div>
                   </div>
                 </motion.div>
+              );
+            })}
+                  </div>
+                </div>
               );
             })}
           </div>
