@@ -143,7 +143,7 @@ const StudentDashboard = () => {
       <MapLocation 
         label="Town Square" 
         description="The Hall of Legends. See how your rank and Boss Kills stack up against the realm."
-        x="45%" 
+        x="43%" 
         y="24%" 
         delay={0.4}
         onClick={() => navigate('/leaderboard')} 
