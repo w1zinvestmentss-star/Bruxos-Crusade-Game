@@ -49,10 +49,17 @@ const Barracks = () => {
     { id: 1030, name: 'Rot Champion', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Rot.Champion.png' },
 
     // BOSS LOOT (Tier 4 Bosses)
-    { id: 'loot_104', name: 'Titan Scholar Vestments', cost: 0, reqBoss: 'Library Titan', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png?placeholder' },
-    { id: 'loot_204', name: 'Celestial Armor', cost: 0, reqBoss: 'Celestial Owl', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png?placeholder' },
-    { id: 'loot_304', name: 'Void Scales', cost: 0, reqBoss: 'Void Hydra', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png?placeholder' },
-    { id: 'loot_404', name: 'Chronos Plate', cost: 0, reqBoss: 'Chronos Titan', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png?placeholder' }
+    { id: 'loot_104', name: 'Library Titan Armor', cost: 0, reqBoss: 'The Library Titan', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Library.Titan.Armor.png' },
+    { id: 'loot_204', name: 'Celestial Owl Armor', cost: 0, reqBoss: 'The Celestial Owl', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Celestial.Owl.Armor.png' },
+    { id: 'loot_304', name: 'Void Hydra Armor', cost: 0, reqBoss: 'The Void Hydra', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Void.Hydra.Armor.png' },
+    { id: 'loot_404', name: 'Chronos Titan Armor', cost: 0, reqBoss: 'The Chronos Titan', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Chronos.Titan.Armor.png' },
+    { id: 'loot_504', name: 'Molten Sovereign Armor', cost: 0, reqBoss: 'The Molten Sovereign', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Molten.Sovereign.Armor.png' },
+    { id: 'loot_604', name: 'Shattered Sovereign Armor', cost: 0, reqBoss: 'The Shattered Sovereign', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shattered.Sovereign.Armor.png' },
+    { id: 'loot_704', name: 'Spectral Archivist Armor', cost: 0, reqBoss: 'The Spectral Archivist', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Spectral.Archivist.Armor.png' },
+    { id: 'loot_804', name: 'Ivory Leviathan Armor', cost: 0, reqBoss: 'The Ivory Leviathan', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ivory.Leviathan.Armor.png' },
+    { id: 'loot_904', name: 'Prism Weaver Armor', cost: 0, reqBoss: 'The Prism Weaver', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Prism.Weaver.Armor.png' },
+    { id: 'loot_1004', name: 'Seraph of Hope Armor', cost: 0, reqBoss: 'The Seraph of Hope', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Seraph.of.Hope.Armor.png' },
+    { id: 'loot_1104', name: 'Weaver of Fates Armor', cost: 0, reqBoss: 'The Weaver of Fates', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Weaver.of.Fates.Armor.png' }
   ];
 
   const handleBuyItem = (item) => {
