@@ -185,7 +185,7 @@ const StudentDashboard = () => {
         label="Hall of Triumphs"
         description="View your unlocked Achievements and claim real-world rewards!"
         icon={Trophy}
-        x="74%" 
+        x="70%" 
         y="13%" 
         delay={1.2}
         onClick={() => navigate('/trophies')}
