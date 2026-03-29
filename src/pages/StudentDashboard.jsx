@@ -153,7 +153,7 @@ const StudentDashboard = () => {
       <MapLocation 
         label="The Archives" 
         description="Your permanent record. Track your Intellect, Wisdom, and overall power level."
-        x="25%" 
+        x="17%" 
         y="15%" 
         delay={0.6}
         onClick={() => navigate('/archives')} 
