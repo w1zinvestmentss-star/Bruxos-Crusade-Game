@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BookOpen, Star, TrendingUp, Swords } from 'lucide-react';
+import { ArrowLeft, BookOpen, Star, TrendingUp, Swords, Info } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const PodiumSpot = ({ student, rank, scoreDisplay }) => {
@@ -69,6 +69,13 @@ const Leaderboard = () => {
   const [activeTab, setActiveTab] = useState('scholar');
 
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
+
+  const TAB_INFO = {
+    scholar: { title: "Path of the Scholar", desc: "Measures true mastery. Heavily weighs your Academic Attributes (Intellect & Wisdom) with your total XP acting as a tie-breaker. Ace your exams!" },
+    slayer: { title: "Path of the Slayer", desc: "Honors the greatest monster hunters. Earn points by defeating Bosses in the Dungeon. Higher tier bosses grant more points. XP breaks ties!" },
+    grinder: { title: "Path of the Grinder", desc: "Rewards pure, unrelenting effort. Ranks heroes strictly by Total XP. Complete daily quests, reports, and bounties to climb to the top!" },
+    comeback: { title: "Path of the Comeback", desc: "Celebrates resilience and growth. Ranks heroes by the greatest improvement from their Midterm (Intellect) to their Final (Wisdom). Never give up!" }
+  };
 
   const sortedStudents = useMemo(() => {
     return [...students].sort((a, b) => {
@@ -164,6 +171,14 @@ const Leaderboard = () => {
               <tab.icon size={16} /> {tab.label}
             </button>
           ))}
+        </div>
+
+        <div className="bg-blue-900/20 border border-blue-500/50 rounded-lg p-4 mb-6 mx-4 mt-4 flex items-start gap-4">
+          <Info className="text-blue-400 mt-1 shrink-0" />
+          <div>
+            <h2 className="font-['Press_Start_2P'] text-blue-300 text-sm mb-2 leading-relaxed">{TAB_INFO[activeTab].title}</h2>
+            <p className="font-['VT323'] text-stone-300 text-xl">{TAB_INFO[activeTab].desc}</p>
+          </div>
         </div>
 
         <div className="p-2 sm:p-4 min-h-[50vh]">
