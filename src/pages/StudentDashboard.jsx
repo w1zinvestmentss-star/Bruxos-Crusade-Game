@@ -153,8 +153,8 @@ const StudentDashboard = () => {
       <MapLocation 
         label="The Archives" 
         description="Your permanent record. Track your Intellect, Wisdom, and overall power level."
-        x="74%" 
-        y="13%" 
+        x="25%" 
+        y="15%" 
         delay={0.6}
         onClick={() => navigate('/archives')} 
       />
@@ -185,8 +185,8 @@ const StudentDashboard = () => {
         label="Hall of Triumphs"
         description="View your unlocked Achievements and claim real-world rewards!"
         icon={Trophy}
-        x="50%" 
-        y="80%" 
+        x="74%" 
+        y="13%" 
         delay={1.2}
         onClick={() => navigate('/trophies')}
         variant="gold"
