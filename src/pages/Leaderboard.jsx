@@ -10,7 +10,7 @@ const PodiumSpot = ({ student, rank, scoreDisplay }) => {
 
   const rankStyles = {
     1: {
-      size: 'h-28 w-28',
+      size: 'w-40 h-40 sm:w-48 sm:h-48',
       avatarBorder: 'border-yellow-400',
       textColor: 'text-yellow-400',
       marginTop: 'mt-0',
@@ -18,18 +18,18 @@ const PodiumSpot = ({ student, rank, scoreDisplay }) => {
       badgeTextColor: 'text-yellow-400',
     },
     2: {
-      size: 'h-24 w-24',
+      size: 'w-32 h-32',
       avatarBorder: 'border-zinc-400',
       textColor: 'text-zinc-400',
-      marginTop: 'mt-8',
+      marginTop: 'mt-8 sm:mt-16',
       badgeColor: 'border-zinc-400',
       badgeTextColor: 'text-zinc-400',
     },
     3: {
-      size: 'h-24 w-24',
+      size: 'w-32 h-32',
       avatarBorder: 'border-orange-400',
       textColor: 'text-orange-400',
-      marginTop: 'mt-8',
+      marginTop: 'mt-8 sm:mt-16',
       badgeColor: 'border-orange-400',
       badgeTextColor: 'text-orange-400',
     },
@@ -42,21 +42,21 @@ const PodiumSpot = ({ student, rank, scoreDisplay }) => {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: rank * 0.1 }}
-      className={`flex flex-col items-center text-center ${styles.marginTop} w-40`}
+      className={`flex flex-col items-center text-center ${styles.marginTop}`}
     >
-      <div className="relative mb-2">
-        <div className={`${styles.size} rounded-full bg-black border-4 ${styles.avatarBorder} overflow-hidden flex items-center justify-center shadow-lg`}>
+      <div className="relative mb-6">
+        <div className={`${styles.size} rounded-xl bg-black border-4 ${styles.avatarBorder} overflow-hidden relative shadow-lg`}>
           <img
             src={student.currentBodySprite}
             alt={`${student.heroName}'s avatar`}
-            className="w-full h-full object-contain object-top pt-2"
+            className="absolute inset-0 w-full h-full object-contain"
           />
         </div>
-        <div className={`absolute -bottom-3 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-black border-2 ${styles.badgeColor} flex items-center justify-center`}>
+        <div className={`absolute -bottom-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-black border-2 ${styles.badgeColor} flex items-center justify-center z-10`}>
             <span className={`font-['Press_Start_2P'] text-xs ${styles.badgeTextColor}`}>{rank}</span>
         </div>
       </div>
-      <h3 className={`font-['VT323'] text-xl font-bold ${styles.textColor}`}>{student.heroName}</h3>
+      <h3 className={`font-['VT323'] text-2xl font-bold ${styles.textColor}`}>{student.heroName}</h3>
       {scoreDisplay}
     </motion.div>
   );
