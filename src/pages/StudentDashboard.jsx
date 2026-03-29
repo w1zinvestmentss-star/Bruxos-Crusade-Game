@@ -27,8 +27,8 @@ const StudentDashboard = () => {
     setShowWelcomeModal(false);
   };
 
-  const MapLocation = ({ label, icon: Icon, onClick, x, y, delay, variant = 'default' }) => {
-    const baseClasses = "absolute z-10 bg-black/80 border-2 text-white flex items-center gap-2 font-bold font-mono uppercase tracking-widest px-4 py-2 hover:bg-black/90 transition-colors";
+  const MapLocation = ({ label, description, icon: Icon, onClick, x, y, delay, variant = 'default' }) => {
+    const baseClasses = "group absolute z-10 bg-black/80 border-2 text-white flex items-center gap-2 font-bold font-mono uppercase tracking-widest px-4 py-2 hover:bg-black/90 transition-colors";
     
     const variants = {
       default: 'border-yellow-500/50 hover:border-yellow-400',
@@ -53,6 +53,11 @@ const StudentDashboard = () => {
         >
             {Icon && <Icon size={18} />}
             <span>{label}</span>
+            {description && (
+              <div className="absolute top-full mt-3 w-56 p-3 bg-black/95 border border-yellow-500/50 rounded-lg shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 text-stone-300 text-xs font-mono text-left leading-relaxed">
+                {description}
+              </div>
+            )}
         </motion.button>
     );
   };
@@ -127,6 +132,7 @@ const StudentDashboard = () => {
       {/* QUEST BOARD */}
       <MapLocation 
         label="Quest Board" 
+        description="Accept daily tasks, quizzes, and missions to earn Gold and XP."
         x="18%" 
         y="45%" 
         delay={0.2}
@@ -136,6 +142,7 @@ const StudentDashboard = () => {
       {/* TOWN SQUARE / LEADERBOARD */}
       <MapLocation 
         label="Town Square" 
+        description="The Hall of Legends. See how your rank and Boss Kills stack up against the realm."
         x="45%" 
         y="24%" 
         delay={0.4}
@@ -145,15 +152,17 @@ const StudentDashboard = () => {
       {/* THE ARCHIVES */}
       <MapLocation 
         label="The Archives" 
+        description="Your permanent record. Track your Intellect, Wisdom, and overall power level."
         x="74%" 
         y="13%" 
         delay={0.6}
         onClick={() => navigate('/archives')} 
       />
 
-      {/* THE BARRACKS */}
+      {/* THE BAZAAR */}
       <MapLocation 
-        label="The Barracks" 
+        label="The Bazaar" 
+        description="Spend your hard-earned gold on legendary outfits and gear."
         x="68%" 
         y="41%" 
         delay={0.8}
@@ -163,6 +172,7 @@ const StudentDashboard = () => {
        {/* THE DUNGEON */}
       <MapLocation 
         label="The Dungeon"
+        description="Face terrifying bosses. Unlocked by maintaining streaks and completing specific quests!"
         x="50%" 
         y="65%" 
         delay={1.0}
@@ -173,6 +183,7 @@ const StudentDashboard = () => {
       {/* HALL OF TRIUMPHS */}
       <MapLocation 
         label="Hall of Triumphs"
+        description="View your unlocked Achievements and claim real-world rewards!"
         icon={Trophy}
         x="50%" 
         y="80%" 
