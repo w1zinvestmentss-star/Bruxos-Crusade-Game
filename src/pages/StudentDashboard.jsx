@@ -159,9 +159,9 @@ const StudentDashboard = () => {
         onClick={() => navigate('/archives')} 
       />
 
-      {/* THE BAZAAR */}
+      {/* THE BARRACKS */}
       <MapLocation 
-        label="The Bazaar" 
+        label="The Barracks" 
         description="Spend your hard-earned gold on legendary outfits and gear."
         x="68%" 
         y="41%" 
