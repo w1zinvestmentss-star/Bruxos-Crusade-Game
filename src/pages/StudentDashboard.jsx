@@ -63,7 +63,7 @@ const StudentDashboard = () => {
   };
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-stone-900">
+    <div className="relative w-full h-screen overflow-hidden bg-black flex items-center justify-center">
 
       {/* Welcome Back Modal */}
       {showWelcomeModal && (
@@ -93,18 +93,19 @@ const StudentDashboard = () => {
         </div>
       )}
 
-      {/* 1. Background Map Layer */}
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-black/30 z-0" />
+      {/* Ambient Beautiful Glow Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-stone-950">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-900/30 via-stone-900/80 to-black z-0" />
         <img 
           src={MAP_BG} 
-          alt="Kingdom Map" 
-          className="w-full h-full object-cover opacity-80"
+          alt="ambient background" 
+          className="absolute inset-0 w-full h-full object-cover blur-3xl opacity-60 scale-125 mix-blend-screen" 
         />
+        <div className="absolute inset-0 bg-black/20" />
       </div>
 
       {/* 2. Top HUD (Heads Up Display) */}
-      <div className="absolute top-0 left-0 w-full p-4 flex justify-between items-start z-20">
+      <div className="absolute top-0 left-0 w-full p-4 flex justify-between items-start z-50">
         <div className="flex items-center gap-4 bg-black/60 p-3 rounded-xl border-2 border-stone-600 backdrop-blur-md">
           <div className="w-12 h-12 bg-indigo-600 rounded-full border-2 border-yellow-400 flex items-center justify-center">
             <User className="text-white" />
@@ -127,73 +128,84 @@ const StudentDashboard = () => {
         </button>
       </div>
 
-      {/* 3. Interactive Map Locations */}
-      
-      {/* QUEST BOARD */}
-      <MapLocation 
-        label="Quest Board" 
-        description="Accept daily tasks, quizzes, and missions to earn Gold and XP."
-        x="18%" 
-        y="45%" 
-        delay={0.2}
-        onClick={() => navigate('/quests')} 
-      />
+      {/* Map Canvas Wrapper */}
+      <div className="relative z-10 h-[96vh] w-auto max-w-[98vw] aspect-video mx-auto overflow-hidden rounded-2xl border-4 border-stone-700/80 shadow-[0_0_80px_rgba(0,0,0,1)]">
+        {/* 1. Background Map Layer */}
+        <div className="absolute inset-0 bg-black/20 z-0" />
+        <img 
+          src={MAP_BG} 
+          alt="Kingdom Map" 
+          className="absolute inset-0 w-full h-full object-cover opacity-80"
+        />
 
-      {/* TOWN SQUARE / LEADERBOARD */}
-      <MapLocation 
-        label="Town Square" 
-        description="The Hall of Legends. See how your rank and Boss Kills stack up against the realm."
-        x="43%" 
-        y="24%" 
-        delay={0.4}
-        onClick={() => navigate('/leaderboard')} 
-      />
+        {/* 3. Interactive Map Locations */}
+        
+        {/* QUEST BOARD */}
+        <MapLocation 
+          label="Quest Board" 
+          description="Accept daily tasks, quizzes, and missions to earn Gold and XP."
+          x="18%" 
+          y="45%" 
+          delay={0.2}
+          onClick={() => navigate('/quests')} 
+        />
 
-      {/* THE ARCHIVES */}
-      <MapLocation 
-        label="The Archives" 
-        description="Your permanent record. Track your Intellect, Wisdom, and overall power level."
-        x="17%" 
-        y="15%" 
-        delay={0.6}
-        onClick={() => navigate('/archives')} 
-      />
+        {/* TOWN SQUARE / LEADERBOARD */}
+        <MapLocation 
+          label="Town Square" 
+          description="The Hall of Legends. See how your rank and Boss Kills stack up against the realm."
+          x="43%" 
+          y="24%" 
+          delay={0.4}
+          onClick={() => navigate('/leaderboard')} 
+        />
 
-      {/* THE BARRACKS */}
-      <MapLocation 
-        label="The Barracks" 
-        description="Spend your hard-earned gold on legendary outfits and gear."
-        x="68%" 
-        y="41%" 
-        delay={0.8}
-        onClick={() => navigate('/barracks')} 
-      />
+        {/* THE ARCHIVES */}
+        <MapLocation 
+          label="The Archives" 
+          description="Your permanent record. Track your Intellect, Wisdom, and overall power level."
+          x="17%" 
+          y="15%" 
+          delay={0.6}
+          onClick={() => navigate('/archives')} 
+        />
 
-       {/* THE DUNGEON */}
-      <MapLocation 
-        label="The Dungeon"
-        description="Face terrifying bosses. Unlocked by maintaining streaks and completing specific quests!"
-        x="50%" 
-        y="65%" 
-        delay={1.0}
-        onClick={() => navigate('/dungeon')}
-        variant="danger"
-      />
+        {/* THE BARRACKS */}
+        <MapLocation 
+          label="The Barracks" 
+          description="Spend your hard-earned gold on legendary outfits and gear."
+          x="68%" 
+          y="41%" 
+          delay={0.8}
+          onClick={() => navigate('/barracks')} 
+        />
 
-      {/* HALL OF TRIUMPHS */}
-      <MapLocation 
-        label="Hall of Triumphs"
-        description="View your unlocked Achievements and claim real-world rewards!"
-        icon={Trophy}
-        x="70%" 
-        y="13%" 
-        delay={1.2}
-        onClick={() => navigate('/trophies')}
-        variant="gold"
-      />
+         {/* THE DUNGEON */}
+        <MapLocation 
+          label="The Dungeon"
+          description="Face terrifying bosses. Unlocked by maintaining streaks and completing specific quests!"
+          x="50%" 
+          y="65%" 
+          delay={1.0}
+          onClick={() => navigate('/dungeon')}
+          variant="danger"
+        />
 
-      <div className="absolute bottom-4 right-4 text-white/50 font-mono text-xs z-10">
-        Map v1.3
+        {/* HALL OF TRIUMPHS */}
+        <MapLocation 
+          label="Hall of Triumphs"
+          description="View your unlocked Achievements and claim real-world rewards!"
+          icon={Trophy}
+          x="70%" 
+          y="13%" 
+          delay={1.2}
+          onClick={() => navigate('/trophies')}
+          variant="gold"
+        />
+
+        <div className="absolute bottom-4 right-4 text-white/50 font-mono text-xs z-10">
+          Map v1.3
+        </div>
       </div>
     </div>
   );
