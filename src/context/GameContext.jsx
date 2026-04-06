@@ -11,39 +11,29 @@ const INITIAL_STUDENTS = [
 ];
 
 const ACHIEVEMENTS =[
-  // PROGRESSION (Levels)
-  { id: 'lvl_5', metric: 'level', target: 5, title: 'Apprentice', desc: 'Reach Level 5.', rewardXp: 200, rewardTicket: 1, limit: null },
-  { id: 'lvl_10', metric: 'level', target: 10, title: 'Journeyman', desc: 'Reach Level 10.', rewardXp: 500, rewardTicket: 2, limit: null },
-  { id: 'lvl_15', metric: 'level', target: 15, title: 'Realm Vanguard', desc: 'First 3 to reach Level 15!', rewardXp: 1500, rewardTicket: 5, realWorldPrize: '$15 Cineplex Card', limit: 3, fallbackGold: 3000 },
-  
-  // CONSISTENCY (Streaks)
-  { id: 'streak_7', metric: 'streak', target: 7, title: 'Dedicated', desc: 'Achieve a 7-day login streak.', rewardXp: 300, rewardTicket: 1, limit: null },
-  { id: 'streak_14', metric: 'streak', target: 14, title: 'Unbreakable', desc: 'Achieve a 14-day login streak.', rewardXp: 800, rewardTicket: 3, limit: null },
-  { id: 'streak_30', metric: 'streak', target: 30, title: 'Relentless', desc: 'Achieve a 30-day login streak!', rewardXp: 2000, rewardTicket: 5, realWorldPrize: '$5 Tim Hortons Card', limit: null },
-
-  // ACADEMICS (Quests by Type)
-  { id: 'math_10', metric: 'quizzes', target: 10, title: 'Mathlete', desc: 'Complete 10 Quiz Quests.', rewardXp: 400, rewardTicket: 1, limit: null },
-  { id: 'journal_5', metric: 'journals', target: 5, title: 'The Scribe', desc: 'Submit 5 Journal Reflections.', rewardXp: 300, rewardTicket: 1, limit: null },
-  { id: 'sports_5', metric: 'sports', target: 5, title: 'The Athlete', desc: 'Complete 5 Physical Education Scout Reports.', rewardXp: 400, rewardTicket: 1, limit: null },
-  { id: 'arts_5', metric: 'arts', target: 5, title: 'The Artist', desc: 'Complete 5 Fine Arts Scout Reports.', rewardXp: 400, rewardTicket: 1, limit: null },
-
-  // VOLUME (Total Quests)
-  { id: 'quests_25', metric: 'total_quests', target: 25, title: 'Quest Master', desc: 'Complete 25 total quests.', rewardXp: 1000, rewardTicket: 2, limit: null },
-  { id: 'quests_50', metric: 'total_quests', target: 50, title: 'Hero of the Realm', desc: 'Complete 50 total quests.', rewardXp: 2500, rewardTicket: 5, limit: null },
-  { id: 'quests_100', metric: 'total_quests', target: 100, title: 'The Legend', desc: 'First to complete 100 quests!', rewardXp: 5000, rewardTicket: 10, realWorldPrize: '$50 Amazon Card', limit: 1, fallbackGold: 10000 },
-
-  // COMBAT (Bosses)
-  { id: 'boss_1', metric: 'bosses', target: 1, title: 'First Blood', desc: 'Defeat your first boss.', rewardXp: 200, rewardTicket: 0, limit: null },
-  { id: 'boss_5', metric: 'bosses', target: 5, title: 'Monster Hunter', desc: 'Defeat 5 bosses.', rewardXp: 1000, rewardTicket: 2, limit: null },
-  { id: 'boss_15', metric: 'bosses', target: 15, title: 'The Slayer', desc: 'Defeat 15 bosses.', rewardXp: 3000, rewardTicket: 5, limit: null },
-
-  // ECONOMY (Shop)
-  { id: 'outfit_1', metric: 'outfits', target: 1, title: 'Fashionista', desc: 'Purchase your first outfit.', rewardXp: 100, rewardTicket: 1, limit: null },
-  { id: 'outfit_5', metric: 'outfits', target: 5, title: 'Wardrobe Wealth', desc: 'Purchase 5 different outfits.', rewardXp: 800, rewardTicket: 2, limit: null },
-
-  // SCHEDULED (Time-Gated Events)
-  { id: 'spring_event', metric: 'total_quests', target: 30, title: 'Spring Awakening', desc: 'Complete 30 quests. Unlocks April 2026!', rewardXp: 1500, rewardTicket: 3, limit: null, unlockDate: '2026-04-01' },
-  { id: 'year_end', metric: 'level', target: 20, title: 'End of Year Champion', desc: 'Reach Level 20. Unlocks June 2026!', rewardXp: 5000, rewardTicket: 10, realWorldPrize: 'End of Year Pizza Party Invite', limit: null, unlockDate: '2026-06-01' }
+// --- PHASE 1: THE ONBOARDING (Early Game / Easy Wins) ---
+{ id: 'first_step', metric: 'total_quests', target: 1, title: 'The First Step', desc: 'Complete your very first quest.', rewardXp: 100, rewardGold: 50, rewardTicket: 0, realWorldPrize: null, limit: null },
+{ id: 'first_blood', metric: 'bosses', target: 1, title: 'First Blood', desc: 'Defeat your first boss in the Dungeon.', rewardXp: 200, rewardGold: 100, rewardTicket: 0, realWorldPrize: null, limit: null },
+{ id: 'fashionista', metric: 'outfits', target: 1, title: 'Fashionista', desc: 'Purchase your first outfit from the Barracks.', rewardXp: 100, rewardGold: 0, rewardTicket: 1, realWorldPrize: null, limit: null },
+{ id: 'streak_7', metric: 'streak', target: 7, title: 'Dedicated', desc: 'Achieve a 7-day login streak.', rewardXp: 300, rewardGold: 150, rewardTicket: 1, realWorldPrize: null, limit: null },
+{ id: 'apprentice', metric: 'level', target: 5, title: 'The Apprentice', desc: 'Reach Level 5.', rewardXp: 500, rewardGold: 250, rewardTicket: 1, realWorldPrize: null, limit: null },
+{ id: 'wellness_5', metric: 'wellness', target: 5, title: 'Sound Mind', desc: 'Complete 5 Tavern Rests (Wellness Checks).', rewardXp: 200, rewardGold: 100, rewardTicket: 1, realWorldPrize: null, limit: null },
+{ id: 'hw_hero_1', metric: 'uploads', target: 10, title: 'Homework Hero I', desc: 'Submit 10 Homework assignments.', rewardXp: 500, rewardGold: 200, rewardTicket: 2, realWorldPrize: null, limit: null },
+{ id: 'quiz_novice', metric: 'quizzes', target: 10, title: 'Quiz Novice', desc: 'Ace 10 Quizzes.', rewardXp: 300, rewardGold: 150, rewardTicket: 1, realWorldPrize: null, limit: null },
+// --- PHASE 2: THE GRIND (Mid-Game Habit Building) ---
+{ id: 'journeyman', metric: 'level', target: 10, title: 'The Journeyman', desc: 'Reach Level 10.', rewardXp: 1000, rewardGold: 500, rewardTicket: 2, realWorldPrize: null, limit: null },
+{ id: 'streak_30', metric: 'streak', target: 30, title: 'Relentless', desc: 'Achieve a 30-day login streak!', rewardXp: 2000, rewardGold: 1000, rewardTicket: 3, realWorldPrize: '$5 Dairy Queen Card', limit: null },
+{ id: 'monster_hunter', metric: 'bosses', target: 10, title: 'Monster Hunter', desc: 'Defeat 10 bosses in the Dungeon.', rewardXp: 1500, rewardGold: 750, rewardTicket: 2, realWorldPrize: null, limit: null },
+{ id: 'wardrobe_wealth', metric: 'outfits', target: 5, title: 'Wardrobe Wealth', desc: 'Purchase 5 different outfits.', rewardXp: 800, rewardGold: 0, rewardTicket: 2, realWorldPrize: null, limit: null },
+{ id: 'halfway_there', metric: 'total_quests', target: 60, title: 'Halfway There', desc: 'Complete 60 total quests.', rewardXp: 2000, rewardGold: 1000, rewardTicket: 5, realWorldPrize: null, limit: null },
+// --- PHASE 3: THE ENDGAME (Hardcore & Competitive) ---
+{ id: 'realm_vanguard', metric: 'level', target: 15, title: 'Realm Vanguard', desc: 'First 3 to reach Level 15!', rewardXp: 3000, rewardGold: 1500, rewardTicket: 5, realWorldPrize: '$10 Indigo Card', limit: null },
+{ id: 'boutique_owner', metric: 'outfits', target: 15, title: 'Boutique Owner', desc: 'First 2 to own 15 outfits!', rewardXp: 3000, rewardGold: 0, rewardTicket: 5, realWorldPrize: '$50 Amazon.ca Card', limit: 1, fallbackGold: 15000 },
+// --- PITY TIMERS (Guaranteed rewards for bad raffle luck) ---
+{ id: 'pity_prize_1', metric: 'tickets', target: 15, title: 'Adept Challenger', desc: 'Earn 15 Raffle Tickets overall.', rewardXp: 0, rewardGold: 0, rewardTicket: 0, realWorldPrize: '$10 Amazon.ca Card', limit: null },
+// --- SEASONAL / SCHEDULED (Time-Gated) ---
+{ id: 'spring_awakening', metric: 'total_quests', target: 80, title: 'Spring Awakening', desc: 'Complete 80 quests. Unlocks April 2026!', rewardXp: 2000, rewardGold: 1000, rewardTicket: 5, realWorldPrize: null, limit: null, unlockDate: '2026-04-01' },
+{ id: 'year_end', metric: 'level', target: 25, title: 'End of Year Champion', desc: 'Reach Level 25. Unlocks June 2026!', rewardXp: 5000, rewardGold: 2500, rewardTicket: 10, realWorldPrize: 'End of Year Pizza Party Invite', limit: null, unlockDate: '2026-06-01' }
 ];
 
 const BOSSES = [
@@ -269,6 +259,7 @@ export function GameProvider({ children }) {
       let updatedStudent = { ...student };
       let newlyUnlocked = false;
       let totalXp = 0;
+      let totalGoldEarned = 0;
       let additionalGoldFromFallback = 0;
       let newNotifications = [...(updatedStudent.notifications || [])];
       let newPendingPrizes = [...(updatedStudent.pendingPrizes || [])];
@@ -280,7 +271,11 @@ export function GameProvider({ children }) {
                           (updatedStudent.multiStepQuestsCompleted || 0) +
                           (updatedStudent.sportsQuestsCompleted || 0) +
                           (updatedStudent.artsQuestsCompleted || 0) +
-                          (updatedStudent.journalQuestsCompleted || 0);
+                          (updatedStudent.journalQuestsCompleted || 0) +
+                          (updatedStudent.scenarioQuestsCompleted || 0) +
+                          (updatedStudent.cipherQuestsCompleted || 0) +
+                          (updatedStudent.incantationQuestsCompleted || 0) +
+                          (updatedStudent.wellnessQuestsCompleted || 0);
 
       const currentLevel = Math.max(updatedStudent.level || 1, Math.floor(updatedStudent.xp / 1000) + 1);
 
@@ -322,6 +317,24 @@ export function GameProvider({ children }) {
           case 'outfits':
             reqMet = (updatedStudent.inventory?.filter(i => i.type === 'outfit').length || 0) >= achievement.target;
             break;
+          case 'scenarios':
+            reqMet = (updatedStudent.scenarioQuestsCompleted || 0) >= achievement.target;
+            break;
+          case 'ciphers':
+            reqMet = (updatedStudent.cipherQuestsCompleted || 0) >= achievement.target;
+            break;
+          case 'incantations':
+            reqMet = (updatedStudent.incantationQuestsCompleted || 0) >= achievement.target;
+            break;
+          case 'wellness':
+            reqMet = (updatedStudent.wellnessQuestsCompleted || 0) >= achievement.target;
+            break;
+          case 'tickets':
+            reqMet = (updatedStudent.totalTicketsEarned || 0) >= achievement.target;
+            break;
+          case 'uploads':
+            reqMet = (updatedStudent.uploadQuestsCompleted || 0) >= achievement.target;
+            break;
           default:
             reqMet = false;
         }
@@ -330,6 +343,7 @@ export function GameProvider({ children }) {
           newlyUnlocked = true;
           updatedStudent.unlockedAchievements.push(achievement.id);
           totalXp += achievement.rewardXp;
+          totalGoldEarned += (achievement.rewardGold || 0);
           newRaffleTickets += achievement.rewardTicket;
           newTotalTickets += achievement.rewardTicket;
 
@@ -378,7 +392,7 @@ export function GameProvider({ children }) {
         updatedStudent.notifications = newNotifications;
         updatedStudent.raffleTickets = newRaffleTickets;
         updatedStudent.totalTicketsEarned = newTotalTickets;
-        updatedStudent.gold += additionalGoldFromFallback;
+        updatedStudent.gold += (additionalGoldFromFallback + totalGoldEarned);
         
         const oldLevel = Math.floor(updatedStudent.xp / 1000) + 1;
         updatedStudent.xp += totalXp;
