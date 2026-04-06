@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
-import { ArrowLeft, Trophy, Lock, Coins, Star, Gift } from 'lucide-react';
+import { ArrowLeft, Trophy, Lock, Coins, Star, Gift, Ticket } from 'lucide-react';
 
 const TrophyRoom = () => {
   const navigate = useNavigate();
-  const { currentUser, ACHIEVEMENTS, students } = useGame();
+  const { currentUser, ACHIEVEMENTS, students, currentRafflePrize = "Mystery Box" } = useGame();
 
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
 
@@ -38,6 +38,18 @@ const TrophyRoom = () => {
             Behold the greatest feats of the realm. Unlock real-world prizes and eternal glory.
           </p>
         </header>
+
+        <div className="w-full max-w-4xl mx-auto mb-8 bg-indigo-900/80 backdrop-blur-md border border-indigo-400 text-white px-6 py-4 rounded-xl shadow-[0_0_20px_rgba(99,102,241,0.3)] flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Ticket className="text-yellow-400" size={24} />
+            <div className="font-bold text-lg">
+              CURRENT GRAND RAFFLE: {currentRafflePrize}
+            </div>
+          </div>
+          <div className="bg-black/60 px-4 py-2 rounded-lg text-yellow-400 font-mono text-xl border border-yellow-500/30">
+            Your Tickets: {currentUser?.raffleTickets || 0}
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {(ACHIEVEMENTS || []).map((achievement) => {
