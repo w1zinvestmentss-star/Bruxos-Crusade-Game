@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
 import { ArrowLeft, Trophy, Lock, Coins, Star, Gift, Ticket } from 'lucide-react';
@@ -6,6 +6,7 @@ import { ArrowLeft, Trophy, Lock, Coins, Star, Gift, Ticket } from 'lucide-react
 const TrophyRoom = () => {
   const navigate = useNavigate();
   const { currentUser, ACHIEVEMENTS, students, currentRafflePrize = "Mystery Box" } = useGame();
+  const [activeFilter, setActiveFilter] = useState('all');
 
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
 
@@ -67,8 +68,34 @@ const TrophyRoom = () => {
           </div>
         </section>
 
+        <div className="flex flex-wrap justify-center gap-4 mb-8">
+          {[
+            { id: 'all', label: 'All Trophies' },
+            { id: 'earned', label: 'Earned' },
+            { id: 'locked', label: 'Locked' },
+            { id: 'prizes', label: 'Real-World Prizes' }
+          ].map(filter => (
+            <button
+              key={filter.id}
+              onClick={() => setActiveFilter(filter.id)}
+              className={
+                activeFilter === filter.id
+                  ? "bg-yellow-600 text-white border-2 border-yellow-400 px-4 py-2 rounded-lg font-bold font-mono shadow-[0_0_10px_rgba(202,138,4,0.5)]"
+                  : "bg-stone-800 text-stone-400 border border-stone-600 px-4 py-2 rounded-lg font-mono hover:bg-stone-700 transition-colors"
+              }
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {(ACHIEVEMENTS || []).map((achievement) => {
+          {(ACHIEVEMENTS || []).filter(ach => {
+            if (activeFilter === 'earned') return currentUser.unlockedAchievements?.includes(ach.id);
+            if (activeFilter === 'locked') return !currentUser.unlockedAchievements?.includes(ach.id);
+            if (activeFilter === 'prizes') return ach.realWorldPrize !== null && ach.realWorldPrize !== undefined;
+            return true;
+          }).map((achievement) => {
             const isFutureGated = achievement.unlockDate && new Date() < new Date(achievement.unlockDate);
             const isUnlocked = currentUser.unlockedAchievements?.includes(achievement.id);
             const claimedCount = students.filter(s => s.unlockedAchievements?.includes(achievement.id)).length;
@@ -79,12 +106,12 @@ const TrophyRoom = () => {
             return (
               <div 
                 key={achievement.id} 
-                className={`bg-stone-900 border-2 rounded-xl p-6 flex flex-col justify-between transition-all relative ${
+                className={`bg-stone-900 border-2 rounded-xl p-6 flex flex-col justify-between relative ${
                   isUnlocked 
-                    ? 'border-yellow-500 shadow-2xl shadow-yellow-900/30' 
+                    ? 'border-yellow-500 shadow-2xl shadow-yellow-900/30 transition-all' 
                     : isFutureGated 
-                      ? 'border-stone-700 opacity-50 grayscale pointer-events-none'
-                      : 'border-stone-700 opacity-60 grayscale hover:grayscale-0 hover:opacity-100'
+                      ? 'border-stone-700 opacity-50 grayscale pointer-events-none transition-all'
+                      : 'border-stone-700 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300'
                 }`}
               >
                 {isFutureGated && (
