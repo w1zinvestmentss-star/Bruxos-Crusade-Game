@@ -211,6 +211,7 @@ export function GameProvider({ children }) {
   const [submissions, setSubmissions] = useState([]);
   const [userRole, setUserRole] = useState(null); 
   const [currentUser, setCurrentUser] = useState(null); 
+  const [currentRafflePrize, setCurrentRafflePrize] = useState('Mystery Prize');
 
   const awardRewards = (studentId, xpToAdd, goldToAdd) => {
     setStudents(prevStudents => prevStudents.map(student => {
@@ -885,6 +886,46 @@ export function GameProvider({ children }) {
     }));
   };
 
+  const runMonthlyRaffle = (prizeName) => {
+    let pool = [];
+    students.forEach(student => {
+      const tickets = student.raffleTickets || 0;
+      for (let i = 0; i < tickets; i++) {
+        pool.push(student.id);
+      }
+    });
+
+    if (pool.length === 0) {
+      return { success: false, message: 'No tickets in the pool.' };
+    }
+
+    const winnerId = pool[Math.floor(Math.random() * pool.length)];
+    const winner = students.find(s => s.id === winnerId);
+
+    setStudents(prev => prev.map(student => {
+      let updated = { ...student };
+      updated.raffleTickets = 0;
+      
+      if (student.id === winnerId) {
+        updated.pendingPrizes = [...(updated.pendingPrizes || []), { name: prizeName, achievement: 'Grand Monthly Raffle', status: 'pending' }];
+        updated.notifications = [...(updated.notifications || []), {
+           id: Date.now() + Math.random(),
+           title: "🎉 YOU WON THE GRAND RAFFLE! 🎉",
+           quote: `Your incredible dedication has earned you the ${prizeName}!`,
+           xp: 0,
+           gold: 0
+        }];
+      }
+      return updated;
+    }));
+
+    if (currentUser) {
+        setCurrentUser(prev => ({ ...prev, raffleTickets: 0 }));
+    }
+
+    return { success: true, winnerName: winner.heroName || winner.name };
+  };
+
   const clearNotifications = () => {
     if (!currentUser) return;
     const updatedUser = { ...currentUser, notifications: [] };
@@ -909,7 +950,10 @@ export function GameProvider({ children }) {
     getSlayerPoints,
     calculateSlayerScore,
     awardRewards,
-    fulfillPrize
+    fulfillPrize,
+    currentRafflePrize,
+    setCurrentRafflePrize,
+    runMonthlyRaffle
   };
 
   return (

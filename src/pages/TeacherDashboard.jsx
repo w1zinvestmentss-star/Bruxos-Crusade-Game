@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Plus, Check, Search, Image as ImageIcon, BookCopy, Save, Upload, Clock, Shield, Star, DollarSign, Swords, Skull, Heart, Gift } from 'lucide-react';
+import { LogOut, Plus, Check, Search, Image as ImageIcon, BookCopy, Save, Upload, Clock, Shield, Star, DollarSign, Swords, Skull, Heart, Gift, Ticket } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const TeacherDashboard = () => {
@@ -14,7 +14,10 @@ const TeacherDashboard = () => {
     setUserRole, 
     updateStudentStats,
     importQuestions,
-    fulfillPrize
+    fulfillPrize,
+    currentRafflePrize,
+    setCurrentRafflePrize,
+    runMonthlyRaffle
   } = useGame();
   
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -192,6 +195,37 @@ const TeacherDashboard = () => {
             <div>
               <p className="font-['Press_Start_2P'] text-sm text-yellow-500 mb-2 flex items-center justify-center gap-2"><DollarSign size={16}/>Gold Hoarded</p>
               <p className="font-['VT323'] text-4xl text-yellow-300">{totalGoldEarned.toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Raffle Control Center */}
+        <div className="bg-indigo-900/30 border-2 border-indigo-500 rounded-xl p-6 mb-8">
+          <h2 className="text-indigo-400 font-bold font-['Press_Start_2P'] mb-6">🎟️ GRAND RAFFLE CONTROLS</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-bold text-stone-300 mb-2">Current Billboard Prize (Visible to Students):</label>
+              <input 
+                type="text" 
+                value={currentRafflePrize} 
+                onChange={(e) => setCurrentRafflePrize(e.target.value)}
+                className="bg-black text-white p-2 rounded w-full border border-indigo-400"
+              />
+            </div>
+            <div className="flex items-end">
+              <button 
+                onClick={() => {
+                  const result = runMonthlyRaffle(currentRafflePrize);
+                  if (result.success) {
+                    alert('🎉 The winner is: ' + result.winnerName + '! The prize has been added to your Fulfillment Center.');
+                  } else {
+                    alert(result.message);
+                  }
+                }}
+                className="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg w-full shadow-[0_0_15px_rgba(202,138,4,0.6)]"
+              >
+                DRAW WINNER NOW
+              </button>
             </div>
           </div>
         </div>
@@ -376,7 +410,12 @@ const TeacherDashboard = () => {
 
             {students.map(student => (
               <div key={student.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center p-2 rounded-lg hover:bg-stone-800/60">
-                <div className="font-semibold text-stone-100">{student.name}</div>
+                <div>
+                  <div className="font-semibold text-stone-100">{student.name}</div>
+                  <div className="flex items-center gap-1 text-yellow-400 font-mono text-sm mt-1">
+                    <Ticket size={14} /> Tickets: {student.raffleTickets || 0}
+                  </div>
+                </div>
                 <div>
                   <input 
                     type="number"
