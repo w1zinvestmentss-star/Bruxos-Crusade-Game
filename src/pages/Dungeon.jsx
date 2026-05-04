@@ -1,22 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
 import { ArrowLeft, Sword, Shield, Coins, Star } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Dungeon = () => {
   const navigate = useNavigate();
-  const { currentUser, BOSSES, fightBoss } = useGame();
+  const { currentUser, BOSSES, fightBoss, submitBossStrike } = useGame();
+
+  const [activeBossBattle, setActiveBossBattle] = useState(null);
+  const [battleInput, setBattleInput] = useState('');
+  const [battleTimeLeft, setBattleTimeLeft] = useState(0);
+  const [cinematic, setCinematic] = useState(null);
 
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
 
-  const handleFightBoss = (bossId) => {
-    const result = fightBoss(bossId);
-    if (result.success) {
-      alert(`Victory! You defeated the boss and earned ${result.rewardGold} Gold and ${result.rewardXp} XP!`);
-    } else {
-      alert(`Defeat: ${result.message}`);
+  useEffect(() => {
+    let timer;
+    if (activeBossBattle && activeBossBattle.finishingBlow?.type === 'auto' && battleTimeLeft > 0) {
+      timer = setInterval(() => {
+        setBattleTimeLeft((prev) => prev - 1);
+      }, 1000);
+    } else if (battleTimeLeft === 0 && activeBossBattle?.finishingBlow?.type === 'auto') {
+      alert('The boss evaded your strike!');
+      setActiveBossBattle(null);
     }
-  };
+    return () => clearInterval(timer);
+  }, [activeBossBattle, battleTimeLeft]);
 
   if (!currentUser) {
     return (
@@ -183,7 +193,13 @@ const Dungeon = () => {
                            </button>
                         ) : (
                            <button 
-                             onClick={() => handleFightBoss(boss.id)}
+                             onClick={() => {
+                               setActiveBossBattle(boss);
+                               if (boss.finishingBlow?.type === 'auto') {
+                                 setBattleTimeLeft(boss.finishingBlow.timeLimit);
+                               }
+                               setBattleInput('');
+                             }}
                              className="w-full mt-2 py-3 px-4 rounded-lg font-bold font-['Press_Start_2P'] text-lg bg-red-700 hover:bg-red-600 text-white animate-pulse shadow-lg shadow-red-500/30 hover:animate-none flex items-center justify-center gap-2"
                            >
                              <Sword size={20}/> BATTLE!
@@ -198,6 +214,127 @@ const Dungeon = () => {
           })}
         </div>
       </div>
+
+      {/* Boss Arena Modal */}
+      {activeBossBattle && (
+        <div className="z-50 fixed inset-0 bg-black/95 flex flex-col items-center justify-center p-4 backdrop-blur-md">
+          <h1 className="text-5xl md:text-6xl text-red-600 font-['Press_Start_2P'] mb-8 text-center drop-shadow-[0_0_15px_rgba(220,38,38,0.8)]">{activeBossBattle.name}</h1>
+          <img src={activeBossBattle.image} alt={activeBossBattle.name} className="h-64 w-64 object-contain mb-8 animate-pulse" />
+          
+          <div className="max-w-2xl text-center mb-8">
+             <p className="text-2xl text-yellow-400 font-['VT323'] drop-shadow-[0_0_8px_rgba(250,204,21,0.8)] leading-relaxed">
+               {activeBossBattle.finishingBlow.prompt}
+             </p>
+          </div>
+
+          {activeBossBattle.finishingBlow.type === 'auto' ? (
+            <div className="flex flex-col items-center w-full max-w-md">
+               <div className="text-6xl text-red-500 font-['VT323'] mb-6 drop-shadow-[0_0_10px_red]">
+                 {battleTimeLeft}s
+               </div>
+               <input
+                 type="text"
+                 value={battleInput}
+                 onChange={(e) => setBattleInput(e.target.value)}
+                 className="w-full bg-stone-900 border-2 border-red-800 text-white p-4 rounded-lg font-mono text-xl text-center focus:outline-none focus:border-red-500 mb-6"
+                 placeholder="Type answer here..."
+               />
+               <button
+                 onClick={() => {
+                   if (battleInput.trim().toLowerCase() === activeBossBattle.finishingBlow.answer.toLowerCase()) {
+                     const result = fightBoss(activeBossBattle.id);
+                     if (result.success) {
+                        setCinematic({ name: activeBossBattle.name, xp: activeBossBattle.rewardXp, gold: activeBossBattle.rewardGold });
+                        setTimeout(() => {
+                           setCinematic(null);
+                           setActiveBossBattle(null);
+                        }, 4500);
+                     }
+                   } else {
+                     alert('Miss! Try again!');
+                     setBattleTimeLeft(prev => Math.max(0, prev - 5));
+                     setBattleInput('');
+                   }
+                 }}
+                 className="w-full bg-red-700 hover:bg-red-600 text-white font-['Press_Start_2P'] py-4 rounded-lg transition-colors"
+               >
+                 EXECUTE STRIKE
+               </button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center w-full max-w-xl">
+               {activeBossBattle.requirement === 'journal' || activeBossBattle.requirement === 'streak' || activeBossBattle.requirement === 'wellness' ? (
+                 <textarea
+                   value={battleInput}
+                   onChange={(e) => setBattleInput(e.target.value)}
+                   className="w-full h-32 bg-stone-900 border-2 border-red-800 text-white p-4 rounded-lg font-mono text-lg mb-6 focus:outline-none focus:border-red-500 resize-none"
+                   placeholder="Write your reflection here..."
+                 />
+               ) : (
+                 <input
+                   type="file"
+                   onChange={(e) => {
+                     if(e.target.files && e.target.files[0]){
+                         setBattleInput(e.target.files[0]);
+                     }
+                   }}
+                   className="w-full mb-6 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-900 file:text-red-100 hover:file:bg-red-800"
+                 />
+               )}
+               <button
+                 onClick={() => {
+                   if (!battleInput) {
+                     alert('Please provide proof for your strike!');
+                     return;
+                   }
+                   submitBossStrike(activeBossBattle.id, battleInput);
+                   alert('Strike submitted for Game Master review!');
+                   setActiveBossBattle(null);
+                 }}
+                 className="w-full bg-red-700 hover:bg-red-600 text-white font-['Press_Start_2P'] py-4 rounded-lg transition-colors"
+               >
+                 SUBMIT STRIKE FOR REVIEW
+               </button>
+            </div>
+          )}
+
+          <button 
+            onClick={() => setActiveBossBattle(null)} 
+            className="mt-8 text-stone-400 hover:text-white font-['Press_Start_2P'] text-sm"
+          >
+            FLEE (Close)
+          </button>
+        </div>
+      )}
+
+      <AnimatePresence>
+        {cinematic && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5 }}
+            className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center"
+          >
+            <h2 className="text-red-600 font-['Press_Start_2P'] text-3xl md:text-6xl tracking-[0.5em] text-center drop-shadow-[0_0_20px_rgba(220,38,38,0.8)] mb-8">
+              NIGHTMARE SLAIN
+            </h2>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.5, duration: 1 }}
+              className="text-center"
+            >
+              <p className="text-stone-400 font-['VT323'] text-2xl mb-4">
+                Defeated: {cinematic.name}
+              </p>
+              <p className="text-yellow-400 font-['VT323'] text-3xl drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]">
+                +{cinematic.xp} XP | +{cinematic.gold} Gold
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

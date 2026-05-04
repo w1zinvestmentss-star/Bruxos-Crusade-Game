@@ -5,13 +5,13 @@ import { useGame } from '../context/GameContext';
 
 const TeacherDashboard = () => {
   const navigate = useNavigate();
-  const { 
-    submissions, 
-    quests, 
-    students, 
-    createQuest, 
-    approveSubmission, 
-    setUserRole, 
+  const {
+    submissions,
+    quests,
+    students,
+    createQuest,
+    approveSubmission,
+    setUserRole,
     updateStudentStats,
     importQuestions,
     fulfillPrize,
@@ -19,7 +19,7 @@ const TeacherDashboard = () => {
     setCurrentRafflePrize,
     runMonthlyRaffle
   } = useGame();
-  
+
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newQuest, setNewQuest] = useState({
     title: '',
@@ -50,11 +50,11 @@ const TeacherDashboard = () => {
 
   const handleCreate = (e) => {
     e.preventDefault();
-    
+
     let questToCreate = { ...newQuest };
 
     if (questToCreate.type === 'quiz' || questToCreate.type === 'scenario' || questToCreate.type === 'incantation') {
-        questToCreate.questionBank = [];
+      questToCreate.questionBank = [];
     } else {
       delete questToCreate.correctAnswer;
       delete questToCreate.timeLimit;
@@ -69,7 +69,7 @@ const TeacherDashboard = () => {
       frequency: 'once', unlockDate: '', correctAnswer: '', timeLimit: 30,
     });
   };
-  
+
   const handleImportClick = (questId) => {
     selectedQuestRef.current = questId;
     fileInputRef.current.click();
@@ -82,8 +82,8 @@ const TeacherDashboard = () => {
 
     const targetQuest = quests.find(q => q.id === questId);
     if (!targetQuest) {
-        alert('Target quest not found!');
-        return;
+      alert('Target quest not found!');
+      return;
     }
 
     const reader = new FileReader();
@@ -91,24 +91,24 @@ const TeacherDashboard = () => {
       try {
         const text = event.target.result;
         const lines = text.split('\n').filter(line => line.trim() !== '');
-        
+
         const parsedData = lines.map(line => {
-            const cols = line.split(',').map(c => c.trim());
-            if (targetQuest.type === 'quiz') {
-                if (cols.length < 2 || !cols[0] || !cols[1]) return null;
-                return { q: cols[0], a: cols[1] };
-            } else if (targetQuest.type === 'scenario') {
-                if (cols.length < 5 || !cols[0] || !cols[4]) return null;
-                return { q: cols[0], options: [cols[1], cols[2], cols[3]], a: cols[4] };
-            } else if (targetQuest.type === 'incantation') {
-                if (cols.length < 1 || !cols[0]) return null;
-                return { q: cols[0], a: cols[0] };
-            }
-            return null;
+          const cols = line.split(',').map(c => c.trim());
+          if (targetQuest.type === 'quiz') {
+            if (cols.length < 2 || !cols[0] || !cols[1]) return null;
+            return { q: cols[0], a: cols[1] };
+          } else if (targetQuest.type === 'scenario') {
+            if (cols.length < 5 || !cols[0] || !cols[4]) return null;
+            return { q: cols[0], options: [cols[1], cols[2], cols[3]], a: cols[4] };
+          } else if (targetQuest.type === 'incantation') {
+            if (cols.length < 1 || !cols[0]) return null;
+            return { q: cols[0], a: cols[0] };
+          }
+          return null;
         }).filter(Boolean);
 
         if (parsedData.length === 0) {
-            throw new Error('No valid data found in CSV.');
+          throw new Error('No valid data found in CSV.');
         }
 
         importQuestions(questId, parsedData);
@@ -148,8 +148,8 @@ const TeacherDashboard = () => {
     }
 
     setGradeInputs(prev => ({
-        ...prev,
-        [studentId]: { midterm: '', final: '' },
+      ...prev,
+      [studentId]: { midterm: '', final: '' },
     }));
   };
 
@@ -157,11 +157,11 @@ const TeacherDashboard = () => {
   const wellnessLogs = submissions.filter(s => s.type === 'wellness');
 
   const getFeelingClass = (feeling) => {
-    switch(feeling) {
-        case 'Strong': return 'border-l-green-500 bg-green-900/30';
-        case 'Weary': return 'border-l-yellow-500 bg-yellow-900/30';
-        case 'Wounded': return 'border-l-red-500 bg-red-900/30';
-        default: return 'border-l-stone-500';
+    switch (feeling) {
+      case 'Strong': return 'border-l-green-500 bg-green-900/30';
+      case 'Weary': return 'border-l-yellow-500 bg-yellow-900/30';
+      case 'Wounded': return 'border-l-red-500 bg-red-900/30';
+      default: return 'border-l-stone-500';
     }
   };
 
@@ -179,21 +179,21 @@ const TeacherDashboard = () => {
       </div>
 
       <div className="max-w-7xl mx-auto p-6 space-y-8">
-        
+
         {/* Realm Overview Section */}
         <div className="bg-black/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
           <h2 className="font-['Press_Start_2P'] text-xl text-yellow-400 text-center mb-6">REALM OVERVIEW</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
             <div>
-              <p className="font-['Press_Start_2P'] text-sm text-yellow-500 mb-2 flex items-center justify-center gap-2"><Swords size={16}/>Quests Done</p>
+              <p className="font-['Press_Start_2P'] text-sm text-yellow-500 mb-2 flex items-center justify-center gap-2"><Swords size={16} />Quests Done</p>
               <p className="font-['VT323'] text-4xl text-yellow-300">{totalQuests}</p>
             </div>
             <div>
-              <p className="font-['Press_Start_2P'] text-sm text-yellow-500 mb-2 flex items-center justify-center gap-2"><Skull size={16}/>Bosses Slain</p>
+              <p className="font-['Press_Start_2P'] text-sm text-yellow-500 mb-2 flex items-center justify-center gap-2"><Skull size={16} />Bosses Slain</p>
               <p className="font-['VT323'] text-4xl text-yellow-300">{totalBossesDefeated}</p>
             </div>
             <div>
-              <p className="font-['Press_Start_2P'] text-sm text-yellow-500 mb-2 flex items-center justify-center gap-2"><DollarSign size={16}/>Gold Hoarded</p>
+              <p className="font-['Press_Start_2P'] text-sm text-yellow-500 mb-2 flex items-center justify-center gap-2"><DollarSign size={16} />Gold Hoarded</p>
               <p className="font-['VT323'] text-4xl text-yellow-300">{totalGoldEarned.toLocaleString()}</p>
             </div>
           </div>
@@ -205,15 +205,15 @@ const TeacherDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-bold text-stone-300 mb-2">Current Billboard Prize (Visible to Students):</label>
-              <input 
-                type="text" 
-                value={currentRafflePrize} 
+              <input
+                type="text"
+                value={currentRafflePrize}
                 onChange={(e) => setCurrentRafflePrize(e.target.value)}
                 className="bg-black text-white p-2 rounded w-full border border-indigo-400"
               />
             </div>
             <div className="flex items-end">
-              <button 
+              <button
                 onClick={() => {
                   const result = runMonthlyRaffle(currentRafflePrize);
                   if (result.success) {
@@ -243,15 +243,21 @@ const TeacherDashboard = () => {
                 </div>
               ) : (
                 pendingSubmissions.map(sub => {
+                  const isBossStrike = sub.isBossStrike;
                   const questDetails = quests.find(q => q.id === sub.questId);
+                  const title = isBossStrike ? "🔴 BOSS FINISHING BLOW" : questDetails?.title;
+                  const containerClass = isBossStrike 
+                    ? "bg-stone-800/80 p-4 rounded-xl shadow-[0_0_15px_red] border-2 border-red-500" 
+                    : "bg-stone-800/80 p-4 rounded-xl shadow-lg border-l-4 border-blue-500";
+                  
                   return (
-                    <div key={sub.id} className="bg-stone-800/80 p-4 rounded-xl shadow-lg border-l-4 border-blue-500">
+                    <div key={sub.id} className={containerClass}>
                       <div className="flex justify-between items-start mb-3">
                         <div>
-                          <h3 className="font-bold text-lg text-stone-100">{questDetails?.title}</h3>
+                          <h3 className="font-bold text-lg text-stone-100">{title}</h3>
                           <p className="text-sm text-stone-400">Student: <span className="font-bold text-blue-400">{sub.studentName}</span></p>
                         </div>
-                        <button 
+                        <button
                           onClick={() => approveSubmission(sub.id)}
                           className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow-md flex items-center gap-2 font-bold text-sm"
                         >
@@ -260,8 +266,8 @@ const TeacherDashboard = () => {
                       </div>
                       {sub.type === 'journal' ? (
                         <div className="bg-stone-900/70 p-4 rounded border-l-4 border-yellow-500">
-                           <p className="text-xs font-bold text-stone-400 mb-2 flex items-center gap-1"><BookCopy size={12} /> JOURNAL ENTRY:</p>
-                           <p className="text-stone-300 font-serif italic">{sub.journalText}</p>
+                          <p className="text-xs font-bold text-stone-400 mb-2 flex items-center gap-1"><BookCopy size={12} /> JOURNAL ENTRY:</p>
+                          <p className="text-stone-300 font-serif italic">{sub.journalText}</p>
                         </div>
                       ) : (
                         <div className="bg-stone-900/70 rounded-lg p-2 border border-stone-700">
@@ -283,24 +289,24 @@ const TeacherDashboard = () => {
           {/* Wellness Logs Section */}
           <div className="lg:col-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-6">
             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 text-stone-200">
-                <Heart className="text-red-400" /> Tavern Logs (Wellness)
+              <Heart className="text-red-400" /> Tavern Logs (Wellness)
             </h2>
             <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-                {wellnessLogs.length === 0 ? (
-                    <div className="p-8 bg-black/20 rounded-xl border border-white/10 text-center text-stone-400 italic">
-                        No wellness check-ins yet.
+              {wellnessLogs.length === 0 ? (
+                <div className="p-8 bg-black/20 rounded-xl border border-white/10 text-center text-stone-400 italic">
+                  No wellness check-ins yet.
+                </div>
+              ) : (
+                wellnessLogs.map(log => (
+                  <div key={log.id} className={`p-3 rounded-lg flex justify-between items-center border-l-4 ${getFeelingClass(log.feeling)}`}>
+                    <div>
+                      <p className="font-bold text-stone-100">{log.studentName}</p>
+                      <p className="text-xs text-stone-400">{log.timestamp}</p>
                     </div>
-                ) : (
-                    wellnessLogs.map(log => (
-                        <div key={log.id} className={`p-3 rounded-lg flex justify-between items-center border-l-4 ${getFeelingClass(log.feeling)}`}>
-                            <div>
-                                <p className="font-bold text-stone-100">{log.studentName}</p>
-                                <p className="text-xs text-stone-400">{log.timestamp}</p>
-                            </div>
-                            <p className="font-bold text-lg">{log.feeling}</p>
-                        </div>
-                    ))
-                )}
+                    <p className="font-bold text-lg">{log.feeling}</p>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -316,9 +322,9 @@ const TeacherDashboard = () => {
               <div className="bg-stone-900/80 p-6 rounded-xl shadow-lg border border-yellow-500/50 mb-6">
                 <h3 className="font-bold mb-4 text-lg border-b border-stone-700 pb-2">Create New Quest</h3>
                 <form onSubmit={handleCreate} className="space-y-4">
-                  <input type="text" placeholder="Quest Title" className="w-full p-2 border rounded bg-stone-800 border-stone-700 text-white placeholder:text-stone-500" value={newQuest.title} onChange={e => setNewQuest({...newQuest, title: e.target.value})} required />
-                  <textarea placeholder="Instructions..." className="w-full p-2 border rounded bg-stone-800 border-stone-700 text-white placeholder:text-stone-500" value={newQuest.description} onChange={e => setNewQuest({...newQuest, description: e.target.value})} />
-                  
+                  <input type="text" placeholder="Quest Title" className="w-full p-2 border rounded bg-stone-800 border-stone-700 text-white placeholder:text-stone-500" value={newQuest.title} onChange={e => setNewQuest({ ...newQuest, title: e.target.value })} required />
+                  <textarea placeholder="Instructions..." className="w-full p-2 border rounded bg-stone-800 border-stone-700 text-white placeholder:text-stone-500" value={newQuest.description} onChange={e => setNewQuest({ ...newQuest, description: e.target.value })} />
+
                   <div className="flex gap-4">
                     <div className="w-1/2">
                       <label className="block text-sm font-bold text-stone-400 mb-1">Quest Type</label>
@@ -349,8 +355,8 @@ const TeacherDashboard = () => {
                       </div>
                       {!newQuest.correctAnswer && (
                         <div className="mt-2">
-                           <label className="block text-sm font-bold text-stone-400 mb-1">Time Limit (seconds)</label>
-                           <input type="number" placeholder="e.g., 30" className="w-full p-2 border rounded bg-stone-800 border-stone-700 text-white placeholder:text-stone-500" value={newQuest.timeLimit} onChange={e => setNewQuest({ ...newQuest, timeLimit: Number(e.target.value) })} />
+                          <label className="block text-sm font-bold text-stone-400 mb-1">Time Limit (seconds)</label>
+                          <input type="number" placeholder="e.g., 30" className="w-full p-2 border rounded bg-stone-800 border-stone-700 text-white placeholder:text-stone-500" value={newQuest.timeLimit} onChange={e => setNewQuest({ ...newQuest, timeLimit: Number(e.target.value) })} />
                         </div>
                       )}
                     </>
@@ -362,8 +368,8 @@ const TeacherDashboard = () => {
                   </div>
 
                   <div className="flex gap-4">
-                    <input type="number" placeholder="XP" className="w-full p-2 border rounded bg-stone-800 border-stone-700 text-white placeholder:text-stone-500" value={newQuest.xp} onChange={e => setNewQuest({...newQuest, xp: Number(e.target.value)})} required />
-                    <input type="number" placeholder="Gold" className="w-full p-2 border rounded bg-stone-800 border-stone-700 text-white placeholder:text-stone-500" value={newQuest.gold} onChange={e => setNewQuest({...newQuest, gold: Number(e.target.value)})} required />
+                    <input type="number" placeholder="XP" className="w-full p-2 border rounded bg-stone-800 border-stone-700 text-white placeholder:text-stone-500" value={newQuest.xp} onChange={e => setNewQuest({ ...newQuest, xp: Number(e.target.value) })} required />
+                    <input type="number" placeholder="Gold" className="w-full p-2 border rounded bg-stone-800 border-stone-700 text-white placeholder:text-stone-500" value={newQuest.gold} onChange={e => setNewQuest({ ...newQuest, gold: Number(e.target.value) })} required />
                   </div>
                   <button type="submit" className="w-full bg-yellow-600 text-black font-bold py-2 rounded hover:bg-yellow-500">PUBLISH</button>
                 </form>
@@ -374,14 +380,14 @@ const TeacherDashboard = () => {
                 <div key={q.id} className="bg-stone-800/80 p-3 rounded shadow-md border border-stone-700 flex justify-between items-center">
                   <div>
                     <span className="font-bold text-stone-300">{q.title}</span>
-                     <span className={`text-xs ml-2 px-2 py-1 rounded ${q.type === 'quiz' ? 'bg-purple-900/80 text-purple-300' : q.type === 'scenario' ? 'bg-orange-900/80 text-orange-300' : q.type === 'incantation' ? 'bg-cyan-900/80 text-cyan-300' : 'bg-stone-700/80 text-stone-400'}`}>
-                        {q.type}
+                    <span className={`text-xs ml-2 px-2 py-1 rounded ${q.type === 'quiz' ? 'bg-purple-900/80 text-purple-300' : q.type === 'scenario' ? 'bg-orange-900/80 text-orange-300' : q.type === 'incantation' ? 'bg-cyan-900/80 text-cyan-300' : 'bg-stone-700/80 text-stone-400'}`}>
+                      {q.type}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs bg-yellow-400/20 text-yellow-300 px-2 py-1 rounded">{q.xp} XP / {q.gold} G</span>
                     {(q.type === 'quiz' || q.type === 'scenario' || q.type === 'incantation') && q.questionBank && (
-                      <button 
+                      <button
                         onClick={() => handleImportClick(q.id)}
                         className="bg-blue-900/80 text-blue-300 px-2 py-1 rounded hover:bg-blue-800/80 text-xs font-semibold flex items-center gap-1"
                       >
@@ -417,7 +423,7 @@ const TeacherDashboard = () => {
                   </div>
                 </div>
                 <div>
-                  <input 
+                  <input
                     type="number"
                     placeholder={`Current: ${student.midtermGPA !== null ? student.midtermGPA / 10 : 'N/A'}`}
                     className="w-full p-2 border rounded-md bg-stone-800 border-stone-700 text-sm text-white placeholder:text-stone-500"
@@ -426,7 +432,7 @@ const TeacherDashboard = () => {
                   />
                 </div>
                 <div>
-                  <input 
+                  <input
                     type="number"
                     placeholder={`Current: ${student.finalGPA !== null ? student.finalGPA / 10 : 'N/A'}`}
                     className="w-full p-2 border rounded-md bg-stone-800 border-stone-700 text-sm text-white placeholder:text-stone-500"
@@ -435,7 +441,7 @@ const TeacherDashboard = () => {
                   />
                 </div>
                 <div>
-                  <button 
+                  <button
                     onClick={() => handleSaveGrades(student.id)}
                     className="w-full bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 flex items-center justify-center gap-2 text-sm font-semibold"
                   >
@@ -446,39 +452,39 @@ const TeacherDashboard = () => {
             ))}
           </div>
         </div>
-        
+
         {/* Student Performance Table */}
         <div className="mt-8">
           <h2 className="text-2xl font-bold mb-6 text-center font-['Press_Start_2P'] text-purple-400">
-              HERO ROSTER & PROGRESS
+            HERO ROSTER & PROGRESS
           </h2>
           <div className="bg-black/60 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden">
-              <table className="w-full font-['VT323'] text-lg text-stone-200">
-                  <thead className="bg-black/50">
-                      <tr>
-                          <th className="p-4 text-left text-yellow-400 font-['Press_Start_2P'] text-xs">Hero Name</th>
-                          <th className="p-4 text-left text-yellow-400 font-['Press_Start_2P'] text-xs">Level</th>
-                          <th className="p-4 text-left text-yellow-400 font-['Press_Start_2P'] text-xs">Quests</th>
-                          <th className="p-4 text-left text-yellow-400 font-['Press_Start_2P'] text-xs">Bosses</th>
-                          <th className="p-4 text-left text-yellow-400 font-['Press_Start_2P'] text-xs">Streak</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      {students.map((student, index) => (
-                          <tr key={student.id} className={index % 2 === 0 ? 'bg-stone-800/80' : 'bg-stone-900/80'}>
-                              <td className="p-4 font-bold text-white">{student.heroName}</td>
-                              <td className="p-4 text-cyan-300">{student.level}</td>
-                              <td className="p-4 text-green-300">
-                                  {(student.uploadQuestsCompleted || 0) + (student.quizQuestsCompleted || 0) + (student.multiStepQuestsCompleted || 0)}
-                              </td>
-                              <td className="p-4 text-red-400">{student.defeatedBosses?.length || 0}</td>
-                              <td className={`p-4 font-bold ${student.loginStreak > 5 ? 'text-green-300' : 'text-gray-400'}`}>
-                                  {student.loginStreak} days
-                              </td>
-                          </tr>
-                      ))}
-                  </tbody>
-              </table>
+            <table className="w-full font-['VT323'] text-lg text-stone-200">
+              <thead className="bg-black/50">
+                <tr>
+                  <th className="p-4 text-left text-yellow-400 font-['Press_Start_2P'] text-xs">Hero Name</th>
+                  <th className="p-4 text-left text-yellow-400 font-['Press_Start_2P'] text-xs">Level</th>
+                  <th className="p-4 text-left text-yellow-400 font-['Press_Start_2P'] text-xs">Quests</th>
+                  <th className="p-4 text-left text-yellow-400 font-['Press_Start_2P'] text-xs">Bosses</th>
+                  <th className="p-4 text-left text-yellow-400 font-['Press_Start_2P'] text-xs">Streak</th>
+                </tr>
+              </thead>
+              <tbody>
+                {students.map((student, index) => (
+                  <tr key={student.id} className={index % 2 === 0 ? 'bg-stone-800/80' : 'bg-stone-900/80'}>
+                    <td className="p-4 font-bold text-white">{student.heroName}</td>
+                    <td className="p-4 text-cyan-300">{student.level}</td>
+                    <td className="p-4 text-green-300">
+                      {(student.uploadQuestsCompleted || 0) + (student.quizQuestsCompleted || 0) + (student.multiStepQuestsCompleted || 0)}
+                    </td>
+                    <td className="p-4 text-red-400">{student.defeatedBosses?.length || 0}</td>
+                    <td className={`p-4 font-bold ${student.loginStreak > 5 ? 'text-green-300' : 'text-gray-400'}`}>
+                      {student.loginStreak} days
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -488,9 +494,9 @@ const TeacherDashboard = () => {
             <Gift className="text-yellow-400" /> Prize Fulfillment Center
           </h2>
           {studentsWithPrizes.length === 0 ? (
-             <div className="p-8 bg-black/20 rounded-xl border border-white/10 text-center text-stone-400 italic">
-               No pending prizes to hand out.
-             </div>
+            <div className="p-8 bg-black/20 rounded-xl border border-white/10 text-center text-stone-400 italic">
+              No pending prizes to hand out.
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {studentsWithPrizes.map(student => (
@@ -504,7 +510,7 @@ const TeacherDashboard = () => {
                       <p className="text-2xl text-yellow-400 font-['VT323'] mb-1">{prize.name}</p>
                       <p className="text-sm text-stone-400 italic mb-4">Reason: "{prize.achievement}"</p>
                     </div>
-                    <button 
+                    <button
                       onClick={() => fulfillPrize(student.id, index)}
                       className="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-500 shadow-md flex items-center justify-center gap-2 font-bold transition-colors mt-2"
                     >

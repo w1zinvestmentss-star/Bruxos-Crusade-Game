@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState } from 'react';
 const GameContext = createContext();
 
 const INITIAL_STUDENTS = [
-  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
+  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight2.png', notifications: [], loginStreak: 150, defeatedBosses: [], uploadQuestsCompleted: 150, quizQuestsCompleted: 150, multiStepQuestsCompleted: 150, scenarioQuestsCompleted: 150, incantationQuestsCompleted: 150, sportsQuestsCompleted: 150, artsQuestsCompleted: 150, wellnessQuestsCompleted: 150, journalQuestsCompleted: 150, cipherQuestsCompleted: 150, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
   { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 880, finalGPA: 900, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Vamphunter1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
   { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 600, finalGPA: 700, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Baller.outfit2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
   { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 920, finalGPA: null, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Powerful.golden.armour.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
@@ -38,70 +38,70 @@ const ACHIEVEMENTS =[
 
 const BOSSES = [
   // Track 1: Uploads
-  { id: 101, name: 'Paper Minion', requirement: 'uploads', target: 10, rewardGold: 50, rewardXp: 100, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Paper.Minion.png', tier: 1 },
-  { id: 102, name: 'Scroll Guardian', requirement: 'uploads', target: 25, rewardGold: 100, rewardXp: 250, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Scroll.Guardian2.png', tier: 2 },
-  { id: 103, name: 'Tome Construct', requirement: 'uploads', target: 50, rewardGold: 250, rewardXp: 500, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Tome.Construct.png', tier: 3 },
-  { id: 104, name: 'Library Titan', requirement: 'uploads', target: 100, rewardGold: 500, rewardXp: 1000, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Library.Titan.png', tier: 5 },
+  { id: 101, name: 'Paper Minion', requirement: 'uploads', target: 10, rewardGold: 50, rewardXp: 100, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Paper.Minion.png', tier: 1, finishingBlow: { type: 'manual', prompt: 'Upload an assignment with a C or higher.' } },
+  { id: 102, name: 'Scroll Guardian', requirement: 'uploads', target: 25, rewardGold: 100, rewardXp: 250, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Scroll.Guardian2.png', tier: 2, finishingBlow: { type: 'manual', prompt: 'Upload an assignment with a B or higher.' } },
+  { id: 103, name: 'Tome Construct', requirement: 'uploads', target: 50, rewardGold: 250, rewardXp: 500, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Tome.Construct.png', tier: 3, finishingBlow: { type: 'manual', prompt: 'Upload a major assignment or test with a B+ or higher.' } },
+  { id: 104, name: 'Library Titan', requirement: 'uploads', target: 100, rewardGold: 500, rewardXp: 1000, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Library.Titan.png', tier: 5, finishingBlow: { type: 'manual', prompt: 'Upload a major test, essay, or capstone project with an A.' } },
 
   // Track 2: Quizzes
-  { id: 201, name: 'The Novice Owl', requirement: 'quizzes', target: 10, rewardGold: 50, rewardXp: 100, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Novice.Owl.png', tier: 1 },
-  { id: 202, name: 'The Tome Warden', requirement: 'quizzes', target: 25, rewardGold: 100, rewardXp: 250, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Tome.Warden.png', tier: 2 },
-  { id: 203, name: 'The Arcane Sage', requirement: 'quizzes', target: 50, rewardGold: 250, rewardXp: 500, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Arcane.Sage.png', tier: 3 },
-  { id: 204, name: 'The Celestial Owl', requirement: 'quizzes', target: 100, rewardGold: 500, rewardXp: 1000, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Celestial.Owl.png', tier: 5 },
+  { id: 201, name: 'The Novice Owl', requirement: 'quizzes', target: 10, rewardGold: 50, rewardXp: 100, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Novice.Owl.png', tier: 1, finishingBlow: { type: 'auto', prompt: 'Solve: 15 x 4', answer: '60', timeLimit: 60 } },
+  { id: 202, name: 'The Tome Warden', requirement: 'quizzes', target: 25, rewardGold: 100, rewardXp: 250, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Tome.Warden.png', tier: 2, finishingBlow: { type: 'auto', prompt: 'Solve: 25 x 6', answer: '150', timeLimit: 50 } },
+  { id: 203, name: 'The Arcane Sage', requirement: 'quizzes', target: 50, rewardGold: 250, rewardXp: 500, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Arcane.Sage.png', tier: 3, finishingBlow: { type: 'auto', prompt: 'Solve: (50 * 4) / 2', answer: '100', timeLimit: 40 } },
+  { id: 204, name: 'The Celestial Owl', requirement: 'quizzes', target: 100, rewardGold: 500, rewardXp: 1000, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Celestial.Owl.png', tier: 5, finishingBlow: { type: 'auto', prompt: 'Solve: (144 / 12) * 5 + 40', answer: '100', timeLimit: 30 } },
 
   // Track 3: Multi-step Quests
-  { id: 301, name: 'Shadow Snake', requirement: 'multistep', target: 10, rewardGold: 75, rewardXp: 150, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shadow.Serpent.png', tier: 1 },
-  { id: 302, name: 'Twin-Head Viper', requirement: 'multistep', target: 25, rewardGold: 150, rewardXp: 300, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Twin-Head.Viper.png', tier: 2 },
-  { id: 303, name: 'Dark Drake', requirement: 'multistep', target: 50, rewardGold: 300, rewardXp: 600, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Dark.Drake.png', tier: 3 },
-  { id: 304, name: 'Void Hydra', requirement: 'multistep', target: 100, rewardGold: 600, rewardXp: 1200, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Void.Hydra.png', tier: 5 },
+  { id: 301, name: 'Shadow Snake', requirement: 'multistep', target: 10, rewardGold: 75, rewardXp: 150, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shadow.Serpent.png', tier: 1, finishingBlow: { type: 'auto', prompt: 'Solve: 12 + 8', answer: '20', timeLimit: 60 } },
+  { id: 302, name: 'Twin-Head Viper', requirement: 'multistep', target: 25, rewardGold: 150, rewardXp: 300, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Twin-Head.Viper.png', tier: 2, finishingBlow: { type: 'auto', prompt: 'Solve: 45 - 17', answer: '28', timeLimit: 50 } },
+  { id: 303, name: 'Dark Drake', requirement: 'multistep', target: 50, rewardGold: 300, rewardXp: 600, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Dark.Drake.png', tier: 3, finishingBlow: { type: 'auto', prompt: 'Solve: 16 * 5', answer: '80', timeLimit: 40 } },
+  { id: 304, name: 'Void Hydra', requirement: 'multistep', target: 100, rewardGold: 600, rewardXp: 1200, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Void.Hydra.png', tier: 5, finishingBlow: { type: 'auto', prompt: 'Solve: (144 / 12) * 5 + 40', answer: '100', timeLimit: 30 } },
 
   // Track 4: Login Streaks
-  { id: 401, name: 'Clockwork Beetle', requirement: 'streak', target: 5, rewardGold: 50, rewardXp: 50, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Clockwork.Beetle.png', tier: 1 },
-  { id: 402, name: 'Timekeeper Knight', requirement: 'streak', target: 10, rewardGold: 100, rewardXp: 100, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Timekeeper.Knight.png', tier: 2 },
-  { id: 403, name: 'Hourglass Golem', requirement: 'streak', target: 15, rewardGold: 200, rewardXp: 200, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Hourglass.Golem.png', tier: 3 },
-  { id: 404, name: 'Chronos Titan', requirement: 'streak', target: 20, rewardGold: 400, rewardXp: 400, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Chronos.Titan.png', tier: 5 },
+  { id: 401, name: 'Clockwork Beetle', requirement: 'streak', target: 5, rewardGold: 50, rewardXp: 50, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Clockwork.Beetle.png', tier: 1, finishingBlow: { type: 'manual', prompt: 'Write a short reflection on your recent habits and consistency.' } },
+  { id: 402, name: 'Timekeeper Knight', requirement: 'streak', target: 10, rewardGold: 100, rewardXp: 100, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Timekeeper.Knight.png', tier: 2, finishingBlow: { type: 'manual', prompt: 'Write a paragraph reflecting on your mental health and daily routines.' } },
+  { id: 403, name: 'Hourglass Golem', requirement: 'streak', target: 15, rewardGold: 200, rewardXp: 200, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Hourglass.Golem.png', tier: 3, finishingBlow: { type: 'manual', prompt: 'Write a deep reflection on how your habits have improved your well-being.' } },
+  { id: 404, name: 'Chronos Titan', requirement: 'streak', target: 20, rewardGold: 400, rewardXp: 400, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Chronos.Titan.png', tier: 5, finishingBlow: { type: 'manual', prompt: 'Write a deep, 1-paragraph reflection on your habits, mental health, or consistency to prove your dedication.' } },
 
   // Track 8: Sports / Ancient Colossi
-  { id: 801, name: 'The Stone Minotaur', requirement: 'sports', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Stone.Minotaur.png' },
-  { id: 802, name: 'The Desert Worm', requirement: 'sports', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Desert.Worm.png' },
-  { id: 803, name: 'The Armored Beast', requirement: 'sports', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Armored.Beast.png' },
-  { id: 804, name: 'The Ivory Leviathan', requirement: 'sports', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ivory.Leviathan.png' },
+  { id: 801, name: 'The Stone Minotaur', requirement: 'sports', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Stone.Minotaur.png', finishingBlow: { type: 'manual', prompt: 'Upload proof of a 1km walk.' } },
+  { id: 802, name: 'The Desert Worm', requirement: 'sports', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Desert.Worm.png', finishingBlow: { type: 'manual', prompt: 'Upload proof of a 2km walk or run.' } },
+  { id: 803, name: 'The Armored Beast', requirement: 'sports', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Armored.Beast.png', finishingBlow: { type: 'manual', prompt: 'Upload proof of a 3km run or 15-min workout.' } },
+  { id: 804, name: 'The Ivory Leviathan', requirement: 'sports', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ivory.Leviathan.png', finishingBlow: { type: 'manual', prompt: 'Upload proof of a 5km run or intense 30-min workout.' } },
   
   // Track 5: The Volcanic Lineage / Scenarios
-  { id: 501, name: 'The Ember Whelp', requirement: 'scenarios', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ember.Whelp.png' },
-  { id: 502, name: 'The Ash Drake', requirement: 'scenarios', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ash.Drake.png' },
-  { id: 503, name: 'The Obsidian Wyvern', requirement: 'scenarios', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Obsidian.Wyvern.png' },
-  { id: 504, name: 'The Molten Sovereign', requirement: 'scenarios', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Molten.Sovereign.png' },
+  { id: 501, name: 'The Ember Whelp', requirement: 'scenarios', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ember.Whelp.png', finishingBlow: { type: 'auto', prompt: 'What has to be broken before you can use it?', answer: 'an egg', timeLimit: 60 } },
+  { id: 502, name: 'The Ash Drake', requirement: 'scenarios', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ash.Drake.png', finishingBlow: { type: 'auto', prompt: 'I’m tall when I’m young, and I’m short when I’m old. What am I?', answer: 'a candle', timeLimit: 50 } },
+  { id: 503, name: 'The Obsidian Wyvern', requirement: 'scenarios', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Obsidian.Wyvern.png', finishingBlow: { type: 'auto', prompt: 'What month of the year has 28 days?', answer: 'all of them', timeLimit: 40 } },
+  { id: 504, name: 'The Molten Sovereign', requirement: 'scenarios', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Molten.Sovereign.png', finishingBlow: { type: 'auto', prompt: 'Solve the anagram to find a 6-letter word: SILENT', answer: 'listen', timeLimit: 30 } },
 
   // Track 11: The Dream Eaters / Journals
-  { id: 1101, name: 'The Shadow Moth', requirement: 'journal', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shadow.Moth.png' },
-  { id: 1102, name: 'The Dream Weave', requirement: 'journal', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Dream.Weave.png' },
-  { id: 1103, name: 'The Night Terror', requirement: 'journal', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Night.Terror.png' },
-  { id: 1104, name: 'The Weaver of Fates', requirement: 'journal', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Weaver.of.Fates.png' },
+  { id: 1101, name: 'The Shadow Moth', requirement: 'journal', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shadow.Moth.png', finishingBlow: { type: 'manual', prompt: 'Write a short reflection on your recent habits and consistency.' } },
+  { id: 1102, name: 'The Dream Weave', requirement: 'journal', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Dream.Weave.png', finishingBlow: { type: 'manual', prompt: 'Write a paragraph reflecting on your mental health and daily routines.' } },
+  { id: 1103, name: 'The Night Terror', requirement: 'journal', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Night.Terror.png', finishingBlow: { type: 'manual', prompt: 'Write a deep reflection on how your habits have improved your well-being.' } },
+  { id: 1104, name: 'The Weaver of Fates', requirement: 'journal', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Weaver.of.Fates.png', finishingBlow: { type: 'manual', prompt: 'Write a deep, 1-paragraph reflection on your habits, mental health, or consistency to prove your dedication.' } },
 
   // Track 10: Wellness / Guardian Spirits
-  { id: 1001, name: 'The Warm Wisp', requirement: 'wellness', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Warm.Wisp.png' },
-  { id: 1002, name: 'The Hearth Spirit', requirement: 'wellness', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Hearth.Spirit.png' },
-  { id: 1003, name: 'The Shielding Angel', requirement: 'wellness', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shielding.Angel.png' },
-  { id: 1004, name: 'The Seraph of Hope', requirement: 'wellness', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Seraph.of.Hope.png' },
+  { id: 1001, name: 'The Warm Wisp', requirement: 'wellness', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Warm.Wisp.png', finishingBlow: { type: 'manual', prompt: 'Write a short reflection on your recent habits and consistency.' } },
+  { id: 1002, name: 'The Hearth Spirit', requirement: 'wellness', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Hearth.Spirit.png', finishingBlow: { type: 'manual', prompt: 'Write a paragraph reflecting on your mental health and daily routines.' } },
+  { id: 1003, name: 'The Shielding Angel', requirement: 'wellness', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shielding.Angel.png', finishingBlow: { type: 'manual', prompt: 'Write a deep reflection on how your habits have improved your well-being.' } },
+  { id: 1004, name: 'The Seraph of Hope', requirement: 'wellness', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Seraph.of.Hope.png', finishingBlow: { type: 'manual', prompt: 'Write a deep, 1-paragraph reflection on your habits, mental health, or consistency to prove your dedication.' } },
 
   // Track 7: Incantations / Spectral Scribes
-  { id: 701, name: 'The Haunted Quill', requirement: 'incantations', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Haunted.Quill.png' },
-  { id: 702, name: 'The Spectral Typist', requirement: 'incantations', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Spectral.Typist.png' },
-  { id: 703, name: 'The Boundless Tome', requirement: 'incantations', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Boundless.Tome.png' },
-  { id: 704, name: 'The Spectral Archivist', requirement: 'incantations', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Spectral.Archivist.png' },
+  { id: 701, name: 'The Haunted Quill', requirement: 'incantations', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Haunted.Quill.png', finishingBlow: { type: 'auto', prompt: 'Type: Hello world.', answer: 'Hello world.', timeLimit: 60 } },
+  { id: 702, name: 'The Spectral Typist', requirement: 'incantations', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Spectral.Typist.png', finishingBlow: { type: 'auto', prompt: 'Type: A wizard is never late, nor is he early.', answer: 'A wizard is never late, nor is he early.', timeLimit: 50 } },
+  { id: 703, name: 'The Boundless Tome', requirement: 'incantations', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Boundless.Tome.png', finishingBlow: { type: 'auto', prompt: 'Type: The brave men, living and dead, who struggled here, have consecrated it.', answer: 'The brave men, living and dead, who struggled here, have consecrated it.', timeLimit: 40 } },
+  { id: 704, name: 'The Spectral Archivist', requirement: 'incantations', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Spectral.Archivist.png', finishingBlow: { type: 'auto', prompt: 'Type: It is not the critic who counts; not the man who points out how the strong man stumbles, or where the doer of deeds could have done them better.', answer: 'It is not the critic who counts; not the man who points out how the strong man stumbles, or where the doer of deeds could have done them better.', timeLimit: 30 } },
 
   // Track 6: The Shapeshifters / Ciphers
-  { id: 601, name: 'The Phantom Mask', requirement: 'ciphers', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Phantom.Mask.png' },
-  { id: 602, name: 'The Mirror Fiend', requirement: 'ciphers', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mirror.Fiend.png' },
-  { id: 603, name: 'The Faceless One', requirement: 'ciphers', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Faceless.One.png' },
-  { id: 604, name: 'The Shattered Sovereign', requirement: 'ciphers', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shattered.Sovereign.png' },
+  { id: 601, name: 'The Phantom Mask', requirement: 'ciphers', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Phantom.Mask.png', finishingBlow: { type: 'auto', prompt: 'What has to be broken before you can use it?', answer: 'an egg', timeLimit: 60 } },
+  { id: 602, name: 'The Mirror Fiend', requirement: 'ciphers', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mirror.Fiend.png', finishingBlow: { type: 'auto', prompt: 'I’m tall when I’m young, and I’m short when I’m old. What am I?', answer: 'a candle', timeLimit: 50 } },
+  { id: 603, name: 'The Faceless One', requirement: 'ciphers', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Faceless.One.png', finishingBlow: { type: 'auto', prompt: 'What month of the year has 28 days?', answer: 'all of them', timeLimit: 40 } },
+  { id: 604, name: 'The Shattered Sovereign', requirement: 'ciphers', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shattered.Sovereign.png', finishingBlow: { type: 'auto', prompt: 'Solve the anagram to find a 6-letter word: SILENT', answer: 'listen', timeLimit: 30 } },
 
   // Track 9: The Arts / Prismatic Muses
-  { id: 901, name: 'The Crystal Butterfly', requirement: 'arts', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Crystal.Butterfly.png' },
-  { id: 902, name: 'The Painted Siren', requirement: 'arts', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Painted.Siren.png' },
-  { id: 903, name: 'The Glass Golem', requirement: 'arts', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Glass.Golem.png' },
-  { id: 904, name: 'The Prism Weaver', requirement: 'arts', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Prism.Weaver.png' }
+  { id: 901, name: 'The Crystal Butterfly', requirement: 'arts', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Crystal.Butterfly.png', finishingBlow: { type: 'manual', prompt: 'Upload a detailed sketch.' } },
+  { id: 902, name: 'The Painted Siren', requirement: 'arts', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Painted.Siren.png', finishingBlow: { type: 'manual', prompt: 'Upload a shaded sketch with some background elements.' } },
+  { id: 903, name: 'The Glass Golem', requirement: 'arts', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Glass.Golem.png', finishingBlow: { type: 'manual', prompt: 'Upload a partially colored piece or digital draft.' } },
+  { id: 904, name: 'The Prism Weaver', requirement: 'arts', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Prism.Weaver.png', finishingBlow: { type: 'manual', prompt: 'Upload a fully colored, finished masterpiece.' } }
 ];
 
 const BOSS_LOOT_OUTFITS = {
@@ -459,6 +459,28 @@ export function GameProvider({ children }) {
     setSubmissions(prev => [...prev, newSubmission]);
   };
 
+  const submitBossStrike = (bossId, content) => {
+    const newSubmission = {
+      id: Date.now(),
+      questId: bossId,
+      studentId: currentUser.id,
+      studentName: currentUser.heroName,
+      status: 'pending',
+      isBossStrike: true,
+      timestamp: new Date().toLocaleDateString()
+    };
+
+    if (typeof content === 'string') {
+      newSubmission.journalText = content;
+      newSubmission.type = 'journal';
+    } else if (content) {
+      newSubmission.proofImage = URL.createObjectURL(content);
+      newSubmission.type = 'upload';
+    }
+
+    setSubmissions(prev => [...prev, newSubmission]);
+  };
+
     const submitWellnessCheck = (questId, feeling) => {
         const quest = quests.find(q => q.id === questId);
         if (!quest) return { success: false, message: 'Quest not found' };
@@ -495,6 +517,14 @@ export function GameProvider({ children }) {
   const approveSubmission = (submissionId) => {
     const submission = submissions.find(s => s.id === submissionId);
     if (!submission) return;
+
+    if (submission.isBossStrike) {
+      fightBoss(submission.questId, submission.studentId);
+      setSubmissions(prev => prev.map(s => 
+        s.id === submissionId ? { ...s, status: 'approved' } : s
+      ));
+      return;
+    }
 
     const quest = quests.find(q => q.id === submission.questId);
     if (!quest) return;
@@ -736,61 +766,69 @@ export function GameProvider({ children }) {
     }));
   }; 
 
-  const fightBoss = (bossId) => {
-    if (!currentUser) return { success: false, message: "Not logged in!" };
+  const fightBoss = (bossId, overrideStudentId = null) => {
+    const targetId = overrideStudentId || currentUser?.id;
+    if (!targetId) return { success: false, message: "Not logged in!" };
 
     const boss = BOSSES.find(b => b.id === bossId);
     if (!boss) return { success: false, message: "Boss not found!" };
 
-    if (currentUser.defeatedBosses.includes(bossId)) {
+    const targetStudent = students.find(s => s.id === targetId);
+    if (!targetStudent) return { success: false, message: "Student not found!" };
+
+    if (targetStudent.defeatedBosses.includes(bossId)) {
       return { success: false, message: "You have already defeated this boss." };
     }
 
     let requirementMet = false;
     switch (boss.requirement) {
       case 'uploads':
-        requirementMet = (currentUser.uploadQuestsCompleted || 0) >= boss.target;
+        requirementMet = (targetStudent.uploadQuestsCompleted || 0) >= boss.target;
         break;
       case 'quizzes':
-        requirementMet = (currentUser.quizQuestsCompleted || 0) >= boss.target;
+        requirementMet = (targetStudent.quizQuestsCompleted || 0) >= boss.target;
         break;
       case 'multistep':
-        requirementMet = (currentUser.multiStepQuestsCompleted || 0) >= boss.target;
+        requirementMet = (targetStudent.multiStepQuestsCompleted || 0) >= boss.target;
         break;
       case 'scenarios':
-        requirementMet = (currentUser.scenarioQuestsCompleted || 0) >= boss.target;
+        requirementMet = (targetStudent.scenarioQuestsCompleted || 0) >= boss.target;
         break;
       case 'incantations':
-        requirementMet = (currentUser.incantationQuestsCompleted || 0) >= boss.target;
+        requirementMet = (targetStudent.incantationQuestsCompleted || 0) >= boss.target;
         break;
       case 'sports':
-        requirementMet = (currentUser.sportsQuestsCompleted || 0) >= boss.target;
+        requirementMet = (targetStudent.sportsQuestsCompleted || 0) >= boss.target;
         break;
       case 'arts':
-        requirementMet = (currentUser.artsQuestsCompleted || 0) >= boss.target;
+        requirementMet = (targetStudent.artsQuestsCompleted || 0) >= boss.target;
         break;
       case 'wellness':
-        requirementMet = (currentUser.wellnessQuestsCompleted || 0) >= boss.target;
+        requirementMet = (targetStudent.wellnessQuestsCompleted || 0) >= boss.target;
         break;
       case 'streak':
-        requirementMet = (currentUser.loginStreak || 0) >= boss.target;
+        requirementMet = (targetStudent.loginStreak || 0) >= boss.target;
         break;
       case 'journal':
-        requirementMet = (currentUser.journalQuestsCompleted || 0) >= boss.target;
+        requirementMet = (targetStudent.journalQuestsCompleted || 0) >= boss.target;
         break;
       case 'ciphers':
-        requirementMet = (currentUser.cipherQuestsCompleted || 0) >= boss.target;
+        requirementMet = (targetStudent.cipherQuestsCompleted || 0) >= boss.target;
         break;
       default:
         requirementMet = false;
     }
 
+    if (overrideStudentId) {
+      requirementMet = true;
+    }
+
     if (requirementMet) {
-      awardRewards(currentUser.id, boss.rewardXp, boss.rewardGold);
+      awardRewards(targetId, boss.rewardXp, boss.rewardGold);
       const bossLoot = BOSS_LOOT_OUTFITS[bossId];
       
       setStudents(prev => prev.map(s => {
-          if (s.id === currentUser.id) {
+          if (s.id === targetId) {
               const updatedS = { ...s, defeatedBosses: [...s.defeatedBosses, bossId] };
               if (bossLoot && !(updatedS.inventory || []).some(item => item.id === bossLoot.id)) {
                   updatedS.inventory = [...(updatedS.inventory || []), bossLoot];
@@ -807,22 +845,24 @@ export function GameProvider({ children }) {
           return s;
       }));
       
-      setCurrentUser(prev => {
-          const updatedPrev = { ...prev, defeatedBosses: [...prev.defeatedBosses, bossId] };
-          if (bossLoot && !(updatedPrev.inventory || []).some(item => item.id === bossLoot.id)) {
-              updatedPrev.inventory = [...(updatedPrev.inventory || []), bossLoot];
-              updatedPrev.notifications = [...(updatedPrev.notifications || []), {
-                  id: Date.now() + Math.random(),
-                  title: "EPIC LOOT ACQUIRED: " + bossLoot.name,
-                  quote: 'A powerful artifact from a vanquished foe!',
-                  gold: 0,
-                  xp: 0
-              }];
-          }
-          return updatedPrev;
-      });
+      if (currentUser && currentUser.id === targetId) {
+          setCurrentUser(prev => {
+              const updatedPrev = { ...prev, defeatedBosses: [...prev.defeatedBosses, bossId] };
+              if (bossLoot && !(updatedPrev.inventory || []).some(item => item.id === bossLoot.id)) {
+                  updatedPrev.inventory = [...(updatedPrev.inventory || []), bossLoot];
+                  updatedPrev.notifications = [...(updatedPrev.notifications || []), {
+                      id: Date.now() + Math.random(),
+                      title: "EPIC LOOT ACQUIRED: " + bossLoot.name,
+                      quote: 'A powerful artifact from a vanquished foe!',
+                      gold: 0,
+                      xp: 0
+                  }];
+              }
+              return updatedPrev;
+          });
+      }
 
-      checkAchievements(currentUser.id);
+      checkAchievements(targetId);
 
       return { success: true, rewardGold: boss.rewardGold, rewardXp: boss.rewardXp };
     } else {
@@ -935,7 +975,7 @@ export function GameProvider({ children }) {
 
   const value = {
     students, quests, submissions, BOSSES, ACHIEVEMENTS,
-    createQuest, importQuestions, submitQuest, approveSubmission, getQuestStatus, submitWellnessCheck,
+    createQuest, importQuestions, submitQuest, approveSubmission, getQuestStatus, submitWellnessCheck, submitBossStrike,
     userRole, setUserRole, currentUser, setCurrentUser,
     buyItem,
     equipOutfit,
