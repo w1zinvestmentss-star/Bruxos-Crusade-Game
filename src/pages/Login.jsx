@@ -1,21 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Sword, Crown, ArrowDown } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { setUserRole, setCurrentUser, students } = useGame();
+  const { setUserRole, setCurrentUser, students, login } = useGame();
+  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (role) => {
-    setUserRole(role);
-    if (role === 'student') {
-      setCurrentUser(students[0]);
-      navigate('/student-dashboard');
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    const result = await login(email, password);
+    
+    if (result.success) {
+      if (email === 'admin@bruxos.com') {
+        setUserRole('teacher');
+        navigate('/teacher-dashboard');
+      } else {
+        setUserRole('student');
+        setCurrentUser(students[0]); // Temporary until real student fetching
+        navigate('/student-dashboard');
+      }
     } else {
-      navigate('/teacher-dashboard');
+      setError(result.message);
     }
+    setLoading(false);
   };
 
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
@@ -43,40 +60,54 @@ const Login = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             className="font-['Press_Start_2P'] text-4xl md:text-5xl mb-12">
-            CHOOSE YOUR PATH
+            ENTER THE REALM
           </motion.h1>
 
-          <div className="flex flex-col md:flex-row gap-8">
-            {/* Hero Card */}
-            <motion.div
-              whileHover={{ scale: 1.05, y: -5 }}
-              onClick={() => handleLogin('student')}
-              className="w-80 cursor-pointer bg-black/60 backdrop-blur-md border-2 border-white/10 hover:border-yellow-500 rounded-xl p-8 text-center transition-all duration-300 flex flex-col items-center"
-            >
-              <div className="p-4 rounded-full inline-block mb-4">
-                <Sword size={48} className="text-blue-400" />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-black/60 backdrop-blur-md p-8 border border-white/10 rounded-xl max-w-md w-full"
+          >
+            <form onSubmit={handleLogin} className="flex flex-col gap-6">
+              {error && (
+                <div className="bg-red-900/50 border border-red-500 text-red-200 p-3 rounded-lg text-sm">
+                  {error}
+                </div>
+              )}
+              
+              <div className="flex flex-col text-left">
+                <label className="font-['VT323'] text-stone-300 text-xl mb-2">Email Address</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-stone-900 border border-stone-600 text-white px-4 py-3 rounded-lg font-sans focus:outline-none focus:border-yellow-500 transition-colors"
+                  placeholder="hero@academy.edu"
+                  required
+                />
               </div>
-              <h2 className="font-['Press_Start_2P'] text-2xl mb-2">HERO</h2>
-              <p className="font-['VT323'] text-stone-300 text-lg">
-                Complete quests, earn gold, and upgrade your avatar.
-              </p>
-            </motion.div>
 
-            {/* Game Master Card */}
-            <motion.div
-              whileHover={{ scale: 1.05, y: -5 }}
-              onClick={() => handleLogin('teacher')}
-              className="w-80 cursor-pointer bg-black/60 backdrop-blur-md border-2 border-white/10 hover:border-yellow-500 rounded-xl p-8 text-center transition-all duration-300 flex flex-col items-center"
-            >
-              <div className="p-4 rounded-full inline-block mb-4">
-                <Crown size={48} className="text-red-400" />
+              <div className="flex flex-col text-left">
+                <label className="font-['VT323'] text-stone-300 text-xl mb-2">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="bg-stone-900 border border-stone-600 text-white px-4 py-3 rounded-lg font-sans focus:outline-none focus:border-yellow-500 transition-colors"
+                  placeholder="••••••••"
+                  required
+                />
               </div>
-              <h2 className="font-['Press_Start_2P'] text-2xl mb-2">GAME MASTER</h2>
-              <p className="font-['VT323'] text-stone-300 text-lg">
-                Assign grades, approve quests, and manage the realm.
-              </p>
-            </motion.div>
-          </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="mt-4 bg-yellow-600 hover:bg-yellow-500 text-white font-['Press_Start_2P'] py-4 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50"
+              >
+                {loading ? 'CASTING...' : 'ENTER THE REALM'}
+              </button>
+            </form>
+          </motion.div>
 
           {/* Scroll Down Indicator */}
           <motion.div

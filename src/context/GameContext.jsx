@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 const GameContext = createContext();
 
@@ -10,7 +11,7 @@ const INITIAL_STUDENTS = [
   { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dark.souls1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
 ];
 
-const ACHIEVEMENTS =[
+const ACHIEVEMENTS = [
   // --- THE LEVEL PROGRESSION TRACK (Guaranteed Real-World Prizes) ---
   { id: 'lvl_5', metric: 'level', target: 5, title: 'The Apprentice', desc: 'Reach Level 5.', rewardXp: 500, rewardGold: 250, rewardTicket: 2, realWorldPrize: '$5 Dairy Queen Card', limit: null },
   { id: 'lvl_10', metric: 'level', target: 10, title: 'The Journeyman', desc: 'Reach Level 10.', rewardXp: 1000, rewardGold: 500, rewardTicket: 3, realWorldPrize: '$5 Tim Hortons Card', limit: null },
@@ -110,7 +111,7 @@ const BOSSES = [
   { id: 802, name: 'The Desert Worm', requirement: 'sports', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Desert.Worm.png', finishingBlow: { type: 'manual', prompt: 'Upload proof of a 2km walk or run.' } },
   { id: 803, name: 'The Armored Beast', requirement: 'sports', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Armored.Beast.png', finishingBlow: { type: 'manual', prompt: 'Upload proof of a 3km run or 15-min workout.' } },
   { id: 804, name: 'The Ivory Leviathan', requirement: 'sports', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ivory.Leviathan.png', finishingBlow: { type: 'manual', prompt: 'Upload proof of a 5km run or intense 30-min workout.' } },
-  
+
   // Track 5: The Volcanic Lineage / Scenarios
   { id: 501, name: 'The Ember Whelp', requirement: 'scenarios', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ember.Whelp.png', finishingBlow: { type: 'auto', prompt: 'What has to be broken before you can use it?', answer: 'an egg', timeLimit: 60 } },
   { id: 502, name: 'The Ash Drake', requirement: 'scenarios', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ash.Drake.png', finishingBlow: { type: 'auto', prompt: 'I’m tall when I’m young, and I’m short when I’m old. What am I?', answer: 'a candle', timeLimit: 50 } },
@@ -182,14 +183,14 @@ export function GameProvider({ children }) {
   const INITIAL_QUESTS = [
     { id: 101, title: "Math Worksheet", description: "Upload a photo of your completed algebra sheet.", xp: 50, gold: 20, type: 'upload', frequency: 'once', unlockDate: null },
     { id: 102, title: "Science Project", description: "Submit a picture of your science fair poster.", xp: 100, gold: 50, type: 'upload', frequency: 'once', unlockDate: null },
-    { 
-      id: 103, 
-      title: "Math Speed Run", 
-      description: "Answer the question before the timer runs out!", 
-      xp: 50, 
-      gold: 20, 
-      type: 'quiz', 
-      frequency: 'daily', 
+    {
+      id: 103,
+      title: "Math Speed Run",
+      description: "Answer the question before the timer runs out!",
+      xp: 50,
+      gold: 20,
+      type: 'quiz',
+      frequency: 'daily',
       unlockDate: null,
       timeLimit: 30,
       questionBank: [
@@ -209,34 +210,34 @@ export function GameProvider({ children }) {
       gold: 25,
       frequency: 'once',
       questionBank: [
-          { q: "You encounter a troll. What do you do?", options: ["Pay toll", "Attack", "Flee"], a: "Pay toll" },
-          { q: "A merchant offers a glowing potion. Do you:", options: ["Drink it", "Inspect it", "Ignore it"], a: "Inspect it" },
-          { q: "You find a locked chest. Do you:", options: ["Smash it", "Pick lock", "Leave it"], a: "Pick lock" }
+        { q: "You encounter a troll. What do you do?", options: ["Pay toll", "Attack", "Flee"], a: "Pay toll" },
+        { q: "A merchant offers a glowing potion. Do you:", options: ["Drink it", "Inspect it", "Ignore it"], a: "Inspect it" },
+        { q: "You find a locked chest. Do you:", options: ["Smash it", "Pick lock", "Leave it"], a: "Pick lock" }
       ]
     },
-    { 
-        id: 107,
-        title: "The Memory Spell",
-        description: "Memorize the phrase, then type it perfectly before time runs out!",
-        type: 'incantation',
-        xp: 60,
-        gold: 20,
-        frequency: 'daily',
-        timeLimit: 45,
-        questionBank: [
-            { q: "To be, or not to be, that is the question.", a: "To be, or not to be, that is the question." },
-            { q: "The quick brown fox jumps over the lazy dog.", a: "The quick brown fox jumps over the lazy dog." }
-        ]
+    {
+      id: 107,
+      title: "The Memory Spell",
+      description: "Memorize the phrase, then type it perfectly before time runs out!",
+      type: 'incantation',
+      xp: 60,
+      gold: 20,
+      frequency: 'daily',
+      timeLimit: 45,
+      questionBank: [
+        { q: "To be, or not to be, that is the question.", a: "To be, or not to be, that is the question." },
+        { q: "The quick brown fox jumps over the lazy dog.", a: "The quick brown fox jumps over the lazy dog." }
+      ]
     },
     { id: 106, title: "Weekly Reflection", description: "Write a short paragraph about what you learned this week.", xp: 100, gold: 50, type: 'journal', frequency: 'weekly', unlockDate: '2025-01-01' },
-    { 
-      id: 111, 
+    {
+      id: 111,
       title: "Long Division Helper",
       description: "Let's solve 144 / 12 step-by-step.",
       type: 'multi-step',
-      xp: 150, 
-      gold: 75, 
-      frequency: 'daily', 
+      xp: 150,
+      gold: 75,
+      frequency: 'daily',
       unlockDate: '2025-01-01',
       steps: [
         { q: "Step 1: How many times does 12 go into 14?", a: "1" },
@@ -253,47 +254,76 @@ export function GameProvider({ children }) {
   const [students, setStudents] = useState(INITIAL_STUDENTS);
   const [quests, setQuests] = useState(INITIAL_QUESTS);
   const [submissions, setSubmissions] = useState([]);
-  const [userRole, setUserRole] = useState(null); 
-  const [currentUser, setCurrentUser] = useState(null); 
+  const [userRole, setUserRole] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [currentRafflePrize, setCurrentRafflePrize] = useState('Mystery Prize');
+  const [session, setSession] = useState(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const login = async (email, password) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      return { success: false, message: error.message };
+    }
+    return { success: true };
+  };
+
+  const logout = async () => {
+    await supabase.auth.signOut();
+    setCurrentUser(null);
+    setUserRole(null);
+  };
 
   const awardRewards = (studentId, xpToAdd, goldToAdd) => {
     setStudents(prevStudents => prevStudents.map(student => {
-        if (student.id === studentId) {
-            const oldLevel = Math.floor(student.xp / 1000) + 1;
-            const newXp = student.xp + xpToAdd;
-            let newGold = student.gold + goldToAdd;
-            const newLevel = Math.floor(newXp / 1000) + 1;
+      if (student.id === studentId) {
+        const oldLevel = Math.floor(student.xp / 1000) + 1;
+        const newXp = student.xp + xpToAdd;
+        let newGold = student.gold + goldToAdd;
+        const newLevel = Math.floor(newXp / 1000) + 1;
 
-            const updatedStudent = { ...student, xp: newXp, gold: newGold };
+        const updatedStudent = { ...student, xp: newXp, gold: newGold };
 
-            if (newLevel > oldLevel) {
-                newGold += 500; // Level Up Bonus
-                updatedStudent.gold = newGold;
-                updatedStudent.notifications = [
-                    ...(student.notifications || []),
-                    {
-                        id: Date.now() + Math.random(),
-                        title: `LEVEL UP! You reached Level ${newLevel}`,
-                        xp: 0,
-                        gold: 500,
-                        quote: 'The King rewards your legendary growth!',
-                    },
-                ];
-            }
-            
-            if (currentUser && currentUser.id === studentId) {
-                setCurrentUser(prevUser => ({
-                    ...prevUser,
-                    xp: newXp,
-                    gold: newGold,
-                    notifications: updatedStudent.notifications
-                }));
-            }
-
-            return updatedStudent;
+        if (newLevel > oldLevel) {
+          newGold += 500; // Level Up Bonus
+          updatedStudent.gold = newGold;
+          updatedStudent.notifications = [
+            ...(student.notifications || []),
+            {
+              id: Date.now() + Math.random(),
+              title: `LEVEL UP! You reached Level ${newLevel}`,
+              xp: 0,
+              gold: 500,
+              quote: 'The King rewards your legendary growth!',
+            },
+          ];
         }
-        return student;
+
+        if (currentUser && currentUser.id === studentId) {
+          setCurrentUser(prevUser => ({
+            ...prevUser,
+            xp: newXp,
+            gold: newGold,
+            notifications: updatedStudent.notifications
+          }));
+        }
+
+        return updatedStudent;
+      }
+      return student;
     }));
   };
 
@@ -311,16 +341,16 @@ export function GameProvider({ children }) {
       let newRaffleTickets = updatedStudent.raffleTickets || 0;
       let newTotalTickets = updatedStudent.totalTicketsEarned || 0;
 
-      const totalQuests = (updatedStudent.uploadQuestsCompleted || 0) + 
-                          (updatedStudent.quizQuestsCompleted || 0) +
-                          (updatedStudent.multiStepQuestsCompleted || 0) +
-                          (updatedStudent.sportsQuestsCompleted || 0) +
-                          (updatedStudent.artsQuestsCompleted || 0) +
-                          (updatedStudent.journalQuestsCompleted || 0) +
-                          (updatedStudent.scenarioQuestsCompleted || 0) +
-                          (updatedStudent.cipherQuestsCompleted || 0) +
-                          (updatedStudent.incantationQuestsCompleted || 0) +
-                          (updatedStudent.wellnessQuestsCompleted || 0);
+      const totalQuests = (updatedStudent.uploadQuestsCompleted || 0) +
+        (updatedStudent.quizQuestsCompleted || 0) +
+        (updatedStudent.multiStepQuestsCompleted || 0) +
+        (updatedStudent.sportsQuestsCompleted || 0) +
+        (updatedStudent.artsQuestsCompleted || 0) +
+        (updatedStudent.journalQuestsCompleted || 0) +
+        (updatedStudent.scenarioQuestsCompleted || 0) +
+        (updatedStudent.cipherQuestsCompleted || 0) +
+        (updatedStudent.incantationQuestsCompleted || 0) +
+        (updatedStudent.wellnessQuestsCompleted || 0);
 
       const currentLevel = Math.max(updatedStudent.level || 1, Math.floor(updatedStudent.xp / 1000) + 1);
 
@@ -332,7 +362,7 @@ export function GameProvider({ children }) {
         if (achievement.unlockDate && new Date() < new Date(achievement.unlockDate)) return;
 
         let reqMet = false;
-        
+
         // Universal Switch
         switch (achievement.metric) {
           case 'level':
@@ -438,26 +468,26 @@ export function GameProvider({ children }) {
         updatedStudent.raffleTickets = newRaffleTickets;
         updatedStudent.totalTicketsEarned = newTotalTickets;
         updatedStudent.gold += (additionalGoldFromFallback + totalGoldEarned);
-        
+
         const oldLevel = Math.floor(updatedStudent.xp / 1000) + 1;
         updatedStudent.xp += totalXp;
         const newLevel = Math.floor(updatedStudent.xp / 1000) + 1;
 
         if (newLevel > oldLevel) {
-            updatedStudent.gold += 500;
-            updatedStudent.notifications.push({
-                id: Date.now() + Math.random(),
-                title: `LEVEL UP! You reached Level ${newLevel}`,
-                xp: 0,
-                gold: 500,
-                quote: 'The King rewards your legendary growth!'
-            });
+          updatedStudent.gold += 500;
+          updatedStudent.notifications.push({
+            id: Date.now() + Math.random(),
+            title: `LEVEL UP! You reached Level ${newLevel}`,
+            xp: 0,
+            gold: 500,
+            quote: 'The King rewards your legendary growth!'
+          });
         }
 
         if (currentUser && currentUser.id === studentId) {
-            setCurrentUser(prevUser => ({
-                ...updatedStudent
-            }));
+          setCurrentUser(prevUser => ({
+            ...updatedStudent
+          }));
         }
       }
 
@@ -525,38 +555,38 @@ export function GameProvider({ children }) {
     setSubmissions(prev => [...prev, newSubmission]);
   };
 
-    const submitWellnessCheck = (questId, feeling) => {
-        const quest = quests.find(q => q.id === questId);
-        if (!quest) return { success: false, message: 'Quest not found' };
+  const submitWellnessCheck = (questId, feeling) => {
+    const quest = quests.find(q => q.id === questId);
+    if (!quest) return { success: false, message: 'Quest not found' };
 
-        setStudents(prevStudents => prevStudents.map(student => {
-            if (student.id === currentUser.id) {
-                const updatedStudent = { ...student, wellnessQuestsCompleted: (student.wellnessQuestsCompleted || 0) + 1 };
-                 if (currentUser && currentUser.id === student.id) {
-                    setCurrentUser(prev => ({...prev, wellnessQuestsCompleted: (prev.wellnessQuestsCompleted || 0) + 1}));
-                }
-                return updatedStudent
-            }
-            return student;
-        }));
+    setStudents(prevStudents => prevStudents.map(student => {
+      if (student.id === currentUser.id) {
+        const updatedStudent = { ...student, wellnessQuestsCompleted: (student.wellnessQuestsCompleted || 0) + 1 };
+        if (currentUser && currentUser.id === student.id) {
+          setCurrentUser(prev => ({ ...prev, wellnessQuestsCompleted: (prev.wellnessQuestsCompleted || 0) + 1 }));
+        }
+        return updatedStudent
+      }
+      return student;
+    }));
 
-        awardRewards(currentUser.id, quest.xp, quest.gold);
+    awardRewards(currentUser.id, quest.xp, quest.gold);
 
-        const newSubmission = {
-            id: Date.now(),
-            questId,
-            studentId: currentUser.id,
-            studentName: currentUser.heroName,
-            feeling: feeling,
-            type: 'wellness',
-            status: 'read_only',
-            timestamp: new Date().toLocaleDateString(),
-        };
-
-        setSubmissions(prev => [...prev, newSubmission]);
-
-        return { success: true };
+    const newSubmission = {
+      id: Date.now(),
+      questId,
+      studentId: currentUser.id,
+      studentName: currentUser.heroName,
+      feeling: feeling,
+      type: 'wellness',
+      status: 'read_only',
+      timestamp: new Date().toLocaleDateString(),
     };
+
+    setSubmissions(prev => [...prev, newSubmission]);
+
+    return { success: true };
+  };
 
   const approveSubmission = (submissionId) => {
     const submission = submissions.find(s => s.id === submissionId);
@@ -564,7 +594,7 @@ export function GameProvider({ children }) {
 
     if (submission.isBossStrike) {
       fightBoss(submission.questId, submission.studentId);
-      setSubmissions(prev => prev.map(s => 
+      setSubmissions(prev => prev.map(s =>
         s.id === submissionId ? { ...s, status: 'approved' } : s
       ));
       return;
@@ -577,29 +607,29 @@ export function GameProvider({ children }) {
       if (student.id === submission.studentId) {
         const updatedStudent = { ...student };
         if (quest.type === 'upload') {
-            updatedStudent.uploadQuestsCompleted = (student.uploadQuestsCompleted || 0) + 1;
+          updatedStudent.uploadQuestsCompleted = (student.uploadQuestsCompleted || 0) + 1;
         } else if (quest.type === 'scout-sports') {
-            updatedStudent.sportsQuestsCompleted = (student.sportsQuestsCompleted || 0) + 1;
+          updatedStudent.sportsQuestsCompleted = (student.sportsQuestsCompleted || 0) + 1;
         } else if (quest.type === 'scout-arts') {
-            updatedStudent.artsQuestsCompleted = (student.artsQuestsCompleted || 0) + 1;
+          updatedStudent.artsQuestsCompleted = (student.artsQuestsCompleted || 0) + 1;
         } else if (quest.type === 'journal') {
-            updatedStudent.journalQuestsCompleted = (student.journalQuestsCompleted || 0) + 1;
+          updatedStudent.journalQuestsCompleted = (student.journalQuestsCompleted || 0) + 1;
         }
 
-        if(currentUser && currentUser.id === submission.studentId){
-             setCurrentUser(prev => {
-                const updatedUser = { ...prev };
-                if (quest.type === 'upload') {
-                        updatedUser.uploadQuestsCompleted = (prev.uploadQuestsCompleted || 0) + 1;
-                    } else if (quest.type === 'scout-sports') {
-                        updatedUser.sportsQuestsCompleted = (prev.sportsQuestsCompleted || 0) + 1;
-                    } else if (quest.type === 'scout-arts') {
-                        updatedUser.artsQuestsCompleted = (prev.artsQuestsCompleted || 0) + 1;
-                    } else if (quest.type === 'journal') {
-                        updatedUser.journalQuestsCompleted = (prev.journalQuestsCompleted || 0) + 1;
-                    }
-                return updatedUser;
-            });
+        if (currentUser && currentUser.id === submission.studentId) {
+          setCurrentUser(prev => {
+            const updatedUser = { ...prev };
+            if (quest.type === 'upload') {
+              updatedUser.uploadQuestsCompleted = (prev.uploadQuestsCompleted || 0) + 1;
+            } else if (quest.type === 'scout-sports') {
+              updatedUser.sportsQuestsCompleted = (prev.sportsQuestsCompleted || 0) + 1;
+            } else if (quest.type === 'scout-arts') {
+              updatedUser.artsQuestsCompleted = (prev.artsQuestsCompleted || 0) + 1;
+            } else if (quest.type === 'journal') {
+              updatedUser.journalQuestsCompleted = (prev.journalQuestsCompleted || 0) + 1;
+            }
+            return updatedUser;
+          });
         }
 
         return updatedStudent;
@@ -609,7 +639,7 @@ export function GameProvider({ children }) {
 
     awardRewards(submission.studentId, quest.xp, quest.gold);
 
-    setSubmissions(prev => prev.map(s => 
+    setSubmissions(prev => prev.map(s =>
       s.id === submissionId ? { ...s, status: 'approved' } : s
     ));
   };
@@ -622,12 +652,12 @@ export function GameProvider({ children }) {
     let isCorrect = false;
 
     if (quest.type === 'incantation') {
-        isCorrect = userAnswer.trim() === correctAnswer.trim();
+      isCorrect = userAnswer.trim() === correctAnswer.trim();
     } else {
-        if (typeof correctAnswer !== 'string') {
-            return { success: false, message: "Incorrect answer. Try again!" };
-        }
-        isCorrect = userAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
+      if (typeof correctAnswer !== 'string') {
+        return { success: false, message: "Incorrect answer. Try again!" };
+      }
+      isCorrect = userAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
     }
 
     if (isCorrect) {
@@ -638,21 +668,21 @@ export function GameProvider({ children }) {
       setStudents(students.map(student => {
         if (student.id === currentUser.id) {
           const updatedStudent = { ...student };
-           if(quest.type === 'quiz') updatedStudent.quizQuestsCompleted = (student.quizQuestsCompleted || 0) + 1;
-           if(quest.type === 'multi-step') updatedStudent.multiStepQuestsCompleted = (student.multiStepQuestsCompleted || 0) + 1;
-           if(quest.type === 'incantation') updatedStudent.incantationQuestsCompleted = (student.incantationQuestsCompleted || 0) + 1;
-           if(quest.type === 'cipher') updatedStudent.cipherQuestsCompleted = (student.cipherQuestsCompleted || 0) + 1;
-           return updatedStudent;
+          if (quest.type === 'quiz') updatedStudent.quizQuestsCompleted = (student.quizQuestsCompleted || 0) + 1;
+          if (quest.type === 'multi-step') updatedStudent.multiStepQuestsCompleted = (student.multiStepQuestsCompleted || 0) + 1;
+          if (quest.type === 'incantation') updatedStudent.incantationQuestsCompleted = (student.incantationQuestsCompleted || 0) + 1;
+          if (quest.type === 'cipher') updatedStudent.cipherQuestsCompleted = (student.cipherQuestsCompleted || 0) + 1;
+          return updatedStudent;
         }
         return student;
       }));
 
       setCurrentUser(prev => {
-        const updatedUser = {...prev };
-        if(quest.type === 'quiz') updatedUser.quizQuestsCompleted = (prev.quizQuestsCompleted || 0) + 1;
-        if(quest.type === 'multi-step') updatedUser.multiStepQuestsCompleted = (prev.multiStepQuestsCompleted || 0) + 1;
-        if(quest.type === 'incantation') updatedUser.incantationQuestsCompleted = (prev.incantationQuestsCompleted || 0) + 1;
-        if(quest.type === 'cipher') updatedUser.cipherQuestsCompleted = (prev.cipherQuestsCompleted || 0) + 1;
+        const updatedUser = { ...prev };
+        if (quest.type === 'quiz') updatedUser.quizQuestsCompleted = (prev.quizQuestsCompleted || 0) + 1;
+        if (quest.type === 'multi-step') updatedUser.multiStepQuestsCompleted = (prev.multiStepQuestsCompleted || 0) + 1;
+        if (quest.type === 'incantation') updatedUser.incantationQuestsCompleted = (prev.incantationQuestsCompleted || 0) + 1;
+        if (quest.type === 'cipher') updatedUser.cipherQuestsCompleted = (prev.cipherQuestsCompleted || 0) + 1;
         return updatedUser
       });
 
@@ -679,29 +709,29 @@ export function GameProvider({ children }) {
     if (!quest) return { success: false, message: "Quest not found!" };
 
     if (isCorrect) {
-        setStudents(students.map(student => {
-            if (student.id === currentUser.id) {
-                return { ...student, scenarioQuestsCompleted: (student.scenarioQuestsCompleted || 0) + 1 };
-            }
-            return student;
-        }));
+      setStudents(students.map(student => {
+        if (student.id === currentUser.id) {
+          return { ...student, scenarioQuestsCompleted: (student.scenarioQuestsCompleted || 0) + 1 };
+        }
+        return student;
+      }));
 
-        setCurrentUser(prev => ({ ...prev, scenarioQuestsCompleted: (prev.scenarioQuestsCompleted || 0) + 1 }));
-        
-        awardRewards(currentUser.id, quest.xp, quest.gold);
+      setCurrentUser(prev => ({ ...prev, scenarioQuestsCompleted: (prev.scenarioQuestsCompleted || 0) + 1 }));
 
-        const newSubmission = {
-            id: Date.now(),
-            questId,
-            studentId: currentUser.id,
-            studentName: currentUser.heroName,
-            status: 'approved',
-            timestamp: new Date().toLocaleDateString(),
-            type: 'scenario',
-        };
-        setSubmissions(prev => [...prev, newSubmission]);
+      awardRewards(currentUser.id, quest.xp, quest.gold);
 
-        return { success: true };
+      const newSubmission = {
+        id: Date.now(),
+        questId,
+        studentId: currentUser.id,
+        studentName: currentUser.heroName,
+        status: 'approved',
+        timestamp: new Date().toLocaleDateString(),
+        type: 'scenario',
+      };
+      setSubmissions(prev => [...prev, newSubmission]);
+
+      return { success: true };
     } else {
       return { success: false, message: "Incorrect choice made." };
     }
@@ -711,7 +741,7 @@ export function GameProvider({ children }) {
     if (!currentUser) return 'available';
 
     const quest = quests.find(q => q.id === questId);
-    if (!quest) return 'unavailable'; 
+    if (!quest) return 'unavailable';
 
     if (quest.unlockDate && Date.now() < new Date(quest.unlockDate).getTime()) {
       return 'locked';
@@ -719,14 +749,14 @@ export function GameProvider({ children }) {
 
     const userSubmissions = submissions
       .filter(s => s.questId === questId && s.studentId === currentUser.id)
-      .sort((a, b) => b.id - a.id); 
+      .sort((a, b) => b.id - a.id);
 
     if (userSubmissions.length === 0) {
       return 'available';
     }
 
     const mostRecentSubmission = userSubmissions[0];
-    
+
     if (quest.frequency === 'daily' || quest.frequency === 'weekly') {
       const todayString = new Date().toLocaleDateString();
       if (mostRecentSubmission.timestamp === todayString) {
@@ -741,10 +771,10 @@ export function GameProvider({ children }) {
 
   const buyItem = (item) => {
     if (!currentUser) return { success: false, message: "Not logged in!" };
-    
+
     if (currentUser.gold >= item.cost) {
       const itemToSave = { ...item };
-      
+
       const updatedStudents = students.map(student => {
         if (student.id === currentUser.id) {
           return {
@@ -808,7 +838,7 @@ export function GameProvider({ children }) {
       }
       return student;
     }));
-  }; 
+  };
 
   const fightBoss = (bossId, overrideStudentId = null) => {
     const targetId = overrideStudentId || currentUser?.id;
@@ -870,40 +900,40 @@ export function GameProvider({ children }) {
     if (requirementMet) {
       awardRewards(targetId, boss.rewardXp, boss.rewardGold);
       const bossLoot = BOSS_LOOT_OUTFITS[bossId];
-      
+
       setStudents(prev => prev.map(s => {
-          if (s.id === targetId) {
-              const updatedS = { ...s, defeatedBosses: [...s.defeatedBosses, bossId] };
-              if (bossLoot && !(updatedS.inventory || []).some(item => item.id === bossLoot.id)) {
-                  updatedS.inventory = [...(updatedS.inventory || []), bossLoot];
-                  updatedS.notifications = [...(updatedS.notifications || []), {
-                      id: Date.now() + Math.random(),
-                      title: "EPIC LOOT ACQUIRED: " + bossLoot.name,
-                      quote: 'A powerful artifact from a vanquished foe!',
-                      gold: 0,
-                      xp: 0
-                  }];
-              }
-              return updatedS;
+        if (s.id === targetId) {
+          const updatedS = { ...s, defeatedBosses: [...s.defeatedBosses, bossId] };
+          if (bossLoot && !(updatedS.inventory || []).some(item => item.id === bossLoot.id)) {
+            updatedS.inventory = [...(updatedS.inventory || []), bossLoot];
+            updatedS.notifications = [...(updatedS.notifications || []), {
+              id: Date.now() + Math.random(),
+              title: "EPIC LOOT ACQUIRED: " + bossLoot.name,
+              quote: 'A powerful artifact from a vanquished foe!',
+              gold: 0,
+              xp: 0
+            }];
           }
-          return s;
+          return updatedS;
+        }
+        return s;
       }));
-      
+
       if (currentUser && currentUser.id === targetId) {
-          setCurrentUser(prev => {
-              const updatedPrev = { ...prev, defeatedBosses: [...prev.defeatedBosses, bossId] };
-              if (bossLoot && !(updatedPrev.inventory || []).some(item => item.id === bossLoot.id)) {
-                  updatedPrev.inventory = [...(updatedPrev.inventory || []), bossLoot];
-                  updatedPrev.notifications = [...(updatedPrev.notifications || []), {
-                      id: Date.now() + Math.random(),
-                      title: "EPIC LOOT ACQUIRED: " + bossLoot.name,
-                      quote: 'A powerful artifact from a vanquished foe!',
-                      gold: 0,
-                      xp: 0
-                  }];
-              }
-              return updatedPrev;
-          });
+        setCurrentUser(prev => {
+          const updatedPrev = { ...prev, defeatedBosses: [...prev.defeatedBosses, bossId] };
+          if (bossLoot && !(updatedPrev.inventory || []).some(item => item.id === bossLoot.id)) {
+            updatedPrev.inventory = [...(updatedPrev.inventory || []), bossLoot];
+            updatedPrev.notifications = [...(updatedPrev.notifications || []), {
+              id: Date.now() + Math.random(),
+              title: "EPIC LOOT ACQUIRED: " + bossLoot.name,
+              quote: 'A powerful artifact from a vanquished foe!',
+              gold: 0,
+              xp: 0
+            }];
+          }
+          return updatedPrev;
+        });
       }
 
       checkAchievements(targetId);
@@ -913,7 +943,7 @@ export function GameProvider({ children }) {
       return { success: false, message: "You are not strong enough yet!" };
     }
   };
-  
+
   const calculateScholarScore = (student) => {
     const currentAttribute = student.finalGPA !== null ? student.finalGPA : student.midtermGPA;
     return currentAttribute + Math.floor(student.xp * 0.1);
@@ -959,10 +989,10 @@ export function GameProvider({ children }) {
     setStudents(prevStudents => prevStudents.map(student => {
       if (student.id === studentId) {
         const updatedPending = (student.pendingPrizes || []).filter((_, idx) => idx !== prizeIndex);
-        
+
         const updatedStudent = { ...student, pendingPrizes: updatedPending };
         if (currentUser && currentUser.id === studentId) {
-           setCurrentUser(prevUser => ({ ...prevUser, pendingPrizes: updatedPending }));
+          setCurrentUser(prevUser => ({ ...prevUser, pendingPrizes: updatedPending }));
         }
         return updatedStudent;
       }
@@ -989,22 +1019,22 @@ export function GameProvider({ children }) {
     setStudents(prev => prev.map(student => {
       let updated = { ...student };
       updated.raffleTickets = 0;
-      
+
       if (student.id === winnerId) {
         updated.pendingPrizes = [...(updated.pendingPrizes || []), { name: prizeName, achievement: 'Grand Monthly Raffle', status: 'pending' }];
         updated.notifications = [...(updated.notifications || []), {
-           id: Date.now() + Math.random(),
-           title: "🎉 YOU WON THE GRAND RAFFLE! 🎉",
-           quote: `Your incredible dedication has earned you the ${prizeName}!`,
-           xp: 0,
-           gold: 0
+          id: Date.now() + Math.random(),
+          title: "🎉 YOU WON THE GRAND RAFFLE! 🎉",
+          quote: `Your incredible dedication has earned you the ${prizeName}!`,
+          xp: 0,
+          gold: 0
         }];
       }
       return updated;
     }));
 
     if (currentUser) {
-        setCurrentUser(prev => ({ ...prev, raffleTickets: 0 }));
+      setCurrentUser(prev => ({ ...prev, raffleTickets: 0 }));
     }
 
     return { success: true, winnerName: winner.heroName || winner.name };
@@ -1037,7 +1067,10 @@ export function GameProvider({ children }) {
     fulfillPrize,
     currentRafflePrize,
     setCurrentRafflePrize,
-    runMonthlyRaffle
+    runMonthlyRaffle,
+    session,
+    login,
+    logout
   };
 
   return (
