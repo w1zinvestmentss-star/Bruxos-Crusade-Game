@@ -197,6 +197,35 @@ const formatProfile = (dbProfile) => ({
   journalQuestsCompleted: dbProfile.journal_quests_completed || 0,
 });
 
+const saveProfileToCloud = async (userId, updates) => {
+  // Map JS camelCase back to Database snake_case
+  const dbUpdates = {};
+  if (updates.gold !== undefined) dbUpdates.gold = updates.gold;
+  if (updates.xp !== undefined) dbUpdates.xp = updates.xp;
+  if (updates.currentBodySprite !== undefined) dbUpdates.current_body_sprite = updates.currentBodySprite;
+  if (updates.loginStreak !== undefined) dbUpdates.login_streak = updates.loginStreak;
+  if (updates.raffleTickets !== undefined) dbUpdates.raffle_tickets = updates.raffleTickets;
+  if (updates.totalTicketsEarned !== undefined) dbUpdates.total_tickets_earned = updates.totalTicketsEarned;
+  if (updates.lootboxPity !== undefined) dbUpdates.lootbox_pity = updates.lootboxPity;
+  if (updates.unlockedAchievements !== undefined) dbUpdates.unlocked_achievements = updates.unlockedAchievements;
+  if (updates.defeatedBosses !== undefined) dbUpdates.defeated_bosses = updates.defeatedBosses;
+  
+  // Map all quest counters:
+  if (updates.uploadQuestsCompleted !== undefined) dbUpdates.upload_quests_completed = updates.uploadQuestsCompleted;
+  if (updates.quizQuestsCompleted !== undefined) dbUpdates.quiz_quests_completed = updates.quizQuestsCompleted;
+  if (updates.multiStepQuestsCompleted !== undefined) dbUpdates.multi_step_quests_completed = updates.multiStepQuestsCompleted;
+  if (updates.scenarioQuestsCompleted !== undefined) dbUpdates.scenario_quests_completed = updates.scenarioQuestsCompleted;
+  if (updates.cipherQuestsCompleted !== undefined) dbUpdates.cipher_quests_completed = updates.cipherQuestsCompleted;
+  if (updates.incantationQuestsCompleted !== undefined) dbUpdates.incantation_quests_completed = updates.incantationQuestsCompleted;
+  if (updates.sportsQuestsCompleted !== undefined) dbUpdates.sports_quests_completed = updates.sportsQuestsCompleted;
+  if (updates.artsQuestsCompleted !== undefined) dbUpdates.arts_quests_completed = updates.artsQuestsCompleted;
+  if (updates.wellnessQuestsCompleted !== undefined) dbUpdates.wellness_quests_completed = updates.wellnessQuestsCompleted;
+  if (updates.journalQuestsCompleted !== undefined) dbUpdates.journal_quests_completed = updates.journalQuestsCompleted;
+
+  const { error } = await supabase.from('profiles').update(dbUpdates).eq('id', userId);
+  if (error) console.error("Error saving to cloud:", error);
+};
+
 export function GameProvider({ children }) {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
@@ -405,6 +434,8 @@ export function GameProvider({ children }) {
             notifications: updatedStudent.notifications
           }));
         }
+        
+        saveProfileToCloud(studentId, { xp: newXp, gold: newGold });
 
         return updatedStudent;
       }
@@ -574,6 +605,12 @@ export function GameProvider({ children }) {
             ...updatedStudent
           }));
         }
+
+        saveProfileToCloud(studentId, {
+          unlockedAchievements: updatedStudent.unlockedAchievements,
+          raffleTickets: newRaffleTickets,
+          totalTicketsEarned: newTotalTickets
+        });
       }
 
       return updatedStudent;
@@ -646,10 +683,12 @@ export function GameProvider({ children }) {
 
     setStudents(prevStudents => prevStudents.map(student => {
       if (student.id === currentUser.id) {
-        const updatedStudent = { ...student, wellnessQuestsCompleted: (student.wellnessQuestsCompleted || 0) + 1 };
+        const newCount = (student.wellnessQuestsCompleted || 0) + 1;
+        const updatedStudent = { ...student, wellnessQuestsCompleted: newCount };
         if (currentUser && currentUser.id === student.id) {
-          setCurrentUser(prev => ({ ...prev, wellnessQuestsCompleted: (prev.wellnessQuestsCompleted || 0) + 1 }));
+          setCurrentUser(prev => ({ ...prev, wellnessQuestsCompleted: newCount }));
         }
+        saveProfileToCloud(currentUser.id, { wellnessQuestsCompleted: newCount });
         return updatedStudent
       }
       return student;
@@ -716,6 +755,16 @@ export function GameProvider({ children }) {
             return updatedUser;
           });
         }
+        
+        const updates = {};
+        if (quest.type === 'upload') updates.uploadQuestsCompleted = updatedStudent.uploadQuestsCompleted;
+        if (quest.type === 'scout-sports') updates.sportsQuestsCompleted = updatedStudent.sportsQuestsCompleted;
+        if (quest.type === 'scout-arts') updates.artsQuestsCompleted = updatedStudent.artsQuestsCompleted;
+        if (quest.type === 'journal') updates.journalQuestsCompleted = updatedStudent.journalQuestsCompleted;
+        
+        if (Object.keys(updates).length > 0) {
+          saveProfileToCloud(submission.studentId, updates);
+        }
 
         return updatedStudent;
       }
@@ -770,6 +819,20 @@ export function GameProvider({ children }) {
         if (quest.type === 'cipher') updatedUser.cipherQuestsCompleted = (prev.cipherQuestsCompleted || 0) + 1;
         return updatedUser
       });
+      
+      if (quest.type === 'quiz') {
+        const newCount = (currentUser.quizQuestsCompleted || 0) + 1;
+        saveProfileToCloud(currentUser.id, { quizQuestsCompleted: newCount });
+      } else if (quest.type === 'multi-step') {
+        const newCount = (currentUser.multiStepQuestsCompleted || 0) + 1;
+        saveProfileToCloud(currentUser.id, { multiStepQuestsCompleted: newCount });
+      } else if (quest.type === 'incantation') {
+        const newCount = (currentUser.incantationQuestsCompleted || 0) + 1;
+        saveProfileToCloud(currentUser.id, { incantationQuestsCompleted: newCount });
+      } else if (quest.type === 'cipher') {
+        const newCount = (currentUser.cipherQuestsCompleted || 0) + 1;
+        saveProfileToCloud(currentUser.id, { cipherQuestsCompleted: newCount });
+      }
 
       awardRewards(currentUser.id, quest.xp, quest.gold);
 
@@ -802,6 +865,8 @@ export function GameProvider({ children }) {
       }));
 
       setCurrentUser(prev => ({ ...prev, scenarioQuestsCompleted: (prev.scenarioQuestsCompleted || 0) + 1 }));
+      
+      saveProfileToCloud(currentUser.id, { scenarioQuestsCompleted: (currentUser.scenarioQuestsCompleted || 0) + 1 });
 
       awardRewards(currentUser.id, quest.xp, quest.gold);
 
@@ -854,17 +919,18 @@ export function GameProvider({ children }) {
     return mostRecentSubmission.status;
   };
 
-  const buyItem = (item) => {
+  const buyItem = async (item) => {
     if (!currentUser) return { success: false, message: "Not logged in!" };
 
     if (currentUser.gold >= item.cost) {
+      const newGold = currentUser.gold - item.cost;
       const itemToSave = { ...item };
 
       const updatedStudents = students.map(student => {
         if (student.id === currentUser.id) {
           return {
             ...student,
-            gold: student.gold - item.cost,
+            gold: newGold,
             inventory: [...(student.inventory || []), itemToSave]
           };
         }
@@ -874,10 +940,20 @@ export function GameProvider({ children }) {
 
       const updatedCurrentUser = {
         ...currentUser,
-        gold: currentUser.gold - item.cost,
+        gold: newGold,
         inventory: [...(currentUser.inventory || []), itemToSave]
       };
       setCurrentUser(updatedCurrentUser);
+
+      saveProfileToCloud(currentUser.id, { gold: newGold });
+      
+      await supabase.from('inventory').insert([{ 
+        student_id: currentUser.id, 
+        item_id: item.id, 
+        name: item.name, 
+        type: item.type, 
+        image_link: item.imageLink 
+      }]);
 
       checkAchievements(currentUser.id);
 
@@ -894,6 +970,8 @@ export function GameProvider({ children }) {
       ...prev,
       currentBodySprite: outfitLink
     }));
+    
+    saveProfileToCloud(currentUser.id, { currentBodySprite: outfitLink });
 
     setStudents(prev => prev.map(student => {
       if (student.id === currentUser.id) {
@@ -913,6 +991,8 @@ export function GameProvider({ children }) {
       ...prev,
       currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'
     }));
+    
+    saveProfileToCloud(currentUser.id, { currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png' });
 
     setStudents(prev => prev.map(student => {
       if (student.id === currentUser.id) {
@@ -1020,6 +1100,9 @@ export function GameProvider({ children }) {
           return updatedPrev;
         });
       }
+      
+      const newDefeatedBossesArray = [...targetStudent.defeatedBosses, bossId];
+      saveProfileToCloud(targetId, { defeatedBosses: newDefeatedBossesArray });
 
       checkAchievements(targetId);
 
