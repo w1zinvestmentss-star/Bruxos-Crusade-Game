@@ -171,6 +171,32 @@ const VICTORY_QUOTES = [
   'Another victory for the Archives!',
 ];
 
+const formatProfile = (dbProfile) => ({
+  ...dbProfile,
+  heroName: dbProfile.hero_name,
+  realName: dbProfile.real_name,
+  currentBodySprite: dbProfile.current_body_sprite,
+  loginStreak: dbProfile.login_streak || 0,
+  raffleTickets: dbProfile.raffle_tickets || 0,
+  totalTicketsEarned: dbProfile.total_tickets_earned || 0,
+  lootboxPity: dbProfile.lootbox_pity || 0,
+  defeatedBosses: dbProfile.defeated_bosses || [],
+  unlockedAchievements: dbProfile.unlocked_achievements || [],
+  unlockedTitles: dbProfile.unlocked_titles || ['The Novice'],
+  midtermGPA: dbProfile.midterm_gpa || 0,
+  finalGPA: dbProfile.final_gpa || 0,
+  uploadQuestsCompleted: dbProfile.upload_quests_completed || 0,
+  quizQuestsCompleted: dbProfile.quiz_quests_completed || 0,
+  multiStepQuestsCompleted: dbProfile.multi_step_quests_completed || 0,
+  scenarioQuestsCompleted: dbProfile.scenario_quests_completed || 0,
+  cipherQuestsCompleted: dbProfile.cipher_quests_completed || 0,
+  incantationQuestsCompleted: dbProfile.incantation_quests_completed || 0,
+  sportsQuestsCompleted: dbProfile.sports_quests_completed || 0,
+  artsQuestsCompleted: dbProfile.arts_quests_completed || 0,
+  wellnessQuestsCompleted: dbProfile.wellness_quests_completed || 0,
+  journalQuestsCompleted: dbProfile.journal_quests_completed || 0,
+});
+
 export function GameProvider({ children }) {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
@@ -260,14 +286,73 @@ export function GameProvider({ children }) {
   const [session, setSession] = useState(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const handleAuthChange = async (session) => {
       setSession(session);
+      if (session) {
+        // Fetch Profile
+        let { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        let profileToSet = data;
+
+        if (error || !data) {
+          const { data: newProfile, error: insertError } = await supabase
+            .from('profiles')
+            .insert([{ id: session.user.id, hero_name: 'New Hero', real_name: session.user.email }])
+            .select()
+            .single();
+
+          if (!insertError) {
+            profileToSet = newProfile;
+          }
+        }
+
+        if (profileToSet) {
+          const formattedProfile = formatProfile(profileToSet);
+
+          // Preserve some critical base defaults not covered by the user adapter
+          formattedProfile.notifications = formattedProfile.notifications || [];
+          formattedProfile.pendingPrizes = formattedProfile.pendingPrizes || [];
+          formattedProfile.xp = formattedProfile.xp || 0;
+          formattedProfile.gold = formattedProfile.gold || 0;
+          formattedProfile.level = formattedProfile.level || 1;
+
+          // Fetch Inventory
+          const { data: inv } = await supabase
+            .from('inventory')
+            .select('*')
+            .eq('student_id', session.user.id);
+
+          formattedProfile.inventory = inv || [];
+          setCurrentUser(formattedProfile);
+
+          // Fetch Submissions
+          const { data: subs } = await supabase
+            .from('submissions')
+            .select('*')
+            .eq('student_id', session.user.id);
+
+          if (subs) {
+            setSubmissions(subs);
+          }
+        }
+      } else {
+        setCurrentUser(null);
+        setSubmissions([]);
+      }
+    };
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      handleAuthChange(session);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+      handleAuthChange(session);
     });
 
     return () => subscription.unsubscribe();
