@@ -209,7 +209,7 @@ const saveProfileToCloud = async (userId, updates) => {
   if (updates.lootboxPity !== undefined) dbUpdates.lootbox_pity = updates.lootboxPity;
   if (updates.unlockedAchievements !== undefined) dbUpdates.unlocked_achievements = updates.unlockedAchievements;
   if (updates.defeatedBosses !== undefined) dbUpdates.defeated_bosses = updates.defeatedBosses;
-  
+
   // Map all quest counters:
   if (updates.uploadQuestsCompleted !== undefined) dbUpdates.upload_quests_completed = updates.uploadQuestsCompleted;
   if (updates.quizQuestsCompleted !== undefined) dbUpdates.quiz_quests_completed = updates.quizQuestsCompleted;
@@ -434,7 +434,7 @@ export function GameProvider({ children }) {
             notifications: updatedStudent.notifications
           }));
         }
-        
+
         saveProfileToCloud(studentId, { xp: newXp, gold: newGold });
 
         return updatedStudent;
@@ -443,178 +443,213 @@ export function GameProvider({ children }) {
     }));
   };
 
-  const checkAchievements = (studentId) => {
-    setStudents(prevStudents => prevStudents.map(student => {
-      if (student.id !== studentId) return student;
+  // =============================================================
+  // checkAchievements — accepts a STUDENT OBJECT (not stale state)
+  // Evaluates ALL logic against that object, then persists if new.
+  // =============================================================
+  const checkAchievements = (student) => {
+    if (!student) return;
+    const studentId = student.id;
 
-      let updatedStudent = { ...student };
-      let newlyUnlocked = false;
-      let totalXp = 0;
-      let totalGoldEarned = 0;
-      let additionalGoldFromFallback = 0;
-      let newNotifications = [...(updatedStudent.notifications || [])];
-      let newPendingPrizes = [...(updatedStudent.pendingPrizes || [])];
-      let newRaffleTickets = updatedStudent.raffleTickets || 0;
-      let newTotalTickets = updatedStudent.totalTicketsEarned || 0;
+    let updatedStudent = { ...student };
+    let newlyUnlocked = false;
+    let totalXp = 0;
+    let totalGoldEarned = 0;
+    let additionalGoldFromFallback = 0;
+    let newNotifications = [...(updatedStudent.notifications || [])];
+    let newPendingPrizes = [...(updatedStudent.pendingPrizes || [])];
+    let newRaffleTickets = updatedStudent.raffleTickets || 0;
+    let newTotalTickets = updatedStudent.totalTicketsEarned || 0;
 
-      const totalQuests = (updatedStudent.uploadQuestsCompleted || 0) +
-        (updatedStudent.quizQuestsCompleted || 0) +
-        (updatedStudent.multiStepQuestsCompleted || 0) +
-        (updatedStudent.sportsQuestsCompleted || 0) +
-        (updatedStudent.artsQuestsCompleted || 0) +
-        (updatedStudent.journalQuestsCompleted || 0) +
-        (updatedStudent.scenarioQuestsCompleted || 0) +
-        (updatedStudent.cipherQuestsCompleted || 0) +
-        (updatedStudent.incantationQuestsCompleted || 0) +
-        (updatedStudent.wellnessQuestsCompleted || 0);
+    const totalQuests = (updatedStudent.uploadQuestsCompleted || 0) +
+      (updatedStudent.quizQuestsCompleted || 0) +
+      (updatedStudent.multiStepQuestsCompleted || 0) +
+      (updatedStudent.sportsQuestsCompleted || 0) +
+      (updatedStudent.artsQuestsCompleted || 0) +
+      (updatedStudent.journalQuestsCompleted || 0) +
+      (updatedStudent.scenarioQuestsCompleted || 0) +
+      (updatedStudent.cipherQuestsCompleted || 0) +
+      (updatedStudent.incantationQuestsCompleted || 0) +
+      (updatedStudent.wellnessQuestsCompleted || 0);
 
-      const currentLevel = Math.max(updatedStudent.level || 1, Math.floor(updatedStudent.xp / 1000) + 1);
+    const currentLevel = Math.max(
+      updatedStudent.level || 1,
+      Math.floor((updatedStudent.xp || 0) / 1000) + 1
+    );
 
-      ACHIEVEMENTS.forEach(achievement => {
-        // Skip if already unlocked
-        if (updatedStudent.unlockedAchievements.includes(achievement.id)) return;
+    ACHIEVEMENTS.forEach(achievement => {
+      // Skip if already unlocked
+      if ((updatedStudent.unlockedAchievements || []).includes(achievement.id)) return;
 
-        // Time Gate Check
-        if (achievement.unlockDate && new Date() < new Date(achievement.unlockDate)) return;
+      // Time Gate Check
+      if (achievement.unlockDate && new Date() < new Date(achievement.unlockDate)) return;
 
-        let reqMet = false;
+      let reqMet = false;
 
-        // Universal Switch
-        switch (achievement.metric) {
-          case 'level':
-            reqMet = currentLevel >= achievement.target;
-            break;
-          case 'streak':
-            reqMet = (updatedStudent.loginStreak || 0) >= achievement.target;
-            break;
-          case 'quizzes':
-            reqMet = (updatedStudent.quizQuestsCompleted || 0) >= achievement.target;
-            break;
-          case 'journals':
-            reqMet = (updatedStudent.journalQuestsCompleted || 0) >= achievement.target;
-            break;
-          case 'sports':
-            reqMet = (updatedStudent.sportsQuestsCompleted || 0) >= achievement.target;
-            break;
-          case 'arts':
-            reqMet = (updatedStudent.artsQuestsCompleted || 0) >= achievement.target;
-            break;
-          case 'total_quests':
-            reqMet = totalQuests >= achievement.target;
-            break;
-          case 'bosses':
-            reqMet = (updatedStudent.defeatedBosses?.length || 0) >= achievement.target;
-            break;
-          case 'outfits':
-            reqMet = (updatedStudent.inventory?.filter(i => i.type === 'outfit').length || 0) >= achievement.target;
-            break;
-          case 'scenarios':
-            reqMet = (updatedStudent.scenarioQuestsCompleted || 0) >= achievement.target;
-            break;
-          case 'ciphers':
-            reqMet = (updatedStudent.cipherQuestsCompleted || 0) >= achievement.target;
-            break;
-          case 'incantations':
-            reqMet = (updatedStudent.incantationQuestsCompleted || 0) >= achievement.target;
-            break;
-          case 'wellness':
-            reqMet = (updatedStudent.wellnessQuestsCompleted || 0) >= achievement.target;
-            break;
-          case 'tickets':
-            reqMet = (updatedStudent.totalTicketsEarned || 0) >= achievement.target;
-            break;
-          case 'uploads':
-            reqMet = (updatedStudent.uploadQuestsCompleted || 0) >= achievement.target;
-            break;
-          default:
-            reqMet = false;
-        }
+      // Evaluate against the PASSED student object — never stale currentUser
+      switch (achievement.metric) {
+        case 'level':
+          reqMet = currentLevel >= achievement.target;
+          break;
+        case 'streak':
+          reqMet = (updatedStudent.loginStreak || 0) >= achievement.target;
+          break;
+        case 'quizzes':
+          reqMet = (updatedStudent.quizQuestsCompleted || 0) >= achievement.target;
+          break;
+        case 'journals':
+          reqMet = (updatedStudent.journalQuestsCompleted || 0) >= achievement.target;
+          break;
+        case 'sports':
+          reqMet = (updatedStudent.sportsQuestsCompleted || 0) >= achievement.target;
+          break;
+        case 'arts':
+          reqMet = (updatedStudent.artsQuestsCompleted || 0) >= achievement.target;
+          break;
+        case 'total_quests':
+          reqMet = totalQuests >= achievement.target;
+          break;
+        case 'bosses':
+          reqMet = (updatedStudent.defeatedBosses?.length || 0) >= achievement.target;
+          break;
+        case 'outfits':
+          reqMet = (updatedStudent.inventory?.filter(i => i.type === 'outfit').length || 0) >= achievement.target;
+          break;
+        case 'scenarios':
+          reqMet = (updatedStudent.scenarioQuestsCompleted || 0) >= achievement.target;
+          break;
+        case 'ciphers':
+          reqMet = (updatedStudent.cipherQuestsCompleted || 0) >= achievement.target;
+          break;
+        case 'incantations':
+          reqMet = (updatedStudent.incantationQuestsCompleted || 0) >= achievement.target;
+          break;
+        case 'wellness':
+          reqMet = (updatedStudent.wellnessQuestsCompleted || 0) >= achievement.target;
+          break;
+        case 'tickets':
+          reqMet = (updatedStudent.totalTicketsEarned || 0) >= achievement.target;
+          break;
+        case 'uploads':
+          reqMet = (updatedStudent.uploadQuestsCompleted || 0) >= achievement.target;
+          break;
+        default:
+          reqMet = false;
+      }
 
-        if (reqMet) {
-          newlyUnlocked = true;
-          updatedStudent.unlockedAchievements.push(achievement.id);
-          totalXp += achievement.rewardXp;
-          totalGoldEarned += (achievement.rewardGold || 0);
-          newRaffleTickets += achievement.rewardTicket;
-          newTotalTickets += achievement.rewardTicket;
+      if (reqMet) {
+        newlyUnlocked = true;
+        updatedStudent.unlockedAchievements = [...(updatedStudent.unlockedAchievements || []), achievement.id];
+        totalXp += achievement.rewardXp;
+        totalGoldEarned += (achievement.rewardGold || 0);
+        newRaffleTickets += achievement.rewardTicket;
+        newTotalTickets += achievement.rewardTicket;
 
-          if (achievement.realWorldPrize) {
-            if (achievement.limit) {
-              const claimCount = prevStudents.filter(s => s.unlockedAchievements?.includes(achievement.id)).length;
-              if (claimCount < achievement.limit) {
-                newPendingPrizes.push({
-                  name: achievement.realWorldPrize,
-                  achievement: achievement.title,
-                  status: 'pending'
-                });
-                newNotifications.push({
-                  id: Date.now() + Math.random(),
-                  title: `Achievement Unlocked: ${achievement.title}`
-                });
-              } else {
-                additionalGoldFromFallback += (achievement.fallbackGold || 0);
-                newNotifications.push({
-                  id: Date.now() + Math.random(),
-                  title: `Achievement Unlocked: ${achievement.title}! The physical prizes were claimed, but you received ${achievement.fallbackGold || 0} Gold!`
-                });
-              }
+        if (achievement.realWorldPrize) {
+          if (achievement.limit) {
+            // Use students from closure (fresh enough for speed-race checks)
+            const claimCount = students.filter(s => (s.unlockedAchievements || []).includes(achievement.id)).length;
+            if (claimCount < achievement.limit) {
+              newPendingPrizes.push({ name: achievement.realWorldPrize, achievement: achievement.title, status: 'pending' });
+              newNotifications.push({ id: Date.now() + Math.random(), title: `Achievement Unlocked: ${achievement.title}` });
             } else {
-              newPendingPrizes.push({
-                name: achievement.realWorldPrize,
-                achievement: achievement.title,
-                status: 'pending'
-              });
-              newNotifications.push({
-                id: Date.now() + Math.random(),
-                title: `Achievement Unlocked: ${achievement.title}`
-              });
+              additionalGoldFromFallback += (achievement.fallbackGold || 0);
+              newNotifications.push({ id: Date.now() + Math.random(), title: `Achievement Unlocked: ${achievement.title}! The physical prizes were claimed, but you received ${achievement.fallbackGold || 0} Gold!` });
             }
           } else {
-            newNotifications.push({
-              id: Date.now() + Math.random(),
-              title: `Achievement Unlocked: ${achievement.title}`
-            });
+            newPendingPrizes.push({ name: achievement.realWorldPrize, achievement: achievement.title, status: 'pending' });
+            newNotifications.push({ id: Date.now() + Math.random(), title: `Achievement Unlocked: ${achievement.title}` });
           }
+        } else {
+          newNotifications.push({ id: Date.now() + Math.random(), title: `Achievement Unlocked: ${achievement.title}` });
         }
+      }
+    });
+
+    if (newlyUnlocked) {
+      updatedStudent.pendingPrizes = newPendingPrizes;
+      updatedStudent.notifications = newNotifications;
+      updatedStudent.raffleTickets = newRaffleTickets;
+      updatedStudent.totalTicketsEarned = newTotalTickets;
+      updatedStudent.gold = (updatedStudent.gold || 0) + additionalGoldFromFallback + totalGoldEarned;
+
+      const oldXpLevel = Math.floor((updatedStudent.xp || 0) / 1000) + 1;
+      updatedStudent.xp = (updatedStudent.xp || 0) + totalXp;
+      const newXpLevel = Math.floor(updatedStudent.xp / 1000) + 1;
+
+      if (newXpLevel > oldXpLevel) {
+        updatedStudent.gold += 500;
+        updatedStudent.level = newXpLevel;
+        updatedStudent.notifications.push({
+          id: Date.now() + Math.random(),
+          title: `LEVEL UP! You reached Level ${newXpLevel}`,
+          xp: 0,
+          gold: 500,
+          quote: 'The King rewards your legendary growth!'
+        });
+      }
+
+      // Update students array and — only if this IS the current user — currentUser
+      setStudents(prev => prev.map(s => s.id === studentId ? updatedStudent : s));
+      if (currentUser && currentUser.id === studentId) {
+        setCurrentUser(updatedStudent);
+      }
+
+      // Persist achievement data + corrected xp/gold to cloud
+      saveProfileToCloud(studentId, {
+        unlockedAchievements: updatedStudent.unlockedAchievements,
+        xp: updatedStudent.xp,
+        gold: updatedStudent.gold,
+        raffleTickets: newRaffleTickets,
+        totalTicketsEarned: newTotalTickets,
       });
+    }
+  };
 
-      if (newlyUnlocked) {
-        updatedStudent.pendingPrizes = newPendingPrizes;
-        updatedStudent.notifications = newNotifications;
-        updatedStudent.raffleTickets = newRaffleTickets;
-        updatedStudent.totalTicketsEarned = newTotalTickets;
-        updatedStudent.gold += (additionalGoldFromFallback + totalGoldEarned);
+  // =============================================================
+  // syncUserUpdate — SINGLE SOURCE OF TRUTH for all player progress
+  // 1. Snapshot true new state  2. Update UI immediately
+  // 3. Persist to cloud         4. Fire achievements with fresh state
+  // =============================================================
+  const syncUserUpdate = async (updates) => {
+    if (!currentUser) return;
 
-        const oldLevel = Math.floor(updatedStudent.xp / 1000) + 1;
-        updatedStudent.xp += totalXp;
-        const newLevel = Math.floor(updatedStudent.xp / 1000) + 1;
+    // 1. Merge updates with the current snapshot to get the TRUE new state
+    const updatedUser = { ...currentUser, ...updates };
 
-        if (newLevel > oldLevel) {
-          updatedStudent.gold += 500;
-          updatedStudent.notifications.push({
+    // Detect and handle level-up whenever XP changes
+    if (updates.xp !== undefined) {
+      const oldLevel = Math.floor((currentUser.xp || 0) / 1000) + 1;
+      const newLevel = Math.floor(updatedUser.xp / 1000) + 1;
+      if (newLevel > oldLevel) {
+        updatedUser.gold = (updatedUser.gold || 0) + 500;
+        updatedUser.level = newLevel;
+        updatedUser.notifications = [
+          ...(updatedUser.notifications || []),
+          {
             id: Date.now() + Math.random(),
             title: `LEVEL UP! You reached Level ${newLevel}`,
             xp: 0,
             gold: 500,
-            quote: 'The King rewards your legendary growth!'
-          });
-        }
-
-        if (currentUser && currentUser.id === studentId) {
-          setCurrentUser(prevUser => ({
-            ...updatedStudent
-          }));
-        }
-
-        saveProfileToCloud(studentId, {
-          unlockedAchievements: updatedStudent.unlockedAchievements,
-          raffleTickets: newRaffleTickets,
-          totalTicketsEarned: newTotalTickets
-        });
+            quote: 'The King rewards your legendary growth!',
+          },
+        ];
       }
+    }
 
-      return updatedStudent;
-    }));
+    // 2. Update React state immediately for snappy UI
+    setCurrentUser(updatedUser);
+    setStudents(prev => prev.map(s => s.id === currentUser.id ? updatedUser : s));
+
+    // 3. Persist to Supabase — include gold in case a level-up bonus was added
+    const cloudUpdates = { ...updates };
+    if (updates.xp !== undefined && updatedUser.gold !== (currentUser.gold || 0) + (updates.gold || 0)) {
+      cloudUpdates.gold = updatedUser.gold; // captures level-up 500g bonus
+    }
+    await saveProfileToCloud(currentUser.id, cloudUpdates);
+
+    // 4. Run achievement check against the TRUE new state, not stale currentUser
+    checkAchievements(updatedUser);
   };
 
   const createQuest = (newQuest) => {
@@ -681,20 +716,12 @@ export function GameProvider({ children }) {
     const quest = quests.find(q => q.id === questId);
     if (!quest) return { success: false, message: 'Quest not found' };
 
-    setStudents(prevStudents => prevStudents.map(student => {
-      if (student.id === currentUser.id) {
-        const newCount = (student.wellnessQuestsCompleted || 0) + 1;
-        const updatedStudent = { ...student, wellnessQuestsCompleted: newCount };
-        if (currentUser && currentUser.id === student.id) {
-          setCurrentUser(prev => ({ ...prev, wellnessQuestsCompleted: newCount }));
-        }
-        saveProfileToCloud(currentUser.id, { wellnessQuestsCompleted: newCount });
-        return updatedStudent
-      }
-      return student;
-    }));
-
-    awardRewards(currentUser.id, quest.xp, quest.gold);
+    // Route through syncUserUpdate: single call covers state + cloud + achievements
+    syncUserUpdate({
+      xp: (currentUser.xp || 0) + quest.xp,
+      gold: (currentUser.gold || 0) + quest.gold,
+      wellnessQuestsCompleted: (currentUser.wellnessQuestsCompleted || 0) + 1,
+    });
 
     const newSubmission = {
       id: Date.now(),
@@ -706,7 +733,6 @@ export function GameProvider({ children }) {
       status: 'read_only',
       timestamp: new Date().toLocaleDateString(),
     };
-
     setSubmissions(prev => [...prev, newSubmission]);
 
     return { success: true };
@@ -727,51 +753,46 @@ export function GameProvider({ children }) {
     const quest = quests.find(q => q.id === submission.questId);
     if (!quest) return;
 
-    setStudents(prev => prev.map(student => {
-      if (student.id === submission.studentId) {
-        const updatedStudent = { ...student };
-        if (quest.type === 'upload') {
-          updatedStudent.uploadQuestsCompleted = (student.uploadQuestsCompleted || 0) + 1;
-        } else if (quest.type === 'scout-sports') {
-          updatedStudent.sportsQuestsCompleted = (student.sportsQuestsCompleted || 0) + 1;
-        } else if (quest.type === 'scout-arts') {
-          updatedStudent.artsQuestsCompleted = (student.artsQuestsCompleted || 0) + 1;
-        } else if (quest.type === 'journal') {
-          updatedStudent.journalQuestsCompleted = (student.journalQuestsCompleted || 0) + 1;
-        }
+    const targetStudent = students.find(s => s.id === submission.studentId);
+    if (!targetStudent) return;
 
-        if (currentUser && currentUser.id === submission.studentId) {
-          setCurrentUser(prev => {
-            const updatedUser = { ...prev };
-            if (quest.type === 'upload') {
-              updatedUser.uploadQuestsCompleted = (prev.uploadQuestsCompleted || 0) + 1;
-            } else if (quest.type === 'scout-sports') {
-              updatedUser.sportsQuestsCompleted = (prev.sportsQuestsCompleted || 0) + 1;
-            } else if (quest.type === 'scout-arts') {
-              updatedUser.artsQuestsCompleted = (prev.artsQuestsCompleted || 0) + 1;
-            } else if (quest.type === 'journal') {
-              updatedUser.journalQuestsCompleted = (prev.journalQuestsCompleted || 0) + 1;
-            }
-            return updatedUser;
-          });
-        }
-        
-        const updates = {};
-        if (quest.type === 'upload') updates.uploadQuestsCompleted = updatedStudent.uploadQuestsCompleted;
-        if (quest.type === 'scout-sports') updates.sportsQuestsCompleted = updatedStudent.sportsQuestsCompleted;
-        if (quest.type === 'scout-arts') updates.artsQuestsCompleted = updatedStudent.artsQuestsCompleted;
-        if (quest.type === 'journal') updates.journalQuestsCompleted = updatedStudent.journalQuestsCompleted;
-        
-        if (Object.keys(updates).length > 0) {
-          saveProfileToCloud(submission.studentId, updates);
-        }
+    // Build the TRUE updated state for the target student in one pass
+    const updatedStudent = { ...targetStudent };
+    if (quest.type === 'upload')      updatedStudent.uploadQuestsCompleted  = (targetStudent.uploadQuestsCompleted  || 0) + 1;
+    else if (quest.type === 'scout-sports') updatedStudent.sportsQuestsCompleted  = (targetStudent.sportsQuestsCompleted  || 0) + 1;
+    else if (quest.type === 'scout-arts')   updatedStudent.artsQuestsCompleted    = (targetStudent.artsQuestsCompleted    || 0) + 1;
+    else if (quest.type === 'journal')      updatedStudent.journalQuestsCompleted = (targetStudent.journalQuestsCompleted || 0) + 1;
 
-        return updatedStudent;
-      }
-      return student;
-    }));
+    // Award XP + gold and handle level-up within the same object
+    const oldLevel = Math.floor((targetStudent.xp || 0) / 1000) + 1;
+    updatedStudent.xp   = (targetStudent.xp   || 0) + quest.xp;
+    updatedStudent.gold = (targetStudent.gold || 0) + quest.gold;
+    const newLevel = Math.floor(updatedStudent.xp / 1000) + 1;
+    if (newLevel > oldLevel) {
+      updatedStudent.gold += 500;
+      updatedStudent.level = newLevel;
+      updatedStudent.notifications = [
+        ...(updatedStudent.notifications || []),
+        { id: Date.now() + Math.random(), title: `LEVEL UP! You reached Level ${newLevel}`, xp: 0, gold: 500, quote: 'The King rewards your legendary growth!' }
+      ];
+    }
 
-    awardRewards(submission.studentId, quest.xp, quest.gold);
+    // Commit to both lists; update currentUser only when target IS the logged-in user
+    setStudents(prev => prev.map(s => s.id === submission.studentId ? updatedStudent : s));
+    if (currentUser && currentUser.id === submission.studentId) {
+      setCurrentUser(updatedStudent);
+    }
+
+    // Persist all changed fields to Supabase
+    const cloudUpdates = { xp: updatedStudent.xp, gold: updatedStudent.gold };
+    if (quest.type === 'upload')       cloudUpdates.uploadQuestsCompleted  = updatedStudent.uploadQuestsCompleted;
+    if (quest.type === 'scout-sports') cloudUpdates.sportsQuestsCompleted  = updatedStudent.sportsQuestsCompleted;
+    if (quest.type === 'scout-arts')   cloudUpdates.artsQuestsCompleted    = updatedStudent.artsQuestsCompleted;
+    if (quest.type === 'journal')      cloudUpdates.journalQuestsCompleted = updatedStudent.journalQuestsCompleted;
+    saveProfileToCloud(submission.studentId, cloudUpdates);
+
+    // Check achievements against the TRUE updated state — no stale reads
+    checkAchievements(updatedStudent);
 
     setSubmissions(prev => prev.map(s =>
       s.id === submissionId ? { ...s, status: 'approved' } : s
@@ -799,42 +820,18 @@ export function GameProvider({ children }) {
         return { success: true, message: "Correct! Keep going..." };
       }
 
-      setStudents(students.map(student => {
-        if (student.id === currentUser.id) {
-          const updatedStudent = { ...student };
-          if (quest.type === 'quiz') updatedStudent.quizQuestsCompleted = (student.quizQuestsCompleted || 0) + 1;
-          if (quest.type === 'multi-step') updatedStudent.multiStepQuestsCompleted = (student.multiStepQuestsCompleted || 0) + 1;
-          if (quest.type === 'incantation') updatedStudent.incantationQuestsCompleted = (student.incantationQuestsCompleted || 0) + 1;
-          if (quest.type === 'cipher') updatedStudent.cipherQuestsCompleted = (student.cipherQuestsCompleted || 0) + 1;
-          return updatedStudent;
-        }
-        return student;
-      }));
+      // Calculate ALL new values from the currentUser snapshot BEFORE any async gap
+      const updates = {
+        xp:   (currentUser.xp   || 0) + quest.xp,
+        gold: (currentUser.gold || 0) + quest.gold,
+      };
+      if (quest.type === 'quiz')        updates.quizQuestsCompleted        = (currentUser.quizQuestsCompleted        || 0) + 1;
+      if (quest.type === 'multi-step')  updates.multiStepQuestsCompleted   = (currentUser.multiStepQuestsCompleted   || 0) + 1;
+      if (quest.type === 'incantation') updates.incantationQuestsCompleted  = (currentUser.incantationQuestsCompleted  || 0) + 1;
+      if (quest.type === 'cipher')      updates.cipherQuestsCompleted       = (currentUser.cipherQuestsCompleted       || 0) + 1;
 
-      setCurrentUser(prev => {
-        const updatedUser = { ...prev };
-        if (quest.type === 'quiz') updatedUser.quizQuestsCompleted = (prev.quizQuestsCompleted || 0) + 1;
-        if (quest.type === 'multi-step') updatedUser.multiStepQuestsCompleted = (prev.multiStepQuestsCompleted || 0) + 1;
-        if (quest.type === 'incantation') updatedUser.incantationQuestsCompleted = (prev.incantationQuestsCompleted || 0) + 1;
-        if (quest.type === 'cipher') updatedUser.cipherQuestsCompleted = (prev.cipherQuestsCompleted || 0) + 1;
-        return updatedUser
-      });
-      
-      if (quest.type === 'quiz') {
-        const newCount = (currentUser.quizQuestsCompleted || 0) + 1;
-        saveProfileToCloud(currentUser.id, { quizQuestsCompleted: newCount });
-      } else if (quest.type === 'multi-step') {
-        const newCount = (currentUser.multiStepQuestsCompleted || 0) + 1;
-        saveProfileToCloud(currentUser.id, { multiStepQuestsCompleted: newCount });
-      } else if (quest.type === 'incantation') {
-        const newCount = (currentUser.incantationQuestsCompleted || 0) + 1;
-        saveProfileToCloud(currentUser.id, { incantationQuestsCompleted: newCount });
-      } else if (quest.type === 'cipher') {
-        const newCount = (currentUser.cipherQuestsCompleted || 0) + 1;
-        saveProfileToCloud(currentUser.id, { cipherQuestsCompleted: newCount });
-      }
-
-      awardRewards(currentUser.id, quest.xp, quest.gold);
+      // One call handles: state update + cloud save + achievement check
+      syncUserUpdate(updates);
 
       const newSubmission = {
         id: Date.now(),
@@ -857,18 +854,12 @@ export function GameProvider({ children }) {
     if (!quest) return { success: false, message: "Quest not found!" };
 
     if (isCorrect) {
-      setStudents(students.map(student => {
-        if (student.id === currentUser.id) {
-          return { ...student, scenarioQuestsCompleted: (student.scenarioQuestsCompleted || 0) + 1 };
-        }
-        return student;
-      }));
-
-      setCurrentUser(prev => ({ ...prev, scenarioQuestsCompleted: (prev.scenarioQuestsCompleted || 0) + 1 }));
-      
-      saveProfileToCloud(currentUser.id, { scenarioQuestsCompleted: (currentUser.scenarioQuestsCompleted || 0) + 1 });
-
-      awardRewards(currentUser.id, quest.xp, quest.gold);
+      // Route through syncUserUpdate: state + cloud + achievements in one call
+      syncUserUpdate({
+        xp:   (currentUser.xp   || 0) + quest.xp,
+        gold: (currentUser.gold || 0) + quest.gold,
+        scenarioQuestsCompleted: (currentUser.scenarioQuestsCompleted || 0) + 1,
+      });
 
       const newSubmission = {
         id: Date.now(),
@@ -946,16 +937,17 @@ export function GameProvider({ children }) {
       setCurrentUser(updatedCurrentUser);
 
       saveProfileToCloud(currentUser.id, { gold: newGold });
-      
-      await supabase.from('inventory').insert([{ 
-        student_id: currentUser.id, 
-        item_id: item.id, 
-        name: item.name, 
-        type: item.type, 
-        image_link: item.imageLink 
+
+      await supabase.from('inventory').insert([{
+        student_id: currentUser.id,
+        item_id: item.id,
+        name: item.name,
+        type: item.type,
+        image_link: item.imageLink
       }]);
 
-      checkAchievements(currentUser.id);
+      // Pass the already-computed updatedCurrentUser so checkAchievements sees fresh inventory
+      checkAchievements(updatedCurrentUser);
 
       return { success: true };
     } else {
@@ -970,7 +962,7 @@ export function GameProvider({ children }) {
       ...prev,
       currentBodySprite: outfitLink
     }));
-    
+
     saveProfileToCloud(currentUser.id, { currentBodySprite: outfitLink });
 
     setStudents(prev => prev.map(student => {
@@ -991,7 +983,7 @@ export function GameProvider({ children }) {
       ...prev,
       currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'
     }));
-    
+
     saveProfileToCloud(currentUser.id, { currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png' });
 
     setStudents(prev => prev.map(student => {
@@ -1021,90 +1013,84 @@ export function GameProvider({ children }) {
 
     let requirementMet = false;
     switch (boss.requirement) {
-      case 'uploads':
-        requirementMet = (targetStudent.uploadQuestsCompleted || 0) >= boss.target;
-        break;
-      case 'quizzes':
-        requirementMet = (targetStudent.quizQuestsCompleted || 0) >= boss.target;
-        break;
-      case 'multistep':
-        requirementMet = (targetStudent.multiStepQuestsCompleted || 0) >= boss.target;
-        break;
-      case 'scenarios':
-        requirementMet = (targetStudent.scenarioQuestsCompleted || 0) >= boss.target;
-        break;
-      case 'incantations':
-        requirementMet = (targetStudent.incantationQuestsCompleted || 0) >= boss.target;
-        break;
-      case 'sports':
-        requirementMet = (targetStudent.sportsQuestsCompleted || 0) >= boss.target;
-        break;
-      case 'arts':
-        requirementMet = (targetStudent.artsQuestsCompleted || 0) >= boss.target;
-        break;
-      case 'wellness':
-        requirementMet = (targetStudent.wellnessQuestsCompleted || 0) >= boss.target;
-        break;
-      case 'streak':
-        requirementMet = (targetStudent.loginStreak || 0) >= boss.target;
-        break;
-      case 'journal':
-        requirementMet = (targetStudent.journalQuestsCompleted || 0) >= boss.target;
-        break;
-      case 'ciphers':
-        requirementMet = (targetStudent.cipherQuestsCompleted || 0) >= boss.target;
-        break;
-      default:
-        requirementMet = false;
+      case 'uploads':      requirementMet = (targetStudent.uploadQuestsCompleted    || 0) >= boss.target; break;
+      case 'quizzes':      requirementMet = (targetStudent.quizQuestsCompleted      || 0) >= boss.target; break;
+      case 'multistep':    requirementMet = (targetStudent.multiStepQuestsCompleted || 0) >= boss.target; break;
+      case 'scenarios':    requirementMet = (targetStudent.scenarioQuestsCompleted  || 0) >= boss.target; break;
+      case 'incantations': requirementMet = (targetStudent.incantationQuestsCompleted || 0) >= boss.target; break;
+      case 'sports':       requirementMet = (targetStudent.sportsQuestsCompleted    || 0) >= boss.target; break;
+      case 'arts':         requirementMet = (targetStudent.artsQuestsCompleted      || 0) >= boss.target; break;
+      case 'wellness':     requirementMet = (targetStudent.wellnessQuestsCompleted  || 0) >= boss.target; break;
+      case 'streak':       requirementMet = (targetStudent.loginStreak              || 0) >= boss.target; break;
+      case 'journal':      requirementMet = (targetStudent.journalQuestsCompleted   || 0) >= boss.target; break;
+      case 'ciphers':      requirementMet = (targetStudent.cipherQuestsCompleted    || 0) >= boss.target; break;
+      default:             requirementMet = false;
     }
 
-    if (overrideStudentId) {
-      requirementMet = true;
-    }
+    if (overrideStudentId) requirementMet = true;
 
     if (requirementMet) {
-      awardRewards(targetId, boss.rewardXp, boss.rewardGold);
       const bossLoot = BOSS_LOOT_OUTFITS[bossId];
 
-      setStudents(prev => prev.map(s => {
-        if (s.id === targetId) {
-          const updatedS = { ...s, defeatedBosses: [...s.defeatedBosses, bossId] };
-          if (bossLoot && !(updatedS.inventory || []).some(item => item.id === bossLoot.id)) {
-            updatedS.inventory = [...(updatedS.inventory || []), bossLoot];
-            updatedS.notifications = [...(updatedS.notifications || []), {
-              id: Date.now() + Math.random(),
-              title: "EPIC LOOT ACQUIRED: " + bossLoot.name,
-              quote: 'A powerful artifact from a vanquished foe!',
-              gold: 0,
-              xp: 0
-            }];
-          }
-          return updatedS;
+      if (!overrideStudentId && currentUser) {
+        // ── Player-initiated path: route through syncUserUpdate ──────────────
+        const newDefeatedBosses = [...(currentUser.defeatedBosses || []), bossId];
+        const updates = {
+          xp:            (currentUser.xp   || 0) + boss.rewardXp,
+          gold:          (currentUser.gold || 0) + boss.rewardGold,
+          defeatedBosses: newDefeatedBosses,
+        };
+        if (bossLoot && !(currentUser.inventory || []).some(item => item.id === bossLoot.id)) {
+          updates.inventory = [...(currentUser.inventory || []), bossLoot];
+          updates.notifications = [
+            ...(currentUser.notifications || []),
+            { id: Date.now() + Math.random(), title: "EPIC LOOT ACQUIRED: " + bossLoot.name, quote: 'A powerful artifact from a vanquished foe!', gold: 0, xp: 0 }
+          ];
         }
-        return s;
-      }));
+        syncUserUpdate(updates);
 
-      if (currentUser && currentUser.id === targetId) {
-        setCurrentUser(prev => {
-          const updatedPrev = { ...prev, defeatedBosses: [...prev.defeatedBosses, bossId] };
-          if (bossLoot && !(updatedPrev.inventory || []).some(item => item.id === bossLoot.id)) {
-            updatedPrev.inventory = [...(updatedPrev.inventory || []), bossLoot];
-            updatedPrev.notifications = [...(updatedPrev.notifications || []), {
-              id: Date.now() + Math.random(),
-              title: "EPIC LOOT ACQUIRED: " + bossLoot.name,
-              quote: 'A powerful artifact from a vanquished foe!',
-              gold: 0,
-              xp: 0
-            }];
-          }
-          return updatedPrev;
+      } else {
+        // ── Teacher/admin approval path: update target student directly ──────
+        const updatedTarget = {
+          ...targetStudent,
+          xp:            (targetStudent.xp   || 0) + boss.rewardXp,
+          gold:          (targetStudent.gold || 0) + boss.rewardGold,
+          defeatedBosses: [...(targetStudent.defeatedBosses || []), bossId],
+        };
+
+        // Handle level-up for the target student
+        const oldLevel = Math.floor((targetStudent.xp || 0) / 1000) + 1;
+        const newLevel = Math.floor(updatedTarget.xp / 1000) + 1;
+        if (newLevel > oldLevel) {
+          updatedTarget.gold += 500;
+          updatedTarget.level = newLevel;
+          updatedTarget.notifications = [
+            ...(updatedTarget.notifications || []),
+            { id: Date.now() + Math.random(), title: `LEVEL UP! You reached Level ${newLevel}`, xp: 0, gold: 500, quote: 'The King rewards your legendary growth!' }
+          ];
+        }
+
+        if (bossLoot && !(updatedTarget.inventory || []).some(item => item.id === bossLoot.id)) {
+          updatedTarget.inventory = [...(updatedTarget.inventory || []), bossLoot];
+          updatedTarget.notifications = [...(updatedTarget.notifications || []), {
+            id: Date.now() + Math.random(),
+            title: "EPIC LOOT ACQUIRED: " + bossLoot.name,
+            quote: 'A powerful artifact from a vanquished foe!', gold: 0, xp: 0
+          }];
+        }
+
+        setStudents(prev => prev.map(s => s.id === targetId ? updatedTarget : s));
+        if (currentUser && currentUser.id === targetId) setCurrentUser(updatedTarget);
+
+        saveProfileToCloud(targetId, {
+          xp:            updatedTarget.xp,
+          gold:          updatedTarget.gold,
+          defeatedBosses: updatedTarget.defeatedBosses,
         });
-      }
-      
-      const newDefeatedBossesArray = [...targetStudent.defeatedBosses, bossId];
-      saveProfileToCloud(targetId, { defeatedBosses: newDefeatedBossesArray });
 
-      checkAchievements(targetId);
+        // Check achievements with the TRUE updated state
+        checkAchievements(updatedTarget);
+      }
 
       return { success: true, rewardGold: boss.rewardGold, rewardXp: boss.rewardXp };
     } else {
