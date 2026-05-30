@@ -73,7 +73,7 @@ const Barracks = () => {
 
   const ownsItem = (itemId) => {
     if (!currentUser || !currentUser.inventory) return false;
-    return currentUser.inventory.some(item => item.id === itemId);
+    return currentUser.inventory.some(item => item.id === itemId || item.item_id === itemId);
   };
 
   if (!currentUser) {
@@ -131,7 +131,8 @@ const Barracks = () => {
                 <div className="space-y-2">
                   {currentUser.inventory.map((item, index) => {
                     if (item.type !== 'outfit') return null;
-                    const isEquipped = currentUser.currentBodySprite === item.imageLink;
+                    const actualImageLink = item.image_link || item.imageLink;
+                    const isEquipped = currentUser.currentBodySprite === actualImageLink;
                     return (
                       <div key={index} className="flex items-center justify-between gap-3 p-3 bg-white/5 rounded-lg border border-white/10">
                         <div className="flex items-center gap-3">
@@ -139,7 +140,7 @@ const Barracks = () => {
                           <span className="text-white font-['VT323'] text-xl">{item.name}</span>
                         </div>
                         <button
-                          onClick={() => isEquipped ? unequipOutfit() : equipOutfit(item.imageLink)}
+                          onClick={() => isEquipped ? unequipOutfit() : equipOutfit(actualImageLink)}
                           className={`py-1 px-3 rounded-md font-['VT323'] text-lg transition-colors ${
                             isEquipped
                               ? 'bg-red-600 hover:bg-red-500 text-white'

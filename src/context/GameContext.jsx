@@ -175,7 +175,7 @@ const formatProfile = (dbProfile) => ({
   ...dbProfile,
   heroName: dbProfile.hero_name,
   realName: dbProfile.real_name,
-  currentBodySprite: dbProfile.current_body_sprite,
+  currentBodySprite: dbProfile.current_body_sprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png',
   loginStreak: dbProfile.login_streak || 0,
   raffleTickets: dbProfile.raffle_tickets || 0,
   totalTicketsEarned: dbProfile.total_tickets_earned || 0,
@@ -758,14 +758,14 @@ export function GameProvider({ children }) {
 
     // Build the TRUE updated state for the target student in one pass
     const updatedStudent = { ...targetStudent };
-    if (quest.type === 'upload')      updatedStudent.uploadQuestsCompleted  = (targetStudent.uploadQuestsCompleted  || 0) + 1;
-    else if (quest.type === 'scout-sports') updatedStudent.sportsQuestsCompleted  = (targetStudent.sportsQuestsCompleted  || 0) + 1;
-    else if (quest.type === 'scout-arts')   updatedStudent.artsQuestsCompleted    = (targetStudent.artsQuestsCompleted    || 0) + 1;
-    else if (quest.type === 'journal')      updatedStudent.journalQuestsCompleted = (targetStudent.journalQuestsCompleted || 0) + 1;
+    if (quest.type === 'upload') updatedStudent.uploadQuestsCompleted = (targetStudent.uploadQuestsCompleted || 0) + 1;
+    else if (quest.type === 'scout-sports') updatedStudent.sportsQuestsCompleted = (targetStudent.sportsQuestsCompleted || 0) + 1;
+    else if (quest.type === 'scout-arts') updatedStudent.artsQuestsCompleted = (targetStudent.artsQuestsCompleted || 0) + 1;
+    else if (quest.type === 'journal') updatedStudent.journalQuestsCompleted = (targetStudent.journalQuestsCompleted || 0) + 1;
 
     // Award XP + gold and handle level-up within the same object
     const oldLevel = Math.floor((targetStudent.xp || 0) / 1000) + 1;
-    updatedStudent.xp   = (targetStudent.xp   || 0) + quest.xp;
+    updatedStudent.xp = (targetStudent.xp || 0) + quest.xp;
     updatedStudent.gold = (targetStudent.gold || 0) + quest.gold;
     const newLevel = Math.floor(updatedStudent.xp / 1000) + 1;
     if (newLevel > oldLevel) {
@@ -785,10 +785,10 @@ export function GameProvider({ children }) {
 
     // Persist all changed fields to Supabase
     const cloudUpdates = { xp: updatedStudent.xp, gold: updatedStudent.gold };
-    if (quest.type === 'upload')       cloudUpdates.uploadQuestsCompleted  = updatedStudent.uploadQuestsCompleted;
-    if (quest.type === 'scout-sports') cloudUpdates.sportsQuestsCompleted  = updatedStudent.sportsQuestsCompleted;
-    if (quest.type === 'scout-arts')   cloudUpdates.artsQuestsCompleted    = updatedStudent.artsQuestsCompleted;
-    if (quest.type === 'journal')      cloudUpdates.journalQuestsCompleted = updatedStudent.journalQuestsCompleted;
+    if (quest.type === 'upload') cloudUpdates.uploadQuestsCompleted = updatedStudent.uploadQuestsCompleted;
+    if (quest.type === 'scout-sports') cloudUpdates.sportsQuestsCompleted = updatedStudent.sportsQuestsCompleted;
+    if (quest.type === 'scout-arts') cloudUpdates.artsQuestsCompleted = updatedStudent.artsQuestsCompleted;
+    if (quest.type === 'journal') cloudUpdates.journalQuestsCompleted = updatedStudent.journalQuestsCompleted;
     saveProfileToCloud(submission.studentId, cloudUpdates);
 
     // Check achievements against the TRUE updated state — no stale reads
@@ -822,13 +822,13 @@ export function GameProvider({ children }) {
 
       // Calculate ALL new values from the currentUser snapshot BEFORE any async gap
       const updates = {
-        xp:   (currentUser.xp   || 0) + quest.xp,
+        xp: (currentUser.xp || 0) + quest.xp,
         gold: (currentUser.gold || 0) + quest.gold,
       };
-      if (quest.type === 'quiz')        updates.quizQuestsCompleted        = (currentUser.quizQuestsCompleted        || 0) + 1;
-      if (quest.type === 'multi-step')  updates.multiStepQuestsCompleted   = (currentUser.multiStepQuestsCompleted   || 0) + 1;
-      if (quest.type === 'incantation') updates.incantationQuestsCompleted  = (currentUser.incantationQuestsCompleted  || 0) + 1;
-      if (quest.type === 'cipher')      updates.cipherQuestsCompleted       = (currentUser.cipherQuestsCompleted       || 0) + 1;
+      if (quest.type === 'quiz') updates.quizQuestsCompleted = (currentUser.quizQuestsCompleted || 0) + 1;
+      if (quest.type === 'multi-step') updates.multiStepQuestsCompleted = (currentUser.multiStepQuestsCompleted || 0) + 1;
+      if (quest.type === 'incantation') updates.incantationQuestsCompleted = (currentUser.incantationQuestsCompleted || 0) + 1;
+      if (quest.type === 'cipher') updates.cipherQuestsCompleted = (currentUser.cipherQuestsCompleted || 0) + 1;
 
       // One call handles: state update + cloud save + achievement check
       syncUserUpdate(updates);
@@ -856,7 +856,7 @@ export function GameProvider({ children }) {
     if (isCorrect) {
       // Route through syncUserUpdate: state + cloud + achievements in one call
       syncUserUpdate({
-        xp:   (currentUser.xp   || 0) + quest.xp,
+        xp: (currentUser.xp || 0) + quest.xp,
         gold: (currentUser.gold || 0) + quest.gold,
         scenarioQuestsCompleted: (currentUser.scenarioQuestsCompleted || 0) + 1,
       });
@@ -957,44 +957,12 @@ export function GameProvider({ children }) {
 
   const equipOutfit = (outfitLink) => {
     if (!currentUser) return;
-
-    setCurrentUser(prev => ({
-      ...prev,
-      currentBodySprite: outfitLink
-    }));
-
-    saveProfileToCloud(currentUser.id, { currentBodySprite: outfitLink });
-
-    setStudents(prev => prev.map(student => {
-      if (student.id === currentUser.id) {
-        return {
-          ...student,
-          currentBodySprite: outfitLink
-        };
-      }
-      return student;
-    }));
+    syncUserUpdate({ currentBodySprite: outfitLink });
   };
 
   const unequipOutfit = () => {
     if (!currentUser) return;
-
-    setCurrentUser(prev => ({
-      ...prev,
-      currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'
-    }));
-
-    saveProfileToCloud(currentUser.id, { currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png' });
-
-    setStudents(prev => prev.map(student => {
-      if (student.id === currentUser.id) {
-        return {
-          ...student,
-          currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'
-        };
-      }
-      return student;
-    }));
+    syncUserUpdate({ currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png' });
   };
 
   const fightBoss = (bossId, overrideStudentId = null) => {
@@ -1013,18 +981,18 @@ export function GameProvider({ children }) {
 
     let requirementMet = false;
     switch (boss.requirement) {
-      case 'uploads':      requirementMet = (targetStudent.uploadQuestsCompleted    || 0) >= boss.target; break;
-      case 'quizzes':      requirementMet = (targetStudent.quizQuestsCompleted      || 0) >= boss.target; break;
-      case 'multistep':    requirementMet = (targetStudent.multiStepQuestsCompleted || 0) >= boss.target; break;
-      case 'scenarios':    requirementMet = (targetStudent.scenarioQuestsCompleted  || 0) >= boss.target; break;
+      case 'uploads': requirementMet = (targetStudent.uploadQuestsCompleted || 0) >= boss.target; break;
+      case 'quizzes': requirementMet = (targetStudent.quizQuestsCompleted || 0) >= boss.target; break;
+      case 'multistep': requirementMet = (targetStudent.multiStepQuestsCompleted || 0) >= boss.target; break;
+      case 'scenarios': requirementMet = (targetStudent.scenarioQuestsCompleted || 0) >= boss.target; break;
       case 'incantations': requirementMet = (targetStudent.incantationQuestsCompleted || 0) >= boss.target; break;
-      case 'sports':       requirementMet = (targetStudent.sportsQuestsCompleted    || 0) >= boss.target; break;
-      case 'arts':         requirementMet = (targetStudent.artsQuestsCompleted      || 0) >= boss.target; break;
-      case 'wellness':     requirementMet = (targetStudent.wellnessQuestsCompleted  || 0) >= boss.target; break;
-      case 'streak':       requirementMet = (targetStudent.loginStreak              || 0) >= boss.target; break;
-      case 'journal':      requirementMet = (targetStudent.journalQuestsCompleted   || 0) >= boss.target; break;
-      case 'ciphers':      requirementMet = (targetStudent.cipherQuestsCompleted    || 0) >= boss.target; break;
-      default:             requirementMet = false;
+      case 'sports': requirementMet = (targetStudent.sportsQuestsCompleted || 0) >= boss.target; break;
+      case 'arts': requirementMet = (targetStudent.artsQuestsCompleted || 0) >= boss.target; break;
+      case 'wellness': requirementMet = (targetStudent.wellnessQuestsCompleted || 0) >= boss.target; break;
+      case 'streak': requirementMet = (targetStudent.loginStreak || 0) >= boss.target; break;
+      case 'journal': requirementMet = (targetStudent.journalQuestsCompleted || 0) >= boss.target; break;
+      case 'ciphers': requirementMet = (targetStudent.cipherQuestsCompleted || 0) >= boss.target; break;
+      default: requirementMet = false;
     }
 
     if (overrideStudentId) requirementMet = true;
@@ -1036,8 +1004,8 @@ export function GameProvider({ children }) {
         // ── Player-initiated path: route through syncUserUpdate ──────────────
         const newDefeatedBosses = [...(currentUser.defeatedBosses || []), bossId];
         const updates = {
-          xp:            (currentUser.xp   || 0) + boss.rewardXp,
-          gold:          (currentUser.gold || 0) + boss.rewardGold,
+          xp: (currentUser.xp || 0) + boss.rewardXp,
+          gold: (currentUser.gold || 0) + boss.rewardGold,
           defeatedBosses: newDefeatedBosses,
         };
         if (bossLoot && !(currentUser.inventory || []).some(item => item.id === bossLoot.id)) {
@@ -1053,8 +1021,8 @@ export function GameProvider({ children }) {
         // ── Teacher/admin approval path: update target student directly ──────
         const updatedTarget = {
           ...targetStudent,
-          xp:            (targetStudent.xp   || 0) + boss.rewardXp,
-          gold:          (targetStudent.gold || 0) + boss.rewardGold,
+          xp: (targetStudent.xp || 0) + boss.rewardXp,
+          gold: (targetStudent.gold || 0) + boss.rewardGold,
           defeatedBosses: [...(targetStudent.defeatedBosses || []), bossId],
         };
 
@@ -1083,8 +1051,8 @@ export function GameProvider({ children }) {
         if (currentUser && currentUser.id === targetId) setCurrentUser(updatedTarget);
 
         saveProfileToCloud(targetId, {
-          xp:            updatedTarget.xp,
-          gold:          updatedTarget.gold,
+          xp: updatedTarget.xp,
+          gold: updatedTarget.gold,
           defeatedBosses: updatedTarget.defeatedBosses,
         });
 
