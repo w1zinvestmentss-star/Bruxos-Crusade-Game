@@ -1260,12 +1260,13 @@ export function GameProvider({ children }) {
     return { success: true, winnerName: winner.heroName || winner.name };
   };
 
-  const clearNotifications = () => {
-    if (!currentUser) return;
-    const updatedUser = { ...currentUser, notifications: [] };
-    setCurrentUser(updatedUser);
-    setStudents(prev => prev.map(s => s.id === currentUser.id ? updatedUser : s));
-  };
+   const clearNotifications = () => {
+     if (!currentUser) return;
+     const updatedUser = { ...currentUser, notifications: [] };
+     setCurrentUser(updatedUser);
+     setStudents(prev => prev.map(s => s.id === currentUser.id ? updatedUser : s));
+     saveProfileToCloud(currentUser.id, { notifications: [] });
+   };
 
   const value = {
     students, quests, submissions, BOSSES, ACHIEVEMENTS,
