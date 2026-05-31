@@ -114,9 +114,9 @@ const StudentDashboard = () => {
             <h2 className="text-yellow-400 font-bold font-mono text-sm uppercase">
               {currentUser ? currentUser.heroName : "Unknown Hero"}
             </h2>
-            <div className="text-xs text-stone-300 font-mono">
-              Lvl {currentUser?.level || 1} • {currentUser?.xp || 0} XP
-            </div>
+           <div className="text-xs text-stone-300 font-mono">
+             Lvl {Math.floor((currentUser?.xp || 0) / 1000) + 1} • {currentUser?.xp || 0} XP
+           </div>
           </div>
         </div>
 
