@@ -195,7 +195,8 @@ const formatProfile = (dbProfile) => ({
   sportsQuestsCompleted: dbProfile.sports_quests_completed || 0,
   artsQuestsCompleted: dbProfile.arts_quests_completed || 0,
   wellnessQuestsCompleted: dbProfile.wellness_quests_completed || 0,
-  journalQuestsCompleted: dbProfile.journal_quests_completed || 0,
+   journalQuestsCompleted: dbProfile.journal_quests_completed || 0,
+   notifications: dbProfile.notifications || [],
 });
 
 const saveProfileToCloud = async (userId, updates) => {
@@ -210,6 +211,7 @@ const saveProfileToCloud = async (userId, updates) => {
   if (updates.lootboxPity !== undefined) dbUpdates.lootbox_pity = updates.lootboxPity;
   if (updates.unlockedAchievements !== undefined) dbUpdates.unlocked_achievements = updates.unlockedAchievements;
   if (updates.defeatedBosses !== undefined) dbUpdates.defeated_bosses = updates.defeatedBosses;
+  if (updates.notifications !== undefined) dbUpdates.notifications = updates.notifications;
 
   // Map all quest counters:
   if (updates.uploadQuestsCompleted !== undefined) dbUpdates.upload_quests_completed = updates.uploadQuestsCompleted;
@@ -813,14 +815,28 @@ export function GameProvider({ children }) {
     const targetStudent = students.find(s => s.id === submission.studentId);
     if (!targetStudent) return;
 
-    // Build the TRUE updated state for the target student in one pass
-    const updatedStudent = { ...targetStudent };
-    if (quest.type === 'upload') updatedStudent.uploadQuestsCompleted = (targetStudent.uploadQuestsCompleted || 0) + 1;
-    else if (quest.type === 'scout-sports') updatedStudent.sportsQuestsCompleted = (targetStudent.sportsQuestsCompleted || 0) + 1;
-    else if (quest.type === 'scout-arts') updatedStudent.artsQuestsCompleted = (targetStudent.artsQuestsCompleted || 0) + 1;
-    else if (quest.type === 'journal') updatedStudent.journalQuestsCompleted = (targetStudent.journalQuestsCompleted || 0) + 1;
+     // Build the TRUE updated state for the target student in one pass
+     const updatedStudent = { ...targetStudent };
+     if (quest.type === 'upload') updatedStudent.uploadQuestsCompleted = (targetStudent.uploadQuestsCompleted || 0) + 1;
+     else if (quest.type === 'scout-sports') updatedStudent.sportsQuestsCompleted = (targetStudent.sportsQuestsCompleted || 0) + 1;
+     else if (quest.type === 'scout-arts') updatedStudent.artsQuestsCompleted = (targetStudent.artsQuestsCompleted || 0) + 1;
+     else if (quest.type === 'journal') updatedStudent.journalQuestsCompleted = (targetStudent.journalQuestsCompleted || 0) + 1;
 
-    // Award XP + gold and handle level-up within the same object
+     // Generate approval notification
+     const randomQuote = VICTORY_QUOTES[Math.floor(Math.random() * VICTORY_QUOTES.length)];
+     const newNotification = {
+       id: Date.now() + Math.random(),
+       title: `${quest.title} Approved!`,
+       xp: quest.xp,
+       gold: quest.gold,
+       quote: randomQuote
+     };
+     updatedStudent.notifications = [
+       ...(targetStudent.notifications || []),
+       newNotification
+     ];
+
+     // Award XP + gold and handle level-up within the same object
     const oldLevel = Math.floor((targetStudent.xp || 0) / 1000) + 1;
     updatedStudent.xp = (targetStudent.xp || 0) + quest.xp;
     updatedStudent.gold = (targetStudent.gold || 0) + quest.gold;
@@ -840,12 +856,16 @@ export function GameProvider({ children }) {
       setCurrentUser(updatedStudent);
     }
 
-    // Persist all changed fields to Supabase
-    const cloudUpdates = { xp: updatedStudent.xp, gold: updatedStudent.gold };
-    if (quest.type === 'upload') cloudUpdates.uploadQuestsCompleted = updatedStudent.uploadQuestsCompleted;
-    if (quest.type === 'scout-sports') cloudUpdates.sportsQuestsCompleted = updatedStudent.sportsQuestsCompleted;
-    if (quest.type === 'scout-arts') cloudUpdates.artsQuestsCompleted = updatedStudent.artsQuestsCompleted;
-    if (quest.type === 'journal') cloudUpdates.journalQuestsCompleted = updatedStudent.journalQuestsCompleted;
+     // Persist all changed fields to Supabase
+     const cloudUpdates = { 
+       xp: updatedStudent.xp, 
+       gold: updatedStudent.gold,
+       notifications: updatedStudent.notifications
+     };
+     if (quest.type === 'upload') cloudUpdates.uploadQuestsCompleted = updatedStudent.uploadQuestsCompleted;
+     if (quest.type === 'scout-sports') cloudUpdates.sportsQuestsCompleted = updatedStudent.sportsQuestsCompleted;
+     if (quest.type === 'scout-arts') cloudUpdates.artsQuestsCompleted = updatedStudent.artsQuestsCompleted;
+     if (quest.type === 'journal') cloudUpdates.journalQuestsCompleted = updatedStudent.journalQuestsCompleted;
     saveProfileToCloud(submission.studentId, cloudUpdates);
 
     // Check achievements against the TRUE updated state — no stale reads
