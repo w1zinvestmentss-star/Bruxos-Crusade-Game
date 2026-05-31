@@ -53,7 +53,7 @@ const PodiumSpot = ({ student, rank, scoreDisplay }) => {
           />
         </div>
         <div className={`absolute -bottom-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-black border-2 ${styles.badgeColor} flex items-center justify-center z-10`}>
-            <span className={`font-['Press_Start_2P'] text-xs ${styles.badgeTextColor}`}>{rank}</span>
+          <span className={`font-['Press_Start_2P'] text-xs ${styles.badgeTextColor}`}>{rank}</span>
         </div>
       </div>
       <h3 className={`font-['VT323'] text-2xl font-bold ${styles.textColor}`}>{student.heroName}</h3>
@@ -79,13 +79,13 @@ const Leaderboard = () => {
 
   const sortedStudents = useMemo(() => {
     return [...students].sort((a, b) => {
-        switch (activeTab) {
-            case 'scholar': return calculateScholarScore(b) - calculateScholarScore(a);
-            case 'grinder': return b.xp - a.xp;
-            case 'comeback': return calculateComebackScore(b) - calculateComebackScore(a);
-            case 'slayer': return calculateSlayerScore(b) - calculateSlayerScore(a);
-            default: return 0;
-        }
+      switch (activeTab) {
+        case 'scholar': return calculateScholarScore(b) - calculateScholarScore(a);
+        case 'grinder': return b.xp - a.xp;
+        case 'comeback': return calculateComebackScore(b) - calculateComebackScore(a);
+        case 'slayer': return calculateSlayerScore(b) - calculateSlayerScore(a);
+        default: return 0;
+      }
     });
   }, [students, activeTab, calculateScholarScore, calculateComebackScore, calculateSlayerScore]);
 
@@ -114,7 +114,7 @@ const Leaderboard = () => {
         const score = calculateComebackScore(student);
         const color = score > 0 ? 'text-green-400' : 'text-slate-400';
         return (
-          <div className={`${scoreBaseStyle} ${color}`}>{score >= 0 ? `+${score}`:score}<span className="text-sm text-slate-400 ml-2">pts</span></div>
+          <div className={`${scoreBaseStyle} ${color}`}>{score >= 0 ? `+${score}` : score}<span className="text-sm text-slate-400 ml-2">pts</span></div>
         );
       case 'slayer':
         return (
@@ -136,11 +136,11 @@ const Leaderboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-stone-900 to-black text-stone-200 p-4 font-sans">
-      
-      <img src={MAP_BG} className="absolute inset-0 w-full h-full object-cover opacity-10 pointer-events-none" alt="background map"/>
+
+      <img src={MAP_BG} className="absolute inset-0 w-full h-full object-cover opacity-10 pointer-events-none" alt="background map" />
 
       <div className="max-w-5xl mx-auto relative z-10 mb-6">
-        <button 
+        <button
           onClick={() => navigate('/student-dashboard')}
           className="flex items-center gap-2 text-stone-400 hover:text-white mb-6 transition-colors"
         >
@@ -156,17 +156,16 @@ const Leaderboard = () => {
       </div>
 
       <div className="max-w-5xl mx-auto bg-black/70 backdrop-blur-md border-2 border-white/10 rounded-xl shadow-2xl overflow-hidden">
-        
+
         <div className="flex font-['Press_Start_2P'] text-xs sm:text-sm">
           {TABS.map(tab => (
-            <button 
+            <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 py-4 px-1 flex items-center justify-center gap-2 transition-all duration-300 border-b-4 ${
-                activeTab === tab.id 
-                ? 'bg-yellow-600/80 text-white border-yellow-400' 
-                : 'bg-black/40 text-stone-400 hover:bg-white/10 border-transparent'
-              }`}
+              className={`flex-1 py-4 px-1 flex items-center justify-center gap-2 transition-all duration-300 border-b-4 ${activeTab === tab.id
+                  ? 'bg-yellow-600/80 text-white border-yellow-400'
+                  : 'bg-black/40 text-stone-400 hover:bg-white/10 border-transparent'
+                }`}
             >
               <tab.icon size={16} /> {tab.label}
             </button>
@@ -182,7 +181,7 @@ const Leaderboard = () => {
         </div>
 
         <div className="p-2 sm:p-4 min-h-[50vh]">
-          
+
           {topThree.length > 0 && (
             <div className="flex justify-center items-end gap-4 md:gap-8 mb-8 pt-8 px-4 border-b border-white/10 pb-8">
               {topThree[1] && <PodiumSpot rank={2} student={topThree[1]} scoreDisplay={<ScoreDisplay student={topThree[1]} />} />}
@@ -192,7 +191,7 @@ const Leaderboard = () => {
           )}
 
           {restOfStudents.map((student, index) => (
-            <motion.div 
+            <motion.div
               key={`${activeTab}-${student.id}`}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -205,8 +204,8 @@ const Leaderboard = () => {
                 </div>
 
                 <div className="w-12 h-12 rounded-full bg-black border border-stone-600 overflow-hidden flex items-center justify-center mr-4">
-                  <img 
-                    src={student.currentBodySprite} 
+                  <img
+                    src={student.currentBodySprite}
                     alt={`${student.heroName}'s avatar`}
                     className="w-full h-full object-contain object-top pt-1"
                   />
@@ -217,7 +216,7 @@ const Leaderboard = () => {
                   <p className="text-xs text-stone-500 font-mono -mt-1">Level {student.level}</p>
                 </div>
               </div>
-              
+
               {/* Need to use the larger text size for the list */}
               <div className="font-['VT323'] text-2xl">
                 <ScoreDisplay student={student} />

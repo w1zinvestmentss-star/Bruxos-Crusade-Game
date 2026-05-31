@@ -184,7 +184,7 @@ const formatProfile = (dbProfile) => ({
   unlockedAchievements: dbProfile.unlocked_achievements || [],
   unlockedTitles: dbProfile.unlocked_titles || ['The Novice'],
   midtermGPA: dbProfile.midterm_gpa || 0,
-  finalGPA: dbProfile.final_gpa || 0,
+  finalGPA: dbProfile.final_gpa !== undefined ? dbProfile.final_gpa : null,
   uploadQuestsCompleted: dbProfile.upload_quests_completed || 0,
   quizQuestsCompleted: dbProfile.quiz_quests_completed || 0,
   multiStepQuestsCompleted: dbProfile.multi_step_quests_completed || 0,
@@ -383,26 +383,32 @@ export function GameProvider({ children }) {
             .eq('student_id', session.user.id);
 
           formattedProfile.inventory = inv || [];
-          setCurrentUser(formattedProfile);
-
-          // Fetch Submissions
-          const { data: subs } = await supabase
-            .from('submissions')
-            .select('*')
-            .eq('student_id', session.user.id);
-
-          if (subs) {
-            const mappedSubs = subs.map(s => ({
-              ...s,
-              // Map snake_case DB columns to the camelCase the app uses internally
-              questId: s.quest_id,
-              studentId: s.student_id,
-              studentName: s.student_name,
-              // created_at is the authoritative date from Supabase (ISO UTC string)
-              // Keep it as-is — getQuestStatus reads it directly
-            }));
-            setSubmissions(mappedSubs);
-          }
+           setCurrentUser(formattedProfile);
+           
+           // Fetch all profiles for leaderboard
+           const { data: allProfiles } = await supabase.from('profiles').select('*');
+           if (allProfiles) {
+             setStudents(allProfiles.map(p => formatProfile(p)));
+           }
+           
+           // Fetch Submissions
+           const { data: subs } = await supabase
+             .from('submissions')
+             .select('*')
+             .eq('student_id', session.user.id);
+           
+           if (subs) {
+             const mappedSubs = subs.map(s => ({
+               ...s,
+               // Map snake_case DB columns to the camelCase the app uses internally
+               questId: s.quest_id,
+               studentId: s.student_id,
+               studentName: s.student_name,
+               // created_at is the authoritative date from Supabase (ISO UTC string)
+               // Keep it as-is — getQuestStatus reads it directly
+             }));
+             setSubmissions(mappedSubs);
+           }
         }
       } else {
         setCurrentUser(null);
