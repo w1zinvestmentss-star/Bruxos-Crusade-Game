@@ -226,6 +226,28 @@ const saveProfileToCloud = async (userId, updates) => {
   if (error) console.error("Error saving to cloud:", error);
 };
 
+const saveSubmissionToCloud = async (submission) => {
+  const dbSub = {
+    id: submission.id,
+    quest_id: submission.questId,
+    student_id: submission.studentId,
+    student_name: submission.studentName,
+    status: submission.status,
+    timestamp: submission.timestamp,
+    type: submission.type,
+    is_boss_strike: submission.isBossStrike || false,
+    journal_text: submission.journalText || null,
+    proof_image: submission.proofImage ? 'local_blob' : null
+  };
+  const { error } = await supabase.from('submissions').insert([dbSub]);
+  if (error) console.error("Error saving submission to cloud:", error);
+};
+
+const updateSubmissionStatusInCloud = async (submissionId, status) => {
+  const { error } = await supabase.from('submissions').update({ status }).eq('id', submissionId);
+  if (error) console.error("Error updating submission status:", error);
+};
+
 export function GameProvider({ children }) {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
@@ -365,7 +387,17 @@ export function GameProvider({ children }) {
             .eq('student_id', session.user.id);
 
           if (subs) {
-            setSubmissions(subs);
+            const mappedSubs = subs.map(s => ({
+              ...s,
+              questId: s.quest_id || s.questId,
+              studentId: s.student_id || s.studentId,
+              studentName: s.student_name || s.studentName,
+              isBossStrike: s.is_boss_strike || s.isBossStrike,
+              journalText: s.journal_text || s.journalText,
+              proofImage: s.proof_image || s.proofImage,
+              timestamp: s.created_at ? new Date(s.created_at).toLocaleDateString('en-CA') : s.timestamp
+            }));
+            setSubmissions(mappedSubs);
           }
         }
       } else {
@@ -677,7 +709,7 @@ export function GameProvider({ children }) {
       studentId: currentUser.id,
       studentName: currentUser.heroName,
       status: 'pending',
-      timestamp: new Date().toLocaleDateString(),
+      timestamp: new Date().toLocaleDateString('en-CA'),
       type,
     };
 
@@ -688,6 +720,7 @@ export function GameProvider({ children }) {
     }
 
     setSubmissions(prev => [...prev, newSubmission]);
+    saveSubmissionToCloud(newSubmission);
   };
 
   const submitBossStrike = (bossId, content) => {
@@ -698,7 +731,7 @@ export function GameProvider({ children }) {
       studentName: currentUser.heroName,
       status: 'pending',
       isBossStrike: true,
-      timestamp: new Date().toLocaleDateString()
+      timestamp: new Date().toLocaleDateString('en-CA')
     };
 
     if (typeof content === 'string') {
@@ -710,6 +743,7 @@ export function GameProvider({ children }) {
     }
 
     setSubmissions(prev => [...prev, newSubmission]);
+    saveSubmissionToCloud(newSubmission);
   };
 
   const submitWellnessCheck = (questId, feeling) => {
@@ -731,9 +765,10 @@ export function GameProvider({ children }) {
       feeling: feeling,
       type: 'wellness',
       status: 'read_only',
-      timestamp: new Date().toLocaleDateString(),
+      timestamp: new Date().toLocaleDateString('en-CA'),
     };
     setSubmissions(prev => [...prev, newSubmission]);
+    saveSubmissionToCloud(newSubmission);
 
     return { success: true };
   };
@@ -747,6 +782,7 @@ export function GameProvider({ children }) {
       setSubmissions(prev => prev.map(s =>
         s.id === submissionId ? { ...s, status: 'approved' } : s
       ));
+      updateSubmissionStatusInCloud(submissionId, 'approved');
       return;
     }
 
@@ -797,6 +833,7 @@ export function GameProvider({ children }) {
     setSubmissions(prev => prev.map(s =>
       s.id === submissionId ? { ...s, status: 'approved' } : s
     ));
+    updateSubmissionStatusInCloud(submissionId, 'approved');
   };
 
   const attemptQuiz = (questId, userAnswer, dynamicCorrectAnswer = null, isFinalStep = true) => {
@@ -839,9 +876,10 @@ export function GameProvider({ children }) {
         studentId: currentUser.id,
         studentName: currentUser.heroName,
         status: 'approved',
-        timestamp: new Date().toLocaleDateString()
+        timestamp: new Date().toLocaleDateString('en-CA')
       };
       setSubmissions(prev => [...prev, newSubmission]);
+      saveSubmissionToCloud(newSubmission);
 
       return { success: true, message: `+${quest.xp} XP, +${quest.gold} Gold` };
     } else {
@@ -867,10 +905,11 @@ export function GameProvider({ children }) {
         studentId: currentUser.id,
         studentName: currentUser.heroName,
         status: 'approved',
-        timestamp: new Date().toLocaleDateString(),
+        timestamp: new Date().toLocaleDateString('en-CA'),
         type: 'scenario',
       };
       setSubmissions(prev => [...prev, newSubmission]);
+      saveSubmissionToCloud(newSubmission);
 
       return { success: true };
     } else {
@@ -890,7 +929,11 @@ export function GameProvider({ children }) {
 
     const userSubmissions = submissions
       .filter(s => s.questId === questId && s.studentId === currentUser.id)
-      .sort((a, b) => b.id - a.id);
+      .sort((a, b) => {
+        const dateA = new Date(a.created_at || a.timestamp).getTime();
+        const dateB = new Date(b.created_at || b.timestamp).getTime();
+        return dateB - dateA;
+      });
 
     if (userSubmissions.length === 0) {
       return 'available';
@@ -899,8 +942,21 @@ export function GameProvider({ children }) {
     const mostRecentSubmission = userSubmissions[0];
 
     if (quest.frequency === 'daily' || quest.frequency === 'weekly') {
-      const todayString = new Date().toLocaleDateString();
-      if (mostRecentSubmission.timestamp === todayString) {
+      // Get today's date strictly as YYYY-MM-DD
+      const todayString = new Date().toLocaleDateString('en-CA');
+      
+      // Extract the submission date strictly as YYYY-MM-DD
+      let submissionDateString = '';
+      if (mostRecentSubmission.created_at) {
+        // If from Supabase, convert the ISO string to local YYYY-MM-DD
+        submissionDateString = new Date(mostRecentSubmission.created_at).toLocaleDateString('en-CA');
+      } else {
+        // If local, it is already YYYY-MM-DD
+        submissionDateString = mostRecentSubmission.timestamp;
+      }
+
+      // Compare the strings directly
+      if (submissionDateString === todayString) {
         return mostRecentSubmission.status;
       } else {
         return 'available';
@@ -1205,6 +1261,3 @@ export function GameProvider({ children }) {
 export function useGame() {
   return useContext(GameContext);
 }
-
-// Triggering Vite HMR update
-
