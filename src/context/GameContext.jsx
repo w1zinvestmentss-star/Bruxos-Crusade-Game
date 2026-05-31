@@ -180,7 +180,7 @@ const formatProfile = (dbProfile) => ({
   raffleTickets: dbProfile.raffle_tickets || 0,
   totalTicketsEarned: dbProfile.total_tickets_earned || 0,
   lootboxPity: dbProfile.lootbox_pity || 0,
-  defeatedBosses: dbProfile.defeated_bosses || [],
+   defeatedBosses: (dbProfile.defeated_bosses || []).map(Number),
   unlockedAchievements: dbProfile.unlocked_achievements || [],
    unlockedTitles: dbProfile.unlocked_titles || ['The Novice'],
    level: Math.floor((dbProfile.xp || 0) / 1000) + 1,

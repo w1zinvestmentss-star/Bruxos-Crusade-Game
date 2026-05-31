@@ -65,33 +65,41 @@ const StudentDashboard = () => {
   return (
     <div className="relative w-full h-screen overflow-hidden bg-black flex items-center justify-center">
 
-      {/* Welcome Back Modal */}
-      {showWelcomeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90">
-          <div className="bg-stone-900 border-2 border-yellow-500 rounded-lg shadow-xl p-8 max-w-lg w-full m-4">
-            <h2 className="text-2xl font-bold font-mono uppercase text-yellow-400 mb-4">
-              REPORT FROM THE KINGDOM
-            </h2>
-            <div className="space-y-4 max-h-60 overflow-y-auto pr-4">
-              {currentUser.notifications.map((notif, index) => (
-                <div key={index} className="border-b border-stone-700 pb-2">
-                  <h3 className="font-bold text-lg text-white">{notif.title}</h3>
-                  <p className="text-sm text-green-400">
-                    + {notif.xp} XP & {notif.gold} Gold
-                  </p>
-                  <p className="text-sm text-stone-400 italic mt-1">"{notif.quote}"</p>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={handleClaimRewards}
-              className="mt-6 w-full bg-yellow-500 text-stone-900 font-bold py-2 px-4 rounded hover:bg-yellow-400 transition-colors"
-            >
-              CLAIM REWARDS
-            </button>
-          </div>
-        </div>
-      )}
+       {/* Welcome Back Modal */}
+       {showWelcomeModal && (
+         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
+           <div className="bg-stone-900 border-2 border-yellow-500 rounded-xl p-6 max-w-lg w-full text-center relative shadow-2xl">
+             <h2 className="font-['Press_Start_2P'] text-yellow-400 text-lg mb-6">
+               WHILE YOU WERE AWAY...
+             </h2>
+             <div className="space-y-4 max-h-60 overflow-y-auto pr-4 text-left">
+               {currentUser.notifications.map((notif, index) => (
+                 <div key={index} className="border-b border-stone-700 pb-4 last:pb-0">
+                   <h3 className="font-['VT323'] text-stone-200 text-xl">{notif.title}</h3>
+                   {notif.xp !== undefined || notif.gold !== undefined ? (
+                     <p className="font-['VT323'] text-stone-200 text-xl">
+                       {notif.xp !== undefined ? `+${notif.xp} XP` : ''}
+                       {notif.xp !== undefined && notif.gold !== undefined ? ' / ' : ''}
+                       {notif.gold !== undefined ? `+${notif.gold} Gold` : ''}
+                     </p>
+                   ) : null}
+                   {notif.quote ? (
+                     <p className="font-['VT323'] text-stone-200 text-xl italic mt-2">
+                       "{notif.quote}"
+                     </p>
+                   ) : null}
+                 </div>
+               ))}
+             </div>
+             <button
+               onClick={handleClaimRewards}
+               className="mt-6 w-full bg-yellow-500 text-stone-900 font-bold py-3 px-6 rounded hover:bg-yellow-400 transition-colors font-['Press_Start_2P'] text-lg"
+             >
+               CLAIM REWARDS
+             </button>
+           </div>
+         </div>
+       )}
 
       {/* Ambient Beautiful Glow Background */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-stone-950">
