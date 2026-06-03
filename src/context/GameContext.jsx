@@ -210,7 +210,7 @@ const saveProfileToCloud = async (userId, updates) => {
   if (updates.totalTicketsEarned !== undefined) dbUpdates.total_tickets_earned = updates.totalTicketsEarned;
   if (updates.lootboxPity !== undefined) dbUpdates.lootbox_pity = updates.lootboxPity;
   if (updates.unlockedAchievements !== undefined) dbUpdates.unlocked_achievements = updates.unlockedAchievements;
-  if (updates.defeatedBosses !== undefined) dbUpdates.defeated_bosses = updates.defeatedBosses;
+   if (updates.defeatedBosses !== undefined) dbUpdates.defeated_bosses = updates.defeatedBosses.map(String);
   if (updates.notifications !== undefined) dbUpdates.notifications = updates.notifications;
 
   // Map all quest counters:
