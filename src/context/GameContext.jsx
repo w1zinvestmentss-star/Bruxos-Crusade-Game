@@ -266,9 +266,9 @@ export function GameProvider({ children }) {
   nextYear.setFullYear(nextYear.getFullYear() + 1);
   const nextYearString = nextYear.toISOString().split('T')[0];
 
-  const INITIAL_QUESTS = [
-    { id: 101, title: "Math Worksheet", description: "Upload a photo of your completed algebra sheet.", xp: 50, gold: 20, type: 'upload', frequency: 'once', unlockDate: null },
-    { id: 102, title: "Science Project", description: "Submit a picture of your science fair poster.", xp: 100, gold: 50, type: 'upload', frequency: 'once', unlockDate: null },
+   const INITIAL_QUESTS = [
+     { id: 101, title: "Math Worksheet", description: "Upload a photo of your completed algebra sheet.", xp: 50, gold: 20, type: 'upload', frequency: 'daily', unlockDate: null },
+     { id: 102, title: "Science Project", description: "Submit a picture of your science fair poster.", xp: 100, gold: 50, type: 'upload', frequency: 'daily', unlockDate: null },
     {
       id: 103,
       title: "Math Speed Run",
