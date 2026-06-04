@@ -5,7 +5,7 @@ import { useGame } from '../context/GameContext';
 
 const Barracks = () => {
   const navigate = useNavigate();
-  const { currentUser, buyItem, equipOutfit, unequipOutfit } = useGame();
+  const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth } = useGame();
 
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
 
@@ -156,6 +156,27 @@ const Barracks = () => {
               ) : (
                 <div className="text-stone-400 italic font-['VT323'] text-lg">No outfits owned.</div>
               )}
+            </div>
+
+            <div className="mt-8 bg-indigo-900/30 border-2 border-indigo-500/50 rounded-xl p-4 text-center shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+              <h3 className="text-lg text-indigo-300 font-['Press_Start_2P'] mb-2">MYSTIC ITEMS</h3>
+              <div className="text-2xl text-white font-['VT323'] mb-1">Tome of Rebirth</div>
+              <div className="text-stone-400 text-sm font-['VT323'] mb-4 leading-tight">Forget your past. Reset your Class. Costs 1000 Gold.</div>
+              <button
+                disabled={currentUser.gold < 1000}
+                onClick={async () => {
+                  const result = await buyTomeOfRebirth();
+                  if (result.success) {
+                    alert("Your memory fades... you must choose a new path!");
+                    navigate('/student-dashboard');
+                  }
+                }}
+                className={`w-full py-2 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
+                  currentUser.gold < 1000 ? 'bg-stone-600 text-stone-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500 text-white'
+                }`}
+              >
+                BUY TOME (1000 G)
+              </button>
             </div>
           </div>
 
