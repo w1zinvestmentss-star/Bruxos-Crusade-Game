@@ -12,6 +12,7 @@ const playlist = {
   '/archives': 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-Archive-theme.mp3',
   '/quests': 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-questboard-theme.mp3',
   '/dungeon': 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Alcards%20Theme.mp3',
+  '/trophies': 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Jameels.interlude.mp3',
 };
 
 const BackgroundMusic = () => {
