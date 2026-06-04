@@ -4,6 +4,57 @@ import { motion } from 'framer-motion';
 import { User, LogOut, Trophy } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
+const Awakening = () => {
+  const { updateHeroIdentity } = useGame();
+  const [inputName, setInputName] = useState('');
+  const [selectedClass, setSelectedClass] = useState(null);
+
+  const handleBeginJourney = () => {
+    if (inputName && selectedClass) {
+      updateHeroIdentity(inputName, selectedClass);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] min-h-screen p-8 flex flex-col items-center justify-center bg-stone-900">
+      <h1 className="font-['Press_Start_2P'] text-yellow-400 text-3xl mb-8">THE AWAKENING</h1>
+      
+      <input
+        type="text"
+        placeholder="Enter your Hero Name..."
+        value={inputName}
+        onChange={(e) => setInputName(e.target.value)}
+        className="bg-black border border-stone-600 p-3 text-white font-['VT323'] text-2xl mb-8 w-80 text-center"
+      />
+      
+      <div className="flex gap-6 mb-8">
+        {['Warrior', 'Mage', 'Rogue'].map((cls) => (
+          <button
+            key={cls}
+            onClick={() => setSelectedClass(cls)}
+            className={`p-6 bg-stone-800 border-2 ${selectedClass === cls ? 'border-yellow-400' : 'border-stone-600'} flex flex-col items-center w-48 hover:border-yellow-300 transition-colors`}
+          >
+            <span className="font-['Press_Start_2P'] text-yellow-400 text-lg mb-2">{cls.toUpperCase()}</span>
+            <span className="font-['VT323'] text-stone-300 text-xl">
+              {cls === 'Warrior' && '+10% Rewards on Homework & Athletics'}
+              {cls === 'Mage' && '+10% Rewards on Quizzes, Math & Typing'}
+              {cls === 'Rogue' && '+15% Rewards on Journals, Scenarios & Arts'}
+            </span>
+          </button>
+        ))}
+      </div>
+      
+      <button
+        onClick={handleBeginJourney}
+        disabled={!inputName || !selectedClass}
+        className="px-12 py-4 bg-yellow-500 text-stone-900 font-bold font-['Press_Start_2P'] text-xl hover:bg-yellow-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        BEGIN JOURNEY
+      </button>
+    </div>
+  );
+};
+
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const { currentUser, setUserRole, clearNotifications } = useGame();
@@ -61,6 +112,10 @@ const StudentDashboard = () => {
         </motion.button>
     );
   };
+
+  if (currentUser && (currentUser.heroName === 'New Hero' || currentUser.heroClass === 'None' || !currentUser.heroClass)) {
+    return <Awakening />;
+  }
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-black flex items-center justify-center">

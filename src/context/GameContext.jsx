@@ -174,6 +174,7 @@ const VICTORY_QUOTES = [
 const formatProfile = (dbProfile) => ({
   ...dbProfile,
   heroName: dbProfile.hero_name,
+  heroClass: dbProfile.hero_class || 'None',
   realName: dbProfile.real_name,
   currentBodySprite: dbProfile.current_body_sprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png',
   loginStreak: dbProfile.login_streak || 0,
@@ -204,6 +205,8 @@ const saveProfileToCloud = async (userId, updates) => {
   const dbUpdates = {};
   if (updates.gold !== undefined) dbUpdates.gold = updates.gold;
   if (updates.xp !== undefined) dbUpdates.xp = updates.xp;
+  if (updates.heroName !== undefined) dbUpdates.hero_name = updates.heroName;
+  if (updates.heroClass !== undefined) dbUpdates.hero_class = updates.heroClass;
   if (updates.currentBodySprite !== undefined) dbUpdates.current_body_sprite = updates.currentBodySprite;
   if (updates.loginStreak !== undefined) dbUpdates.login_streak = updates.loginStreak;
   if (updates.raffleTickets !== undefined) dbUpdates.raffle_tickets = updates.raffleTickets;
@@ -707,6 +710,19 @@ export function GameProvider({ children }) {
     checkAchievements(updatedUser);
   };
 
+  const updateHeroIdentity = (newName, newClass) => {
+    syncUserUpdate({ heroName: newName, heroClass: newClass });
+  };
+
+  const applyClassBonus = (questType, rewardAmount, heroClass) => {
+    if (!heroClass || heroClass === 'None') return rewardAmount;
+    let multiplier = 1;
+    if (heroClass === 'Warrior' && ['upload', 'scout-sports'].includes(questType)) multiplier = 1.1;
+    if (heroClass === 'Mage' && ['quiz', 'multi-step', 'cipher', 'incantation'].includes(questType)) multiplier = 1.1;
+    if (heroClass === 'Rogue' && ['scenario', 'scout-arts', 'journal', 'wellness'].includes(questType)) multiplier = 1.15;
+    return Math.floor(rewardAmount * multiplier);
+  };
+
   const createQuest = (newQuest) => {
     setQuests(prev => [...prev, { ...newQuest, id: Date.now() }]);
   };
@@ -773,10 +789,13 @@ export function GameProvider({ children }) {
     const quest = quests.find(q => q.id === questId);
     if (!quest) return { success: false, message: 'Quest not found' };
 
+    const xpEarned = applyClassBonus(quest.type, quest.xp, currentUser.heroClass);
+    const goldEarned = applyClassBonus(quest.type, quest.gold, currentUser.heroClass);
+
     // Route through syncUserUpdate: single call covers state + cloud + achievements
     syncUserUpdate({
-      xp: (currentUser.xp || 0) + quest.xp,
-      gold: (currentUser.gold || 0) + quest.gold,
+      xp: (currentUser.xp || 0) + xpEarned,
+      gold: (currentUser.gold || 0) + goldEarned,
       wellnessQuestsCompleted: (currentUser.wellnessQuestsCompleted || 0) + 1,
     });
 
@@ -796,7 +815,7 @@ export function GameProvider({ children }) {
     return { success: true };
   };
 
-  const approveSubmission = (submissionId) => {
+const approveSubmission = (submissionId) => {
     const submission = submissions.find(s => s.id === submissionId);
     if (!submission) return;
 
@@ -822,13 +841,16 @@ export function GameProvider({ children }) {
      else if (quest.type === 'scout-arts') updatedStudent.artsQuestsCompleted = (targetStudent.artsQuestsCompleted || 0) + 1;
      else if (quest.type === 'journal') updatedStudent.journalQuestsCompleted = (targetStudent.journalQuestsCompleted || 0) + 1;
 
+     const xpEarned = applyClassBonus(quest.type, quest.xp, targetStudent.heroClass);
+     const goldEarned = applyClassBonus(quest.type, quest.gold, targetStudent.heroClass);
+
      // Generate approval notification
      const randomQuote = VICTORY_QUOTES[Math.floor(Math.random() * VICTORY_QUOTES.length)];
      const newNotification = {
        id: Date.now() + Math.random(),
        title: `${quest.title} Approved!`,
-       xp: quest.xp,
-       gold: quest.gold,
+       xp: xpEarned,
+       gold: goldEarned,
        quote: randomQuote
      };
      updatedStudent.notifications = [
@@ -838,8 +860,8 @@ export function GameProvider({ children }) {
 
      // Award XP + gold and handle level-up within the same object
     const oldLevel = Math.floor((targetStudent.xp || 0) / 1000) + 1;
-    updatedStudent.xp = (targetStudent.xp || 0) + quest.xp;
-    updatedStudent.gold = (targetStudent.gold || 0) + quest.gold;
+    updatedStudent.xp = (targetStudent.xp || 0) + xpEarned;
+    updatedStudent.gold = (targetStudent.gold || 0) + goldEarned;
     const newLevel = Math.floor(updatedStudent.xp / 1000) + 1;
     if (newLevel > oldLevel) {
       updatedStudent.gold += 500;
@@ -898,10 +920,13 @@ export function GameProvider({ children }) {
         return { success: true, message: "Correct! Keep going..." };
       }
 
+      const xpEarned = applyClassBonus(quest.type, quest.xp, currentUser.heroClass);
+      const goldEarned = applyClassBonus(quest.type, quest.gold, currentUser.heroClass);
+
       // Calculate ALL new values from the currentUser snapshot BEFORE any async gap
       const updates = {
-        xp: (currentUser.xp || 0) + quest.xp,
-        gold: (currentUser.gold || 0) + quest.gold,
+        xp: (currentUser.xp || 0) + xpEarned,
+        gold: (currentUser.gold || 0) + goldEarned,
       };
       if (quest.type === 'quiz') updates.quizQuestsCompleted = (currentUser.quizQuestsCompleted || 0) + 1;
       if (quest.type === 'multi-step') updates.multiStepQuestsCompleted = (currentUser.multiStepQuestsCompleted || 0) + 1;
@@ -923,7 +948,7 @@ export function GameProvider({ children }) {
       setSubmissions(prev => [...prev, newSubmission]);
       saveSubmissionToCloud(newSubmission);
 
-      return { success: true, message: `+${quest.xp} XP, +${quest.gold} Gold` };
+      return { success: true, message: `+${xpEarned} XP, +${goldEarned} Gold` };
     } else {
       return { success: false, message: "Incorrect answer. Try again!" };
     }
@@ -934,10 +959,12 @@ export function GameProvider({ children }) {
     if (!quest) return { success: false, message: "Quest not found!" };
 
     if (isCorrect) {
-      // Route through syncUserUpdate: state + cloud + achievements in one call
+      const xpEarned = applyClassBonus(quest.type, quest.xp, currentUser.heroClass);
+      const goldEarned = applyClassBonus(quest.type, quest.gold, currentUser.heroClass);
+
       syncUserUpdate({
-        xp: (currentUser.xp || 0) + quest.xp,
-        gold: (currentUser.gold || 0) + quest.gold,
+        xp: (currentUser.xp || 0) + xpEarned,
+        gold: (currentUser.gold || 0) + goldEarned,
         scenarioQuestsCompleted: (currentUser.scenarioQuestsCompleted || 0) + 1,
       });
 
@@ -1291,7 +1318,9 @@ export function GameProvider({ children }) {
     runMonthlyRaffle,
     session,
     login,
-    logout
+    logout,
+    updateHeroIdentity,
+    applyClassBonus
   };
 
   return (
