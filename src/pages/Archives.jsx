@@ -73,6 +73,7 @@ const Archives = () => {
           <div className="md:col-span-1">
             <div className="text-center mb-4">
               <h2 className="text-2xl text-yellow-400 font-['Press_Start_2P'] mb-2">{currentUser.heroName}</h2>
+              <p className="text-purple-400 font-['VT323'] text-3xl uppercase tracking-widest mb-1">{currentUser.heroClass}</p>
               <p className="text-stone-400 font-['VT323'] text-xl">Level {Math.floor(currentUser.xp / 1000) + 1}</p>
             </div>
             <div className="relative w-full h-80 lg:h-96 bg-black rounded-xl overflow-hidden border-2 border-stone-700 shadow-inner">

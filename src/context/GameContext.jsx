@@ -714,6 +714,18 @@ export function GameProvider({ children }) {
     syncUserUpdate({ heroName: newName, heroClass: newClass });
   };
 
+  const buyTomeOfRebirth = async () => {
+    if (!currentUser) return { success: false };
+    if (currentUser.gold < 1000) return { success: false, message: "Not enough gold!" };
+    
+    // Deduct 1000 gold and reset class to 'None'
+    syncUserUpdate({ 
+      gold: currentUser.gold - 1000, 
+      heroClass: 'None' 
+    });
+    return { success: true };
+  };
+
   const applyClassBonus = (questType, rewardAmount, heroClass) => {
     if (!heroClass || heroClass === 'None') return rewardAmount;
     let multiplier = 1;
@@ -1320,6 +1332,7 @@ const approveSubmission = (submissionId) => {
     login,
     logout,
     updateHeroIdentity,
+    buyTomeOfRebirth,
     applyClassBonus
   };
 
