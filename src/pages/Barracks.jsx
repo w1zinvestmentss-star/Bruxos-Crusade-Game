@@ -132,11 +132,11 @@ const Barracks = () => {
             </div>
 
             {/* Equipped Companion Box */}
-            {currentUser.equippedPet && (
+            {currentUser.equippedPet && currentUser.inventory?.some(i => i.name === currentUser.equippedPet) && (
               <div className="mb-6 bg-stone-800/80 border-2 border-purple-500/50 rounded-xl p-4 flex items-center gap-4 shadow-lg">
                 <div className="w-20 h-20 bg-black rounded-lg border border-purple-400 overflow-hidden flex-shrink-0 flex items-center justify-center p-1">
                   <img 
-                    src={currentUser.inventory?.find(i => i.name === currentUser.equippedPet)?.imageLink} 
+                    src={currentUser.inventory.find(i => i.name === currentUser.equippedPet)?.imageLink || currentUser.inventory.find(i => i.name === currentUser.equippedPet)?.image_link} 
                     alt="Pet" 
                     className="w-full h-full object-contain"
                   />
