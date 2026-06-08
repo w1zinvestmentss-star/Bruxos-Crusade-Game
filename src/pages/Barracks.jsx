@@ -62,9 +62,9 @@ const Barracks = () => {
     { id: 'loot_1104', name: 'Weaver of Fates Armor', cost: 0, reqBoss: 'The Weaver of Fates', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Weaver.of.Fates.Armor.png' },
 
 // COMPANIONS (PETS)
-     { id: 2001, name: 'Mystic Owlet', cost: 300, reqLevel: 1, type: 'pet', icon: Bird, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mystic.Owlet.png' },
-     { id: 2002, name: 'Fire Whelp', cost: 300, reqLevel: 1, type: 'pet', icon: Flame, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Fire.Whelp.png' },
-     { id: 2003, name: 'Astral Fox', cost: 800, reqLevel: 5, type: 'pet', icon: Sparkles, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Astral.Fox.png' }
+     { id: 2001, name: 'Mystic Owlet', cost: 300, reqLevel: 1, type: 'pet', icon: Bird, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mystic.Owlet.png', buff: '+15% XP (Quizzes & Puzzles)' },
+     { id: 2002, name: 'Fire Whelp', cost: 300, reqLevel: 1, type: 'pet', icon: Flame, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Fire.Whelp.png', buff: '+15% Gold (Homework & Reports)' },
+     { id: 2003, name: 'Astral Fox', cost: 800, reqLevel: 5, type: 'pet', icon: Sparkles, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Astral.Fox.png', buff: '+5% Gold & XP (All Quests)' }
   ];
 
   const handleBuyItem = (item) => {
@@ -144,6 +144,7 @@ const Barracks = () => {
                 <div>
                   <div className="text-purple-400 font-['Press_Start_2P'] text-[10px] mb-1 tracking-wider">COMPANION</div>
                   <div className="text-white font-['VT323'] text-2xl">{currentUser.equippedPet}</div>
+                  {currentUser.inventory?.find(i => i.name === currentUser.equippedPet)?.buff && (<div className="text-green-400 font-mono text-[10px] sm:text-xs mt-1 leading-tight">{currentUser.inventory.find(i => i.name === currentUser.equippedPet).buff}</div>)}
                 </div>
               </div>
             )}
@@ -255,6 +256,7 @@ const Barracks = () => {
                          <img src={item.imageLink} alt={item.name} className="h-full w-full object-contain"/>
                       </div>
                       <h3 className="text-xl font-bold text-white font-['VT323'] mb-1">{item.name}</h3>
+                      {item.type === 'pet' && item.buff && (<div className="text-green-400 font-mono text-xs mb-1 min-h-[1rem] leading-tight px-1">{item.buff}</div>)}
                       {isBossLoot ? (
                         <div className="text-purple-400 font-mono text-sm font-bold">BOSS LOOT</div>
                       ) : (
