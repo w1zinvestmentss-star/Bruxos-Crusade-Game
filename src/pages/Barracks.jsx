@@ -61,10 +61,10 @@ const Barracks = () => {
     { id: 'loot_1004', name: 'Seraph of Hope Armor', cost: 0, reqBoss: 'The Seraph of Hope', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Seraph.of.Hope.Armor.png' },
     { id: 'loot_1104', name: 'Weaver of Fates Armor', cost: 0, reqBoss: 'The Weaver of Fates', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Weaver.of.Fates.Armor.png' },
 
-    // COMPANIONS (PETS)
-    { id: 'pet_1', name: 'Mystic Owlet', cost: 300, reqLevel: 1, type: 'pet', icon: Bird, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mystic.Owlet.png' },
-    { id: 'pet_2', name: 'Fire Whelp', cost: 300, reqLevel: 1, type: 'pet', icon: Flame, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Fire.Whelp.png' },
-    { id: 'pet_3', name: 'Astral Fox', cost: 800, reqLevel: 5, type: 'pet', icon: Sparkles, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Astral.Fox.png' }
+// COMPANIONS (PETS)
+     { id: 2001, name: 'Mystic Owlet', cost: 300, reqLevel: 1, type: 'pet', icon: Bird, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mystic.Owlet.png' },
+     { id: 2002, name: 'Fire Whelp', cost: 300, reqLevel: 1, type: 'pet', icon: Flame, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Fire.Whelp.png' },
+     { id: 2003, name: 'Astral Fox', cost: 800, reqLevel: 5, type: 'pet', icon: Sparkles, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Astral.Fox.png' }
   ];
 
   const handleBuyItem = (item) => {
@@ -130,6 +130,23 @@ const Barracks = () => {
                 className="absolute inset-0 w-full h-full object-contain"
               />
             </div>
+
+            {/* Equipped Companion Box */}
+            {currentUser.equippedPet && (
+              <div className="mb-6 bg-stone-800/80 border-2 border-purple-500/50 rounded-xl p-4 flex items-center gap-4 shadow-lg">
+                <div className="w-20 h-20 bg-black rounded-lg border border-purple-400 overflow-hidden flex-shrink-0 flex items-center justify-center p-1">
+                  <img 
+                    src={currentUser.inventory?.find(i => i.name === currentUser.equippedPet)?.imageLink} 
+                    alt="Pet" 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div>
+                  <div className="text-purple-400 font-['Press_Start_2P'] text-[10px] mb-1 tracking-wider">COMPANION</div>
+                  <div className="text-white font-['VT323'] text-2xl">{currentUser.equippedPet}</div>
+                </div>
+              </div>
+            )}
 
             <div>
               <h3 className="text-xl text-white font-['VT323'] mb-3">EQUIPPED</h3>
