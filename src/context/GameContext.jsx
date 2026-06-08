@@ -181,11 +181,11 @@ const formatProfile = (dbProfile) => ({
   raffleTickets: dbProfile.raffle_tickets || 0,
   totalTicketsEarned: dbProfile.total_tickets_earned || 0,
   lootboxPity: dbProfile.lootbox_pity || 0,
-   defeatedBosses: (dbProfile.defeated_bosses || []).map(Number),
+  defeatedBosses: (dbProfile.defeated_bosses || []).map(Number),
   unlockedAchievements: dbProfile.unlocked_achievements || [],
-   unlockedTitles: dbProfile.unlocked_titles || ['The Novice'],
-   level: Math.floor((dbProfile.xp || 0) / 1000) + 1,
-   midtermGPA: dbProfile.midterm_gpa || 0,
+  unlockedTitles: dbProfile.unlocked_titles || ['The Novice'],
+  level: Math.floor((dbProfile.xp || 0) / 1000) + 1,
+  midtermGPA: dbProfile.midterm_gpa || 0,
   finalGPA: dbProfile.final_gpa !== undefined ? dbProfile.final_gpa : null,
   uploadQuestsCompleted: dbProfile.upload_quests_completed || 0,
   quizQuestsCompleted: dbProfile.quiz_quests_completed || 0,
@@ -196,9 +196,9 @@ const formatProfile = (dbProfile) => ({
   sportsQuestsCompleted: dbProfile.sports_quests_completed || 0,
   artsQuestsCompleted: dbProfile.arts_quests_completed || 0,
   wellnessQuestsCompleted: dbProfile.wellness_quests_completed || 0,
-   journalQuestsCompleted: dbProfile.journal_quests_completed || 0,
-   notifications: dbProfile.notifications || [],
-   equippedPet: dbProfile.equipped_pet || null,
+  journalQuestsCompleted: dbProfile.journal_quests_completed || 0,
+  notifications: dbProfile.notifications || [],
+  equippedPet: dbProfile.equipped_pet || null,
 });
 
 const saveProfileToCloud = async (userId, updates) => {
@@ -214,7 +214,7 @@ const saveProfileToCloud = async (userId, updates) => {
   if (updates.totalTicketsEarned !== undefined) dbUpdates.total_tickets_earned = updates.totalTicketsEarned;
   if (updates.lootboxPity !== undefined) dbUpdates.lootbox_pity = updates.lootboxPity;
   if (updates.unlockedAchievements !== undefined) dbUpdates.unlocked_achievements = updates.unlockedAchievements;
-   if (updates.defeatedBosses !== undefined) dbUpdates.defeated_bosses = updates.defeatedBosses.map(String);
+  if (updates.defeatedBosses !== undefined) dbUpdates.defeated_bosses = updates.defeatedBosses.map(String);
   if (updates.notifications !== undefined) dbUpdates.notifications = updates.notifications;
   if (updates.equippedPet !== undefined) dbUpdates.equipped_pet = updates.equippedPet;
 
@@ -271,9 +271,9 @@ export function GameProvider({ children }) {
   nextYear.setFullYear(nextYear.getFullYear() + 1);
   const nextYearString = nextYear.toISOString().split('T')[0];
 
-   const INITIAL_QUESTS = [
-     { id: 101, title: "Math Worksheet", description: "Upload a photo of your completed algebra sheet.", xp: 50, gold: 20, type: 'upload', frequency: 'daily', unlockDate: null },
-     { id: 102, title: "Science Project", description: "Submit a picture of your science fair poster.", xp: 100, gold: 50, type: 'upload', frequency: 'daily', unlockDate: null },
+  const INITIAL_QUESTS = [
+    { id: 101, title: "Math Worksheet", description: "Upload a photo of your completed algebra sheet.", xp: 50, gold: 20, type: 'upload', frequency: 'daily', unlockDate: null },
+    { id: 102, title: "Science Project", description: "Submit a picture of your science fair poster.", xp: 100, gold: 50, type: 'upload', frequency: 'daily', unlockDate: null },
     {
       id: 103,
       title: "Math Speed Run",
@@ -392,41 +392,41 @@ export function GameProvider({ children }) {
             .eq('student_id', session.user.id);
 
           formattedProfile.inventory = inv || [];
-           setCurrentUser(formattedProfile);
-           
-           // Fetch all profiles for leaderboard
-           const { data: allProfiles } = await supabase.from('profiles').select('*');
-           if (allProfiles) {
-             setStudents(allProfiles.map(p => formatProfile(p)));
-           }
-           
-           // Fetch Submissions
-           const isTeacher = session.user.email === 'admin@bruxos.com';
-           let subsQuery = supabase.from('submissions').select('*');
+          setCurrentUser(formattedProfile);
 
-           // If they are a student, only let them see their own submissions. 
-           // If they are the teacher, let them see everything!
-           if (!isTeacher) {
-             subsQuery = subsQuery.eq('student_id', session.user.id);
-           }
+          // Fetch all profiles for leaderboard
+          const { data: allProfiles } = await supabase.from('profiles').select('*');
+          if (allProfiles) {
+            setStudents(allProfiles.map(p => formatProfile(p)));
+          }
 
-           const { data: subs, error: subsError } = await subsQuery;
-           if (subsError) {
-             console.error("Error fetching submissions:", subsError);
-           } else if (subs) {
-             const mappedSubs = subs.map(s => ({
-               ...s,
-               // Map snake_case DB columns to the camelCase the app uses internally
-               questId: s.quest_id,
-               studentId: s.student_id,
-               studentName: s.student_name,
-               isBossStrike: s.is_boss_strike,
-               proofContent: s.proof_content || null,
-               // created_at is the authoritative date from Supabase (ISO UTC string)
-               // Keep it as-is — getQuestStatus reads it directly
-             }));
-             setSubmissions(mappedSubs);
-           }
+          // Fetch Submissions
+          const isTeacher = session.user.email === 'admin@bruxos.com';
+          let subsQuery = supabase.from('submissions').select('*');
+
+          // If they are a student, only let them see their own submissions. 
+          // If they are the teacher, let them see everything!
+          if (!isTeacher) {
+            subsQuery = subsQuery.eq('student_id', session.user.id);
+          }
+
+          const { data: subs, error: subsError } = await subsQuery;
+          if (subsError) {
+            console.error("Error fetching submissions:", subsError);
+          } else if (subs) {
+            const mappedSubs = subs.map(s => ({
+              ...s,
+              // Map snake_case DB columns to the camelCase the app uses internally
+              questId: s.quest_id,
+              studentId: s.student_id,
+              studentName: s.student_name,
+              isBossStrike: s.is_boss_strike,
+              proofContent: s.proof_content || null,
+              // created_at is the authoritative date from Supabase (ISO UTC string)
+              // Keep it as-is — getQuestStatus reads it directly
+            }));
+            setSubmissions(mappedSubs);
+          }
         }
       } else {
         setCurrentUser(null);
@@ -719,11 +719,11 @@ export function GameProvider({ children }) {
   const buyTomeOfRebirth = async () => {
     if (!currentUser) return { success: false };
     if (currentUser.gold < 1000) return { success: false, message: "Not enough gold!" };
-    
+
     // Deduct 1000 gold and reset class to 'None'
-    syncUserUpdate({ 
-      gold: currentUser.gold - 1000, 
-      heroClass: 'None' 
+    syncUserUpdate({
+      gold: currentUser.gold - 1000,
+      heroClass: 'None'
     });
     return { success: true };
   };
@@ -848,7 +848,7 @@ export function GameProvider({ children }) {
     return { success: true };
   };
 
-const approveSubmission = (submissionId) => {
+  const approveSubmission = (submissionId) => {
     const submission = submissions.find(s => s.id === submissionId);
     if (!submission) return;
 
@@ -867,34 +867,34 @@ const approveSubmission = (submissionId) => {
     const targetStudent = students.find(s => s.id === submission.studentId);
     if (!targetStudent) return;
 
-     // Build the TRUE updated state for the target student in one pass
-     const updatedStudent = { ...targetStudent };
-     if (quest.type === 'upload') updatedStudent.uploadQuestsCompleted = (targetStudent.uploadQuestsCompleted || 0) + 1;
-     else if (quest.type === 'scout-sports') updatedStudent.sportsQuestsCompleted = (targetStudent.sportsQuestsCompleted || 0) + 1;
-     else if (quest.type === 'scout-arts') updatedStudent.artsQuestsCompleted = (targetStudent.artsQuestsCompleted || 0) + 1;
-     else if (quest.type === 'journal') updatedStudent.journalQuestsCompleted = (targetStudent.journalQuestsCompleted || 0) + 1;
+    // Build the TRUE updated state for the target student in one pass
+    const updatedStudent = { ...targetStudent };
+    if (quest.type === 'upload') updatedStudent.uploadQuestsCompleted = (targetStudent.uploadQuestsCompleted || 0) + 1;
+    else if (quest.type === 'scout-sports') updatedStudent.sportsQuestsCompleted = (targetStudent.sportsQuestsCompleted || 0) + 1;
+    else if (quest.type === 'scout-arts') updatedStudent.artsQuestsCompleted = (targetStudent.artsQuestsCompleted || 0) + 1;
+    else if (quest.type === 'journal') updatedStudent.journalQuestsCompleted = (targetStudent.journalQuestsCompleted || 0) + 1;
 
-     let xpEarned = applyClassBonus(quest.type, quest.xp, targetStudent.heroClass);
-     xpEarned = applyPetBonus(quest.type, xpEarned, false, targetStudent.equippedPet);
+    let xpEarned = applyClassBonus(quest.type, quest.xp, targetStudent.heroClass);
+    xpEarned = applyPetBonus(quest.type, xpEarned, false, targetStudent.equippedPet);
 
-     let goldEarned = applyClassBonus(quest.type, quest.gold, targetStudent.heroClass);
-     goldEarned = applyPetBonus(quest.type, goldEarned, true, targetStudent.equippedPet);
+    let goldEarned = applyClassBonus(quest.type, quest.gold, targetStudent.heroClass);
+    goldEarned = applyPetBonus(quest.type, goldEarned, true, targetStudent.equippedPet);
 
-     // Generate approval notification
-     const randomQuote = VICTORY_QUOTES[Math.floor(Math.random() * VICTORY_QUOTES.length)];
-     const newNotification = {
-       id: Date.now() + Math.random(),
-       title: `${quest.title} Approved!`,
-       xp: xpEarned,
-       gold: goldEarned,
-       quote: randomQuote
-     };
-     updatedStudent.notifications = [
-       ...(targetStudent.notifications || []),
-       newNotification
-     ];
+    // Generate approval notification
+    const randomQuote = VICTORY_QUOTES[Math.floor(Math.random() * VICTORY_QUOTES.length)];
+    const newNotification = {
+      id: Date.now() + Math.random(),
+      title: `${quest.title} Approved!`,
+      xp: xpEarned,
+      gold: goldEarned,
+      quote: randomQuote
+    };
+    updatedStudent.notifications = [
+      ...(targetStudent.notifications || []),
+      newNotification
+    ];
 
-     // Award XP + gold and handle level-up within the same object
+    // Award XP + gold and handle level-up within the same object
     const oldLevel = Math.floor((targetStudent.xp || 0) / 1000) + 1;
     updatedStudent.xp = (targetStudent.xp || 0) + xpEarned;
     updatedStudent.gold = (targetStudent.gold || 0) + goldEarned;
@@ -914,16 +914,16 @@ const approveSubmission = (submissionId) => {
       setCurrentUser(updatedStudent);
     }
 
-     // Persist all changed fields to Supabase
-     const cloudUpdates = { 
-       xp: updatedStudent.xp, 
-       gold: updatedStudent.gold,
-       notifications: updatedStudent.notifications
-     };
-     if (quest.type === 'upload') cloudUpdates.uploadQuestsCompleted = updatedStudent.uploadQuestsCompleted;
-     if (quest.type === 'scout-sports') cloudUpdates.sportsQuestsCompleted = updatedStudent.sportsQuestsCompleted;
-     if (quest.type === 'scout-arts') cloudUpdates.artsQuestsCompleted = updatedStudent.artsQuestsCompleted;
-     if (quest.type === 'journal') cloudUpdates.journalQuestsCompleted = updatedStudent.journalQuestsCompleted;
+    // Persist all changed fields to Supabase
+    const cloudUpdates = {
+      xp: updatedStudent.xp,
+      gold: updatedStudent.gold,
+      notifications: updatedStudent.notifications
+    };
+    if (quest.type === 'upload') cloudUpdates.uploadQuestsCompleted = updatedStudent.uploadQuestsCompleted;
+    if (quest.type === 'scout-sports') cloudUpdates.sportsQuestsCompleted = updatedStudent.sportsQuestsCompleted;
+    if (quest.type === 'scout-arts') cloudUpdates.artsQuestsCompleted = updatedStudent.artsQuestsCompleted;
+    if (quest.type === 'journal') cloudUpdates.journalQuestsCompleted = updatedStudent.journalQuestsCompleted;
     saveProfileToCloud(submission.studentId, cloudUpdates);
 
     // Check achievements against the TRUE updated state — no stale reads
@@ -1055,7 +1055,7 @@ const approveSubmission = (submissionId) => {
     if (quest.frequency === 'daily' || quest.frequency === 'weekly') {
       // Get today's date strictly as YYYY-MM-DD
       const todayString = new Date().toLocaleDateString('en-CA');
-      
+
       // Extract the submission date strictly as YYYY-MM-DD
       let submissionDateString = '';
       if (mostRecentSubmission.created_at) {
@@ -1329,13 +1329,13 @@ const approveSubmission = (submissionId) => {
     return { success: true, winnerName: winner.heroName || winner.name };
   };
 
-   const clearNotifications = () => {
-     if (!currentUser) return;
-     const updatedUser = { ...currentUser, notifications: [] };
-     setCurrentUser(updatedUser);
-     setStudents(prev => prev.map(s => s.id === currentUser.id ? updatedUser : s));
-     saveProfileToCloud(currentUser.id, { notifications: [] });
-   };
+  const clearNotifications = () => {
+    if (!currentUser) return;
+    const updatedUser = { ...currentUser, notifications: [] };
+    setCurrentUser(updatedUser);
+    setStudents(prev => prev.map(s => s.id === currentUser.id ? updatedUser : s));
+    saveProfileToCloud(currentUser.id, { notifications: [] });
+  };
 
   const value = {
     students, quests, submissions, BOSSES, ACHIEVEMENTS,
