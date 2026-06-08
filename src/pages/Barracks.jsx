@@ -144,7 +144,11 @@ const Barracks = () => {
                 <div>
                   <div className="text-purple-400 font-['Press_Start_2P'] text-[10px] mb-1 tracking-wider">COMPANION</div>
                   <div className="text-white font-['VT323'] text-2xl">{currentUser.equippedPet}</div>
-                  {currentUser.inventory?.find(i => i.name === currentUser.equippedPet)?.buff && (<div className="text-green-400 font-mono text-[10px] sm:text-xs mt-1 leading-tight">{currentUser.inventory.find(i => i.name === currentUser.equippedPet).buff}</div>)}
+                  {shopItems.find(item => item.name === currentUser.equippedPet)?.buff && (
+                    <div className="text-green-400 font-mono text-[10px] sm:text-xs mt-1 leading-tight">
+                      {shopItems.find(item => item.name === currentUser.equippedPet).buff}
+                    </div>
+                  )}
                 </div>
               </div>
             )}

@@ -158,6 +158,23 @@ const Archives = () => {
           </div>
         </div>
 
+        {/* Active Companion Box */}
+        <div className="bg-black/60 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl p-6 mt-6">
+          <h3 className="text-yellow-400 font-['Press_Start_2P'] text-sm mb-4">ACTIVE COMPANION</h3>
+          {currentUser.equippedPet ? (
+            <div className="flex items-center gap-4 bg-stone-900/80 p-4 rounded-lg border border-purple-500/30">
+              <div className="text-white font-['VT323'] text-3xl">{currentUser.equippedPet}</div>
+              <div className="text-green-400 font-mono text-sm ml-auto text-right">
+                {currentUser.equippedPet === 'Mystic Owlet' && '+15% XP (Quizzes & Puzzles)'}
+                {currentUser.equippedPet === 'Fire Whelp' && '+15% Gold (Homework & Reports)'}
+                {currentUser.equippedPet === 'Astral Fox' && '+5% Gold & XP (All Quests)'}
+              </div>
+            </div>
+          ) : (
+            <div className="text-stone-500 font-['VT323'] text-xl italic">No companion equipped. Visit the Barracks.</div>
+          )}
+        </div>
+
         {/* Glass Card 3: Quest Log */}
         <div className="mt-10 bg-black/60 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl p-6">
           <h2 className="font-['Press_Start_2P'] text-yellow-400 text-lg mb-6 flex items-center"><BookOpen className="mr-3 text-yellow-500"/>The History</h2>
