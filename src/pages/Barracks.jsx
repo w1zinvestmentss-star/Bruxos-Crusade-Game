@@ -67,12 +67,12 @@ const Barracks = () => {
      { id: 2003, name: 'Astral Fox', cost: 800, reqLevel: 5, type: 'pet', icon: Sparkles, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Astral.Fox.png', buff: '+5% Gold & XP (All Quests)' }
   ];
 
-  const handleBuyItem = (item) => {
-    const result = buyItem(item);
-    if (result.success) {
+  const handleBuyItem = async (item) => {
+    const result = await buyItem(item);
+    if (result && result.success) {
       alert("Purchase successful!");
     } else {
-      alert(result.message || "Purchase failed!");
+      alert(result?.message || "Purchase failed!");
     }
   };
 
