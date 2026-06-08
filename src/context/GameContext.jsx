@@ -198,6 +198,7 @@ const formatProfile = (dbProfile) => ({
   wellnessQuestsCompleted: dbProfile.wellness_quests_completed || 0,
    journalQuestsCompleted: dbProfile.journal_quests_completed || 0,
    notifications: dbProfile.notifications || [],
+   equippedPet: dbProfile.equipped_pet || null,
 });
 
 const saveProfileToCloud = async (userId, updates) => {
@@ -215,6 +216,7 @@ const saveProfileToCloud = async (userId, updates) => {
   if (updates.unlockedAchievements !== undefined) dbUpdates.unlocked_achievements = updates.unlockedAchievements;
    if (updates.defeatedBosses !== undefined) dbUpdates.defeated_bosses = updates.defeatedBosses.map(String);
   if (updates.notifications !== undefined) dbUpdates.notifications = updates.notifications;
+  if (updates.equippedPet !== undefined) dbUpdates.equipped_pet = updates.equippedPet;
 
   // Map all quest counters:
   if (updates.uploadQuestsCompleted !== undefined) dbUpdates.upload_quests_completed = updates.uploadQuestsCompleted;
@@ -735,6 +737,22 @@ export function GameProvider({ children }) {
     return Math.floor(rewardAmount * multiplier);
   };
 
+  const equipPet = (petName) => {
+    syncUserUpdate({ equippedPet: petName });
+  };
+
+  const unequipPet = () => {
+    syncUserUpdate({ equippedPet: null });
+  };
+
+  const applyPetBonus = (questType, baseAmount, isGold, petName) => {
+    if (!petName) return Math.floor(baseAmount);
+    if (petName === 'Mystic Owlet' && !isGold && ['quiz', 'multi-step', 'cipher', 'incantation'].includes(questType)) return Math.floor(baseAmount * 1.15);
+    if (petName === 'Fire Whelp' && isGold && ['upload', 'scout-sports', 'scout-arts', 'journal'].includes(questType)) return Math.floor(baseAmount * 1.15);
+    if (petName === 'Astral Fox') return Math.floor(baseAmount * 1.05);
+    return Math.floor(baseAmount);
+  };
+
   const createQuest = (newQuest) => {
     setQuests(prev => [...prev, { ...newQuest, id: Date.now() }]);
   };
@@ -801,8 +819,11 @@ export function GameProvider({ children }) {
     const quest = quests.find(q => q.id === questId);
     if (!quest) return { success: false, message: 'Quest not found' };
 
-    const xpEarned = applyClassBonus(quest.type, quest.xp, currentUser.heroClass);
-    const goldEarned = applyClassBonus(quest.type, quest.gold, currentUser.heroClass);
+    let xpEarned = applyClassBonus(quest.type, quest.xp, currentUser.heroClass);
+    xpEarned = applyPetBonus(quest.type, xpEarned, false, currentUser.equippedPet);
+
+    let goldEarned = applyClassBonus(quest.type, quest.gold, currentUser.heroClass);
+    goldEarned = applyPetBonus(quest.type, goldEarned, true, currentUser.equippedPet);
 
     // Route through syncUserUpdate: single call covers state + cloud + achievements
     syncUserUpdate({
@@ -853,8 +874,11 @@ const approveSubmission = (submissionId) => {
      else if (quest.type === 'scout-arts') updatedStudent.artsQuestsCompleted = (targetStudent.artsQuestsCompleted || 0) + 1;
      else if (quest.type === 'journal') updatedStudent.journalQuestsCompleted = (targetStudent.journalQuestsCompleted || 0) + 1;
 
-     const xpEarned = applyClassBonus(quest.type, quest.xp, targetStudent.heroClass);
-     const goldEarned = applyClassBonus(quest.type, quest.gold, targetStudent.heroClass);
+     let xpEarned = applyClassBonus(quest.type, quest.xp, targetStudent.heroClass);
+     xpEarned = applyPetBonus(quest.type, xpEarned, false, targetStudent.equippedPet);
+
+     let goldEarned = applyClassBonus(quest.type, quest.gold, targetStudent.heroClass);
+     goldEarned = applyPetBonus(quest.type, goldEarned, true, targetStudent.equippedPet);
 
      // Generate approval notification
      const randomQuote = VICTORY_QUOTES[Math.floor(Math.random() * VICTORY_QUOTES.length)];
@@ -932,8 +956,11 @@ const approveSubmission = (submissionId) => {
         return { success: true, message: "Correct! Keep going..." };
       }
 
-      const xpEarned = applyClassBonus(quest.type, quest.xp, currentUser.heroClass);
-      const goldEarned = applyClassBonus(quest.type, quest.gold, currentUser.heroClass);
+      let xpEarned = applyClassBonus(quest.type, quest.xp, currentUser.heroClass);
+      xpEarned = applyPetBonus(quest.type, xpEarned, false, currentUser.equippedPet);
+
+      let goldEarned = applyClassBonus(quest.type, quest.gold, currentUser.heroClass);
+      goldEarned = applyPetBonus(quest.type, goldEarned, true, currentUser.equippedPet);
 
       // Calculate ALL new values from the currentUser snapshot BEFORE any async gap
       const updates = {
@@ -971,8 +998,11 @@ const approveSubmission = (submissionId) => {
     if (!quest) return { success: false, message: "Quest not found!" };
 
     if (isCorrect) {
-      const xpEarned = applyClassBonus(quest.type, quest.xp, currentUser.heroClass);
-      const goldEarned = applyClassBonus(quest.type, quest.gold, currentUser.heroClass);
+      let xpEarned = applyClassBonus(quest.type, quest.xp, currentUser.heroClass);
+      xpEarned = applyPetBonus(quest.type, xpEarned, false, currentUser.equippedPet);
+
+      let goldEarned = applyClassBonus(quest.type, quest.gold, currentUser.heroClass);
+      goldEarned = applyPetBonus(quest.type, goldEarned, true, currentUser.equippedPet);
 
       syncUserUpdate({
         xp: (currentUser.xp || 0) + xpEarned,
@@ -1333,7 +1363,10 @@ const approveSubmission = (submissionId) => {
     logout,
     updateHeroIdentity,
     buyTomeOfRebirth,
-    applyClassBonus
+    applyClassBonus,
+    equipPet,
+    unequipPet,
+    applyPetBonus
   };
 
   return (

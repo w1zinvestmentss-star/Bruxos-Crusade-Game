@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shirt, ArrowLeft } from 'lucide-react';
+import { Shirt, ArrowLeft, Bird, Flame, Sparkles } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const Barracks = () => {
   const navigate = useNavigate();
-  const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth } = useGame();
+  const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equipPet, unequipPet } = useGame();
 
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
 
@@ -59,7 +59,12 @@ const Barracks = () => {
     { id: 'loot_804', name: 'Ivory Leviathan Armor', cost: 0, reqBoss: 'The Ivory Leviathan', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ivory.Leviathan.Armor.png' },
     { id: 'loot_904', name: 'Prism Weaver Armor', cost: 0, reqBoss: 'The Prism Weaver', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Prism.Weaver.Armor.png' },
     { id: 'loot_1004', name: 'Seraph of Hope Armor', cost: 0, reqBoss: 'The Seraph of Hope', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Seraph.of.Hope.Armor.png' },
-    { id: 'loot_1104', name: 'Weaver of Fates Armor', cost: 0, reqBoss: 'The Weaver of Fates', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Weaver.of.Fates.Armor.png' }
+    { id: 'loot_1104', name: 'Weaver of Fates Armor', cost: 0, reqBoss: 'The Weaver of Fates', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Weaver.of.Fates.Armor.png' },
+
+    // COMPANIONS (PETS)
+    { id: 'pet_1', name: 'Mystic Owlet', cost: 300, reqLevel: 1, type: 'pet', icon: Bird, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mystic.Owlet.png' },
+    { id: 'pet_2', name: 'Fire Whelp', cost: 300, reqLevel: 1, type: 'pet', icon: Flame, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Fire.Whelp.png' },
+    { id: 'pet_3', name: 'Astral Fox', cost: 800, reqLevel: 5, type: 'pet', icon: Sparkles, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Astral.Fox.png' }
   ];
 
   const handleBuyItem = (item) => {
@@ -114,6 +119,7 @@ const Barracks = () => {
                 <span>{currentUser.gold}</span>
                 <span className="ml-2 text-yellow-500">G</span>
               </div>
+              <div className="text-sm text-purple-400 font-['VT323'] mt-2">Companion: {currentUser.equippedPet || 'None'}</div>
             </div>
 
             {/* IMPORTANT: Solid background for sprite visibility */}
@@ -155,6 +161,42 @@ const Barracks = () => {
                 </div>
               ) : (
                 <div className="text-stone-400 italic font-['VT323'] text-lg">No outfits owned.</div>
+              )}
+            </div>
+
+            <div className="mt-6">
+              <h3 className="text-[10px] sm:text-xs text-yellow-400 font-['Press_Start_2P'] mb-3">COMPANIONS (PETS)</h3>
+              {currentUser.inventory && currentUser.inventory.filter(i => i.type === 'pet').length > 0 ? (
+                <div className="space-y-2">
+                  {currentUser.inventory.map((item, index) => {
+                    if (item.type !== 'pet') return null;
+                    const isEquipped = currentUser.equippedPet === item.name;
+                    let IconComponent = Bird;
+                    if (item.name === 'Fire Whelp') IconComponent = Flame;
+                    else if (item.name === 'Astral Fox') IconComponent = Sparkles;
+
+                    return (
+                      <div key={index} className="flex items-center justify-between gap-3 p-3 bg-white/5 rounded-lg border border-white/10">
+                        <div className="flex items-center gap-3">
+                          <IconComponent size={24} className="text-yellow-400" />
+                          <span className="text-white font-['VT323'] text-xl">{item.name}</span>
+                        </div>
+                        <button
+                          onClick={() => isEquipped ? unequipPet() : equipPet(item.name)}
+                          className={`py-1 px-3 rounded-md font-['VT323'] text-lg transition-colors ${
+                            isEquipped
+                              ? 'bg-red-600 hover:bg-red-500 text-white'
+                              : 'bg-green-600 hover:bg-green-500 text-white'
+                          }`}
+                        >
+                          {isEquipped ? 'UNEQUIP' : 'EQUIP'}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-stone-400 italic font-['VT323'] text-lg">No pets owned.</div>
               )}
             </div>
 
