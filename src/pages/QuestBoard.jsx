@@ -14,7 +14,7 @@ const VICTORY_QUOTES = [
 
 const QuestBoard = () => {
   const navigate = useNavigate();
-  const { quests, submitQuest, getQuestStatus, currentUser, attemptQuiz, attemptScenario, submitWellnessCheck } = useGame();
+  const { quests, submitQuest, getQuestStatus, currentUser, attemptQuiz, attemptScenario, submitWellnessCheck, globalEffects, resolveVoidGrasp } = useGame();
   
   const fileInputRef = useRef(null);
   const selectedQuestRef = useRef(null);
@@ -25,6 +25,9 @@ const QuestBoard = () => {
   const [showVictoryModal, setShowVictoryModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [modalQuote, setModalQuote] = useState('');
+  const [voidAnswer, setVoidAnswer] = useState('');
+  const graspLock = globalEffects?.find(e => e.type === 'void_grasp' && e.target_id === currentUser?.id);
+  const isLocked = !!graspLock;
 
   const [activeSessions, setActiveSessions] = useState({});
   const [sessionAnswers, setSessionAnswers] = useState({});
@@ -226,8 +229,35 @@ const QuestBoard = () => {
           <p className="text-stone-400 text-center max-w-2xl mx-auto mb-10 font-['VT323'] text-xl italic">
             Welcome to the Bounty Board, Hero. Choose your path, complete tasks to earn Gold and Experience, and awaken the bosses lurking in the Dungeon.
           </p>
-          <div>
-            {Object.keys(QUEST_CATEGORIES).map(categoryKey => {
+
+          {isLocked ? (
+            <div className="bg-purple-900/80 border-4 border-purple-500 p-8 rounded-xl max-w-2xl mx-auto text-center shadow-[0_0_50px_rgba(168,85,247,0.5)]">
+              <h1 className="text-4xl text-white font-['Press_Start_2P'] mb-6 animate-pulse">VOID BREACH DETECTED</h1>
+              <p className="text-xl font-['VT323'] text-purple-200 mb-6">A dark magic has sealed your board! Solve the ancient equation to break the seal.</p>
+              <div className="text-4xl font-mono text-yellow-400 mb-8 bg-black/50 p-4 rounded-lg inline-block">144 * 12 + 8 / 2 - 50</div>
+              <input 
+                type="text" 
+                value={voidAnswer} 
+                onChange={e => setVoidAnswer(e.target.value)} 
+                className="w-full bg-black/80 text-white border-2 border-purple-500 rounded p-4 text-2xl font-mono mb-4 text-center focus:outline-none focus:border-yellow-400" 
+                placeholder="Enter answer..."
+              />
+              <button 
+                onClick={() => {
+                  if(voidAnswer.trim() === "1682") {
+                    resolveVoidGrasp(true);
+                  } else {
+                    alert("Incorrect. The void tightens...");
+                  }
+                }} 
+                className="w-full bg-yellow-500 text-black py-4 rounded font-bold font-['VT323'] text-3xl hover:bg-yellow-400 transition-colors"
+              >
+                BREAK SEAL
+              </button>
+            </div>
+          ) : (
+            <div>
+              {Object.keys(QUEST_CATEGORIES).map(categoryKey => {
               const categoryQuests = quests.filter(q => q.type === categoryKey);
               if (categoryQuests.length === 0) return null;
 
@@ -358,7 +388,8 @@ const QuestBoard = () => {
                 </div>
               );
             })}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 

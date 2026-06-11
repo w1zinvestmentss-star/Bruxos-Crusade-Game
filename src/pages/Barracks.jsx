@@ -5,7 +5,9 @@ import { useGame } from '../context/GameContext';
 
 const Barracks = () => {
   const navigate = useNavigate();
-  const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equipPet, unequipPet } = useGame();
+  const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equipPet, unequipPet, placeMimicSnare, applyVoidGrasp, quests, students } = useGame();
+  const [selectedSnareQuest, setSelectedSnareQuest] = React.useState('');
+  const [selectedGraspTarget, setSelectedGraspTarget] = React.useState('');
 
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
 
@@ -68,7 +70,10 @@ const Barracks = () => {
 
      // MAGIC SPELLS (CONSUMABLES)
      { id: 'spell_1', name: 'Oath of the Abyss', cost: 150, type: 'consumable', buffType: 'oath', icon: Wand, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Oath.of.the.Abyss.png?v=1' },
-     { id: 'spell_2', name: 'Ember of the Ashen', cost: 250, type: 'consumable', buffType: 'ember', icon: Flame, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Ember.of.the.Ashen.png?v=1' }
+     { id: 'spell_2', name: 'Ember of the Ashen', cost: 250, type: 'consumable', buffType: 'ember', icon: Flame, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Ember.of.the.Ashen.png?v=1' },
+     // PVP ITEMS
+     { id: 2004, name: 'Mimic Snare', cost: 150, type: 'pvp', imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mimic.Snare.png' },
+     { id: 2005, name: "Voidwalker's Grasp", cost: 500, type: 'pvp', imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Voidwalker\'s.Grasp.png' }
   ];
 
   const handleBuyItem = async (item) => {
@@ -364,6 +369,89 @@ const Barracks = () => {
                 })}
               </div>
             </div>
+
+            {/* Dark Magic (PvP) Section */}
+            <div className="mt-12 bg-black/75 backdrop-blur-md border border-red-900/50 shadow-2xl rounded-xl p-6">
+              <h2 className="text-2xl text-red-500 font-['Press_Start_2P'] mb-4">DARK MAGIC</h2>
+              <p className="text-stone-400 font-['VT323'] text-lg mb-4">Dangerous spells that affect other students.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+                {shopItems.filter(item => item.type === 'pvp').map((item) => {
+                  return (
+                    <div key={item.id} className="bg-white/5 border border-white/10 rounded-lg p-4 hover:border-red-500/50 transition-colors flex flex-col justify-between">
+                      <div className="flex flex-col items-center text-center mb-3">
+                        <div className="w-full h-32 mb-2 rounded-lg bg-black/80 flex items-center justify-center overflow-hidden">
+                          <img src={item.imageLink} alt={item.name} className="h-full w-full object-contain"/>
+                        </div>
+                        <h3 className="text-xl font-bold text-red-500 font-['VT323'] mb-1">{item.name}</h3>
+                        <div className="text-red-400 font-['VT323'] text-sm mb-1">
+                          {item.name === 'Mimic Snare' ? 'Trap a Daily Quest. If they fail, you steal Gold/XP!' : 'Lock the Leaderboard Top 3 out of Quests!'}
+                        </div>
+                        <div className="text-yellow-400 font-['VT323'] text-xl mb-4">{item.cost} G</div>
+                      </div>
+
+                      {item.name === 'Mimic Snare' ? (
+                        <div className="flex flex-col gap-2">
+                          <select
+                            value={selectedSnareQuest}
+                            onChange={(e) => setSelectedSnareQuest(e.target.value)}
+                            className="bg-black/80 text-stone-300 border border-stone-600 rounded p-2 font-['VT323'] text-lg w-full"
+                          >
+                            <option value="">Select a Daily Quest...</option>
+                            {quests.filter(q => q.frequency === 'daily').map(q => (
+                              <option key={q.id} value={q.id}>{q.title}</option>
+                            ))}
+                          </select>
+                          <button
+                            onClick={async () => {
+                              if (!selectedSnareQuest) return alert('Select a quest first!');
+                              const res = await placeMimicSnare(parseInt(selectedSnareQuest));
+                              alert(res.message);
+                            }}
+                            disabled={currentUser.gold < item.cost || !selectedSnareQuest}
+                            className={`w-full py-2 px-4 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
+                              currentUser.gold < item.cost || !selectedSnareQuest ? 'bg-stone-800 text-stone-500 cursor-not-allowed' : 'bg-red-700 hover:bg-red-600 text-white'
+                            }`}
+                          >
+                            CAST ({item.cost} G)
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-2">
+                          <select
+                            value={selectedGraspTarget}
+                            onChange={(e) => setSelectedGraspTarget(e.target.value)}
+                            className="bg-black/80 text-stone-300 border border-stone-600 rounded p-2 font-['VT323'] text-lg w-full"
+                          >
+                            <option value="">Select a Target...</option>
+                            {[...students]
+                              .sort((a, b) => b.xp - a.xp)
+                              .slice(0, 3)
+                              .filter(s => s.id !== currentUser.id)
+                              .map(s => (
+                                <option key={s.id} value={s.id}>{s.heroName || s.name}</option>
+                              ))}
+                          </select>
+                          <button
+                            onClick={async () => {
+                              if (!selectedGraspTarget) return alert('Select a target first!');
+                              const res = await applyVoidGrasp(selectedGraspTarget);
+                              alert(res.message);
+                            }}
+                            disabled={currentUser.gold < item.cost || !selectedGraspTarget}
+                            className={`w-full py-2 px-4 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
+                              currentUser.gold < item.cost || !selectedGraspTarget ? 'bg-stone-800 text-stone-500 cursor-not-allowed' : 'bg-red-700 hover:bg-red-600 text-white'
+                            }`}
+                          >
+                            CAST ({item.cost} G)
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
