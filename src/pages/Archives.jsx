@@ -12,7 +12,8 @@ const Archives = () => {
     calculateScholarScore,
     calculateComebackScore,
     calculateSlayerScore,
-    getSlayerPoints
+    getSlayerPoints,
+    globalEffects
   } = useGame();
   const navigate = useNavigate();
 
@@ -54,6 +55,11 @@ const Archives = () => {
 
   const approvedSubmissions = submissions.filter(s => s.studentId === currentUser.id && s.status === 'approved');
 
+  const hasEmber = currentUser.activeBuffs?.ember && currentUser.activeBuffs.ember > Date.now();
+  const hasOath = currentUser.activeBuffs?.oath;
+  const hasVoidGrasp = globalEffects?.some(e => e.type === 'void_grasp' && e.target_id === currentUser.id);
+  const hasActiveSpells = hasEmber || hasOath || hasVoidGrasp;
+
   return (
     <div className="min-h-screen text-stone-200 p-4 sm:p-6 md:p-8 relative">
       <img src={MAP_BG} alt="Background Map" className="absolute inset-0 w-full h-full object-cover" />
@@ -79,6 +85,33 @@ const Archives = () => {
             <div className="relative w-full h-80 lg:h-96 bg-black rounded-xl overflow-hidden border-2 border-stone-700 shadow-inner">
               <img src={currentUser.currentBodySprite} alt="Hero Avatar" className="absolute inset-0 w-full h-full object-contain" />
             </div>
+
+            {/* ACTIVE SPELLS SECTION */}
+            <div className="mt-6">
+              <h3 className="text-yellow-400 font-['Press_Start_2P'] text-xs mb-3 text-center">ACTIVE SPELLS</h3>
+              {!hasActiveSpells ? (
+                <div className="text-stone-500 font-['VT323'] text-xl italic text-center">No active enchantments.</div>
+              ) : (
+                <div className="space-y-2">
+                  {hasEmber && (
+                    <div className="bg-orange-900/40 border border-orange-500 text-orange-400 p-2 rounded text-center font-['VT323'] text-lg shadow-[0_0_10px_rgba(249,115,22,0.2)]">
+                      EMBER ACTIVE (2x XP)
+                    </div>
+                  )}
+                  {hasOath && (
+                    <div className="bg-purple-900/40 border border-purple-500 text-purple-400 p-2 rounded text-center font-['VT323'] text-lg shadow-[0_0_10px_rgba(168,85,247,0.2)]">
+                      OATH ACTIVE (4x REWARDS)
+                    </div>
+                  )}
+                  {hasVoidGrasp && (
+                    <div className="bg-red-900/60 border border-red-500 text-red-200 animate-pulse p-2 rounded text-center font-['VT323'] text-lg shadow-[0_0_15px_rgba(239,68,68,0.4)]">
+                      VOID GRASPED (BOARD LOCKED)
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
           </div>
 
           <div className="md:col-span-2 bg-black/60 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl p-6 flex flex-col justify-center">

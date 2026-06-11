@@ -5,7 +5,7 @@ import { useGame } from '../context/GameContext';
 
 const Barracks = () => {
   const navigate = useNavigate();
-  const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equipPet, unequipPet, placeMimicSnare, applyVoidGrasp, quests, students } = useGame();
+  const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equipPet, unequipPet, placeMimicSnare, applyVoidGrasp, quests, students, globalEffects } = useGame();
   const [selectedSnareQuest, setSelectedSnareQuest] = React.useState('');
   const [selectedGraspTarget, setSelectedGraspTarget] = React.useState('');
 
@@ -100,6 +100,11 @@ const Barracks = () => {
 
   const currentLevel = Math.floor(currentUser.xp / 1000) + 1;
 
+  const hasEmber = currentUser.activeBuffs?.ember && currentUser.activeBuffs.ember > Date.now();
+  const hasOath = currentUser.activeBuffs?.oath;
+  const hasVoidGrasp = globalEffects?.some(e => e.type === 'void_grasp' && e.target_id === currentUser.id);
+  const hasActiveSpells = hasEmber || hasOath || hasVoidGrasp;
+
   return (
     <div className="min-h-screen p-4 md:p-8 relative">
       <img src={MAP_BG} alt="Background Map" className="absolute inset-0 w-full h-full object-cover" />
@@ -161,6 +166,32 @@ const Barracks = () => {
                 </div>
               </div>
             )}
+
+            {/* ACTIVE SPELLS SECTION */}
+            <div className="mb-6">
+              <h3 className="text-[10px] sm:text-xs text-yellow-400 font-['Press_Start_2P'] mb-3">ACTIVE SPELLS</h3>
+              {!hasActiveSpells ? (
+                <div className="text-stone-500 italic font-['VT323'] text-lg">No active enchantments.</div>
+              ) : (
+                <div className="space-y-2">
+                  {hasEmber && (
+                    <div className="bg-orange-900/40 border border-orange-500 text-orange-400 p-2 rounded text-center font-['VT323'] text-lg shadow-[0_0_10px_rgba(249,115,22,0.2)]">
+                      EMBER ACTIVE (2x XP)
+                    </div>
+                  )}
+                  {hasOath && (
+                    <div className="bg-purple-900/40 border border-purple-500 text-purple-400 p-2 rounded text-center font-['VT323'] text-lg shadow-[0_0_10px_rgba(168,85,247,0.2)]">
+                      OATH ACTIVE (4x REWARDS)
+                    </div>
+                  )}
+                  {hasVoidGrasp && (
+                    <div className="bg-red-900/60 border border-red-500 text-red-200 animate-pulse p-2 rounded text-center font-['VT323'] text-lg shadow-[0_0_15px_rgba(239,68,68,0.4)]">
+                      VOID GRASPED (BOARD LOCKED)
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             <div>
               <h3 className="text-xl text-white font-['VT323'] mb-3">EQUIPPED</h3>
