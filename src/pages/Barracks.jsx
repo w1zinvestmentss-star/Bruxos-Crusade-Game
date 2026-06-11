@@ -67,8 +67,8 @@ const Barracks = () => {
      { id: 2003, name: 'Astral Fox', cost: 800, reqLevel: 5, type: 'pet', icon: Sparkles, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Astral.Fox.png', buff: '+5% Gold & XP (All Quests)' },
 
      // MAGIC SPELLS (CONSUMABLES)
-     { id: 'spell_1', name: 'Oath of the Abyss', cost: 150, type: 'consumable', buffType: 'oath', icon: Wand, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Arcane.Sage.png' },
-     { id: 'spell_2', name: 'Ember of the Ashen', cost: 250, type: 'consumable', buffType: 'ember', icon: Flame, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Fire.Whelp.png' }
+     { id: 'spell_1', name: 'Oath of the Abyss', cost: 150, type: 'consumable', buffType: 'oath', icon: Wand, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Oath.of.the.Abyss.png?v=1' },
+     { id: 'spell_2', name: 'Ember of the Ashen', cost: 250, type: 'consumable', buffType: 'ember', icon: Flame, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Ember.of.the.Ashen.png?v=1' }
   ];
 
   const handleBuyItem = async (item) => {
