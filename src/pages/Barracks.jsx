@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shirt, ArrowLeft, Bird, Flame, Sparkles } from 'lucide-react';
+import { Shirt, ArrowLeft, Bird, Flame, Sparkles, Wand } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const Barracks = () => {
@@ -64,7 +64,11 @@ const Barracks = () => {
 // COMPANIONS (PETS)
      { id: 2001, name: 'Mystic Owlet', cost: 300, reqLevel: 1, type: 'pet', icon: Bird, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mystic.Owlet.png', buff: '+15% XP (Quizzes & Puzzles)' },
      { id: 2002, name: 'Fire Whelp', cost: 300, reqLevel: 1, type: 'pet', icon: Flame, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Fire.Whelp.png', buff: '+15% Gold (Homework & Reports)' },
-     { id: 2003, name: 'Astral Fox', cost: 800, reqLevel: 5, type: 'pet', icon: Sparkles, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Astral.Fox.png', buff: '+5% Gold & XP (All Quests)' }
+     { id: 2003, name: 'Astral Fox', cost: 800, reqLevel: 5, type: 'pet', icon: Sparkles, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Astral.Fox.png', buff: '+5% Gold & XP (All Quests)' },
+
+     // MAGIC SPELLS (CONSUMABLES)
+     { id: 'spell_1', name: 'Oath of the Abyss', cost: 150, type: 'consumable', buffType: 'oath', icon: Wand, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Arcane.Sage.png' },
+     { id: 'spell_2', name: 'Ember of the Ashen', cost: 250, type: 'consumable', buffType: 'ember', icon: Flame, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Fire.Whelp.png' }
   ];
 
   const handleBuyItem = async (item) => {
@@ -248,7 +252,7 @@ const Barracks = () => {
           <div className="md:col-span-2 bg-black/75 backdrop-blur-md border border-white/10 shadow-2xl rounded-xl p-6">
             <h2 className="text-2xl text-yellow-400 font-['Press_Start_2P'] mb-4">THE ARMORY</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {shopItems.map((item) => {
+              {shopItems.filter(item => item.type === 'outfit').map((item) => {
                 const alreadyOwned = ownsItem(item.id);
                 const isLevelLocked = currentLevel < item.reqLevel;
                 const isBossLoot = !!item.reqBoss;
@@ -290,6 +294,75 @@ const Barracks = () => {
                   </div>
                 );
               })}
+            </div>
+
+            {/* Companions Section */}
+            <div className="mt-12">
+              <h2 className="text-2xl text-yellow-400 font-['Press_Start_2P'] mb-2 uppercase">COMPANIONS</h2>
+              <p className="text-stone-400 font-['VT323'] text-xl mb-6">Loyal familiars that grant passive bonuses to your quests.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {shopItems.filter(item => item.type === 'pet').map((item) => {
+                  const alreadyOwned = ownsItem(item.id);
+                  return (
+                    <div key={item.id} className="bg-white/5 border border-white/10 rounded-lg p-4 hover:border-yellow-400/50 transition-colors flex flex-col justify-between">
+                      <div className="flex flex-col items-center text-center mb-3">
+                        <div className="w-full h-32 mb-2 rounded-lg bg-black/80 flex items-center justify-center overflow-hidden">
+                           <img src={item.imageLink} alt={item.name} className="h-full w-full object-contain mix-blend-normal"/>
+                        </div>
+                        <h3 className="text-xl font-bold text-white font-['VT323'] mb-1">{item.name}</h3>
+                        {item.buff && <div className="text-green-400 font-mono text-xs mb-1 leading-tight">{item.buff}</div>}
+                        <div className="text-yellow-400 font-['VT323'] text-xl mt-1">{item.cost} G</div>
+                      </div>
+                      <button
+                        onClick={() => handleBuyItem(item)}
+                        disabled={alreadyOwned || currentUser.gold < item.cost}
+                        className={`w-full py-2 px-4 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
+                          alreadyOwned ? 'bg-stone-600 text-stone-400 cursor-not-allowed' : currentUser.gold < item.cost ? 'bg-red-900/50 text-red-300 cursor-not-allowed' : 'bg-yellow-600 hover:bg-yellow-500 text-white'
+                        }`}
+                      >
+                        {alreadyOwned ? 'OWNED' : 'BUY'}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Magic Spells Section */}
+            <div className="mt-12 bg-black/75 backdrop-blur-md border border-white/10 shadow-2xl rounded-xl p-6">
+              <h2 className="text-2xl text-purple-400 font-['Press_Start_2P'] mb-4">MAGIC SPELLS</h2>
+              <p className="text-stone-400 font-['VT323'] text-lg mb-4">Consumable enchantments that grant powerful, one-time effects during your quests.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {shopItems.filter(item => item.type === 'consumable').map((item) => {
+                  const alreadyOwned = false;
+                  return (
+                    <div key={item.id} className="bg-white/5 border border-white/10 rounded-lg p-4 hover:border-purple-400/50 transition-colors flex flex-col justify-between">
+                      <div className="flex flex-col items-center text-center mb-3">
+                        <div className="w-full h-32 mb-2 rounded-lg bg-black/80 flex items-center justify-center overflow-hidden">
+                          <img src={item.imageLink} alt={item.name} className="h-full w-full object-contain"/>
+                        </div>
+                        <h3 className="text-xl font-bold text-white font-['VT323'] mb-1">{item.name}</h3>
+                        <div className="text-purple-400 font-['VT323'] text-sm mb-1">
+                          {item.buffType === 'ember' ? '2x XP for 24 Hours' : '4x XP/Gold on next success'}
+                        </div>
+                        {item.buffType === 'ember' && (
+                          <div className="text-red-400 font-['VT323'] text-xs italic">"Only use if you have fallen behind!"</div>
+                        )}
+                        <div className="text-yellow-400 font-['VT323'] text-xl">{item.cost} G</div>
+                      </div>
+                      <button
+                        onClick={() => handleBuyItem(item)}
+                        disabled={currentUser.gold < item.cost}
+                        className={`w-full py-2 px-4 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
+                          currentUser.gold < item.cost ? 'bg-stone-800 text-stone-500 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-500 text-white'
+                        }`}
+                      >
+                        CAST SPELL ({item.cost} G)
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>

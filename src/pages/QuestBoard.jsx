@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, CheckCircle, Coins, Star, Brain, Zap, AlertTriangle, Upload, Clock, BookText, MessageSquare, Swords, Palette, Heart } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Coins, Star, Brain, Zap, AlertTriangle, Upload, Clock, BookText, MessageSquare, Swords, Palette, Heart, Wand } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const VICTORY_QUOTES = [
@@ -138,7 +138,7 @@ const QuestBoard = () => {
       setActiveSessions(prev => ({...prev, [quest.id]: {
           isActive: true,
           currentQuestion: quest.questionBank[randIdx],
-          timeLeft: quest.timeLimit || 30,
+          timeLeft: currentUser?.activeBuffs?.oath ? Math.floor((quest.timeLimit || 30) / 2) : (quest.timeLimit || 30),
         }
       }));
       setSessionAnswers(prev => ({...prev, [quest.id]: ''}));
@@ -275,9 +275,12 @@ const QuestBoard = () => {
                     <div className="flex-shrink-0 w-1/2 ml-4">
                       {status === 'available' ? (
                         isTimedChallenge ? (
-                          session?.isActive && session.timeLeft > 0 ? (
-                            <div className="space-y-3">
-                               <div className="text-center font-bold text-4xl text-red-500 font-mono">{session.timeLeft}s</div>
+                           session?.isActive && session.timeLeft > 0 ? (
+                             <div className="space-y-3">
+                                {currentUser?.activeBuffs?.oath && (
+                                  <div className="text-purple-400 font-['Press_Start_2P'] text-xs mb-2 animate-pulse text-center">OATH ACTIVE: 4x REWARDS / HALF TIME</div>
+                                )}
+                                <div className="text-center font-bold text-4xl text-red-500 font-mono">{session.timeLeft}s</div>
                                <p className={`text-lg text-center text-white transition-opacity duration-500 ${(quest.type === 'incantation' && currentAnswer.length > 0) ? 'opacity-0' : 'opacity-100'}`}>
                                    {session.currentQuestion.q}
                                </p>

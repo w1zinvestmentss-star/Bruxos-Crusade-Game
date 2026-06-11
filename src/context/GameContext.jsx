@@ -4,11 +4,11 @@ import { supabase } from '../lib/supabase';
 const GameContext = createContext();
 
 const INITIAL_STUDENTS = [
-  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight2.png', notifications: [], loginStreak: 150, defeatedBosses: [], uploadQuestsCompleted: 150, quizQuestsCompleted: 150, multiStepQuestsCompleted: 150, scenarioQuestsCompleted: 150, incantationQuestsCompleted: 150, sportsQuestsCompleted: 150, artsQuestsCompleted: 150, wellnessQuestsCompleted: 150, journalQuestsCompleted: 150, cipherQuestsCompleted: 150, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
-  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 880, finalGPA: 900, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Vamphunter1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
-  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 600, finalGPA: 700, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Baller.outfit2.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
-  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 920, finalGPA: null, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Powerful.golden.armour.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
-  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dark.souls1.png', notifications: [], loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
+  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight2.png', notifications: [], activeBuffs: {}, loginStreak: 150, defeatedBosses: [], uploadQuestsCompleted: 150, quizQuestsCompleted: 150, multiStepQuestsCompleted: 150, scenarioQuestsCompleted: 150, incantationQuestsCompleted: 150, sportsQuestsCompleted: 150, artsQuestsCompleted: 150, wellnessQuestsCompleted: 150, journalQuestsCompleted: 150, cipherQuestsCompleted: 150, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
+  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 880, finalGPA: 900, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Vamphunter1.png', notifications: [], activeBuffs: {}, loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
+  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 600, finalGPA: 700, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Baller.outfit2.png', notifications: [], activeBuffs: {}, loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
+  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 920, finalGPA: null, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Powerful.golden.armour.png', notifications: [], activeBuffs: {}, loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
+  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dark.souls1.png', notifications: [], activeBuffs: {}, loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
 ];
 
 const ACHIEVEMENTS = [
@@ -216,6 +216,7 @@ const saveProfileToCloud = async (userId, updates) => {
   if (updates.unlockedAchievements !== undefined) dbUpdates.unlocked_achievements = updates.unlockedAchievements;
   if (updates.defeatedBosses !== undefined) dbUpdates.defeated_bosses = updates.defeatedBosses.map(String);
   if (updates.notifications !== undefined) dbUpdates.notifications = updates.notifications;
+  if (updates.activeBuffs !== undefined) dbUpdates.active_buffs = updates.activeBuffs;
   if (updates.equippedPet !== undefined) dbUpdates.equipped_pet = updates.equippedPet;
 
   // Map all quest counters:
@@ -384,6 +385,7 @@ export function GameProvider({ children }) {
           formattedProfile.xp = formattedProfile.xp || 0;
           formattedProfile.gold = formattedProfile.gold || 0;
           formattedProfile.level = formattedProfile.level || 1;
+          formattedProfile.activeBuffs = formattedProfile.activeBuffs || {};
 
           // Fetch Inventory
           const { data: inv } = await supabase
@@ -951,21 +953,35 @@ export function GameProvider({ children }) {
       isCorrect = userAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
     }
 
+    let currentBuffs = { ...(currentUser.activeBuffs || {}) };
+
     if (isCorrect) {
       if (!isFinalStep) {
         return { success: true, message: "Correct! Keep going..." };
       }
 
-      let xpEarned = applyClassBonus(quest.type, quest.xp, currentUser.heroClass);
+      let finalXp = quest.xp;
+      let finalGold = quest.gold;
+
+      if (currentBuffs.oath) {
+        finalXp *= 4;
+        finalGold *= 4;
+        delete currentBuffs.oath;
+      }
+      if (currentBuffs.ember && Date.now() < currentBuffs.ember) {
+        finalXp *= 2;
+      }
+
+      let xpEarned = applyClassBonus(quest.type, finalXp, currentUser.heroClass);
       xpEarned = applyPetBonus(quest.type, xpEarned, false, currentUser.equippedPet);
 
-      let goldEarned = applyClassBonus(quest.type, quest.gold, currentUser.heroClass);
+      let goldEarned = applyClassBonus(quest.type, finalGold, currentUser.heroClass);
       goldEarned = applyPetBonus(quest.type, goldEarned, true, currentUser.equippedPet);
 
-      // Calculate ALL new values from the currentUser snapshot BEFORE any async gap
       const updates = {
         xp: (currentUser.xp || 0) + xpEarned,
         gold: (currentUser.gold || 0) + goldEarned,
+        activeBuffs: currentBuffs,
       };
       if (quest.type === 'quiz') updates.quizQuestsCompleted = (currentUser.quizQuestsCompleted || 0) + 1;
       if (quest.type === 'multi-step') updates.multiStepQuestsCompleted = (currentUser.multiStepQuestsCompleted || 0) + 1;
@@ -989,6 +1005,12 @@ export function GameProvider({ children }) {
 
       return { success: true, message: `+${xpEarned} XP, +${goldEarned} Gold` };
     } else {
+      if (currentBuffs.oath) {
+        const updatedBuffs = { ...currentBuffs };
+        delete updatedBuffs.oath;
+        syncUserUpdate({ activeBuffs: updatedBuffs });
+        return { success: false, message: "The Abyss claims you! Your Oath is broken and the answer is incorrect." };
+      }
       return { success: false, message: "Incorrect answer. Try again!" };
     }
   };
@@ -1084,6 +1106,18 @@ export function GameProvider({ children }) {
       const newGold = currentUser.gold - item.cost;
       const itemToSave = { ...item };
 
+      if (item.type === 'consumable') {
+        const newBuffs = { ...(currentUser.activeBuffs || {}) };
+        if (item.buffType === 'ember') {
+          newBuffs.ember = Date.now() + 86400000;
+        } else if (item.buffType === 'oath') {
+          newBuffs.oath = true;
+        }
+
+        syncUserUpdate({ gold: newGold, activeBuffs: newBuffs });
+        return { success: true, message: "Dark magic acquired!" };
+      }
+
       const updatedStudents = students.map(student => {
         if (student.id === currentUser.id) {
           return {
@@ -1113,7 +1147,6 @@ export function GameProvider({ children }) {
         image_link: item.imageLink
       }]);
 
-      // Pass the already-computed updatedCurrentUser so checkAchievements sees fresh inventory
       checkAchievements(updatedCurrentUser);
 
       return { success: true };
