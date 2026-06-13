@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Plus, Check, Search, Image as ImageIcon, BookCopy, Save, Upload, Clock, Shield, Star, DollarSign, Swords, Skull, Heart, Gift, Ticket } from 'lucide-react';
+import { LogOut, Plus, Check, Search, Image as ImageIcon, BookCopy, Save, Upload, Clock, Shield, Star, DollarSign, Swords, Skull, Heart, Gift, Ticket, Download, FileText } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const TeacherDashboard = () => {
@@ -257,12 +257,28 @@ const TeacherDashboard = () => {
                           <h3 className="font-bold text-lg text-stone-100">{title}</h3>
                           <p className="text-sm text-stone-400">Student: <span className="font-bold text-blue-400">{sub.studentName}</span></p>
                         </div>
-                        <button
-                          onClick={() => approveSubmission(sub.id)}
-                          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow-md flex items-center gap-2 font-bold text-sm"
-                        >
-                          <Check size={16} /> APPROVE
-                        </button>
+                        <div className="flex flex-col items-end gap-2">
+                          {sub.type !== 'journal' && (sub.proofContent || sub.proof_content || sub.proofImage) && (
+                            <a
+                              href={sub.proofContent || sub.proof_content || sub.proofImage}
+                              download
+                              target="_blank"
+                              rel="noreferrer"
+                              className="bg-blue-600 text-white p-2 px-4 rounded-lg hover:bg-blue-500 shadow-md flex items-center justify-center gap-2 font-bold text-sm w-full"
+                            >
+                              <Download size={16} /> DOWNLOAD
+                            </a>
+                          )}
+                          <p className="text-[10px] text-red-400 italic max-w-[200px] text-right leading-tight">
+                            Note: Clicking Approve will permanently delete this file from the cloud server.
+                          </p>
+                          <button
+                            onClick={() => approveSubmission(sub.id)}
+                            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow-md flex items-center justify-center gap-2 font-bold text-sm w-full"
+                          >
+                            <Check size={16} /> APPROVE
+                          </button>
+                        </div>
                       </div>
                       {sub.type === 'journal' ? (
                         <div className="bg-stone-900/70 p-4 rounded border-l-4 border-yellow-500">
@@ -272,11 +288,25 @@ const TeacherDashboard = () => {
                       ) : (
                         <div className="bg-stone-900/70 rounded-lg p-2 border border-stone-700">
                           <p className="text-xs font-bold text-stone-400 mb-2 flex items-center gap-1"><ImageIcon size={12} /> PROOF OF WORK:</p>
-                          {sub.proofImage ? (
-                            <img src={sub.proofImage} alt="Proof" className="w-full h-48 object-cover rounded border border-stone-600" />
-                          ) : (
-                            <div className="h-20 flex items-center justify-center text-stone-500 text-sm">No image attached</div>
-                          )}
+                          {(() => {
+                            const fileUrl = sub.proofContent || sub.proof_content || sub.proofImage;
+                            if (!fileUrl) {
+                               return <div className="h-20 flex items-center justify-center text-stone-500 text-sm">No file attached</div>;
+                            }
+                            const isImage = fileUrl.match(/\.(jpeg|jpg|gif|png|webp)(\?.*)?$/i) || fileUrl.startsWith('blob:');
+                            if (isImage) {
+                               return <img src={fileUrl} alt="Proof" className="w-full h-48 object-cover rounded border border-stone-600" />;
+                            } else {
+                               return (
+                                 <div className="h-32 flex flex-col items-center justify-center text-stone-400 bg-black/50 rounded border border-stone-600">
+                                   <FileText size={48} className="mb-2 text-blue-400" />
+                                   <a href={fileUrl} target="_blank" rel="noreferrer" className="text-blue-400 hover:text-blue-300 underline font-bold">
+                                     Preview in New Tab
+                                   </a>
+                                 </div>
+                               );
+                            }
+                          })()}
                         </div>
                       )}
                     </div>
