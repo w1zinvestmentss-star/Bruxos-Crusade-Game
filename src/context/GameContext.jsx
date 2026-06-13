@@ -146,7 +146,13 @@ const BOSSES = [
   { id: 901, name: 'The Crystal Butterfly', requirement: 'arts', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Crystal.Butterfly.png', finishingBlow: { type: 'manual', prompt: 'Upload a detailed sketch.' } },
   { id: 902, name: 'The Painted Siren', requirement: 'arts', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Painted.Siren.png', finishingBlow: { type: 'manual', prompt: 'Upload a shaded sketch with some background elements.' } },
   { id: 903, name: 'The Glass Golem', requirement: 'arts', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Glass.Golem.png', finishingBlow: { type: 'manual', prompt: 'Upload a partially colored piece or digital draft.' } },
-  { id: 904, name: 'The Prism Weaver', requirement: 'arts', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Prism.Weaver.png', finishingBlow: { type: 'manual', prompt: 'Upload a fully colored, finished masterpiece.' } }
+  { id: 904, name: 'The Prism Weaver', requirement: 'arts', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Prism.Weaver.png', finishingBlow: { type: 'manual', prompt: 'Upload a fully colored, finished masterpiece.' } },
+
+  // Track 12: Gauntlet Bosses
+  { id: 1201, name: 'The Brick Brute', requirement: 'gauntlet', target: 5, rewardXp: 200, rewardGold: 100, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Brick.Brute.png', finishingBlow: { type: 'auto', prompt: 'Solve: 12 + 15', answer: '27', timeLimit: 7 } },
+  { id: 1202, name: 'The Static Beast', requirement: 'gauntlet', target: 10, rewardXp: 500, rewardGold: 250, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Static.Beast.png', finishingBlow: { type: 'auto', prompt: 'Solve: 8 x 7', answer: '56', timeLimit: 7 } },
+  { id: 1203, name: 'The Veil Dancer', requirement: 'gauntlet', target: 20, rewardXp: 1500, rewardGold: 750, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Veil.Dancer.png', finishingBlow: { type: 'auto', prompt: 'Solve: 125 / 5', answer: '25', timeLimit: 7 } },
+  { id: 1204, name: 'The Storm-Born King', requirement: 'gauntlet', target: 40, rewardXp: 5000, rewardGold: 3000, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Storm-Born.King.png', finishingBlow: { type: 'auto', prompt: 'Solve: (12 x 12) - 44', answer: '100', timeLimit: 7 } }
 ];
 
 const BOSS_LOOT_OUTFITS = {
@@ -197,6 +203,7 @@ const formatProfile = (dbProfile) => ({
   artsQuestsCompleted: dbProfile.arts_quests_completed || 0,
   wellnessQuestsCompleted: dbProfile.wellness_quests_completed || 0,
   journalQuestsCompleted: dbProfile.journal_quests_completed || 0,
+  gauntletQuestsCompleted: dbProfile.gauntlet_quests_completed || 0,
   notifications: dbProfile.notifications || [],
   equippedPet: dbProfile.equipped_pet || null,
 });
@@ -230,6 +237,7 @@ const saveProfileToCloud = async (userId, updates) => {
   if (updates.artsQuestsCompleted !== undefined) dbUpdates.arts_quests_completed = updates.artsQuestsCompleted;
   if (updates.wellnessQuestsCompleted !== undefined) dbUpdates.wellness_quests_completed = updates.wellnessQuestsCompleted;
   if (updates.journalQuestsCompleted !== undefined) dbUpdates.journal_quests_completed = updates.journalQuestsCompleted;
+  if (updates.gauntletQuestsCompleted !== undefined) dbUpdates.gauntlet_quests_completed = updates.gauntletQuestsCompleted;
 
   const { error } = await supabase.from('profiles').update(dbUpdates).eq('id', userId);
   if (error) console.error("Error saving to cloud:", error);
@@ -260,6 +268,7 @@ const updateSubmissionStatusInCloud = async (submission, status) => {
     .eq('quest_id', submission.questId)
     .eq('student_id', submission.studentId);
   if (error) console.error("Error updating submission status:", error);
+  return { success: !error, error };
 };
 
 
@@ -341,6 +350,7 @@ export function GameProvider({ children }) {
     { id: 108, title: "Scout Report: Athletics", description: "Complete a 1-mile walk and upload a photo of your route/shoes.", type: 'scout-sports', xp: 100, gold: 40, frequency: 'daily' },
     { id: 109, title: "Scout Report: The Arts", description: "Draw a sketch of a castle and upload a picture of it.", type: 'scout-arts', xp: 100, gold: 40, frequency: 'weekly' },
     { id: 110, title: "Tavern Rest", description: "How rests your spirit today, hero?", type: 'wellness', xp: 10, gold: 10, frequency: 'daily' },
+    { id: 999, title: "The Gauntlet", description: "5 Questions. 7 Seconds each. No mistakes allowed. One attempt per day.", type: 'gauntlet', xp: 100, gold: 40, frequency: 'daily', totalSteps: 5, timePerStep: 7 }
   ];
 
   const [students, setStudents] = useState(INITIAL_STUDENTS);
@@ -856,16 +866,38 @@ export function GameProvider({ children }) {
     return { success: true };
   };
 
-  const approveSubmission = (submissionId) => {
+  const deleteFileFromStorage = async (fullUrl) => {
+    if (typeof fullUrl !== 'string') return { success: false, message: 'Invalid storage URL' };
+
+    const marker = '/homework/';
+    const markerIndex = fullUrl.indexOf(marker);
+    if (markerIndex === -1) return { success: false, message: 'Not a homework storage URL' };
+
+    const filePath = decodeURIComponent(fullUrl.slice(markerIndex + marker.length).split(/[?#]/)[0]);
+    const { error } = await supabase.storage.from('homework').remove([filePath]);
+    if (error) console.error("Error deleting homework storage file:", error);
+    return { success: !error, error };
+  };
+  GameProvider.deleteFileFromStorage = deleteFileFromStorage;
+
+  const approveSubmission = async (submissionId) => {
     const submission = submissions.find(s => s.id === submissionId);
     if (!submission) return;
+
+    const purgeProofFile = async () => {
+      const proofUrl = submission.proofContent || submission.proof_content || submission.proofImage;
+      if (typeof proofUrl === 'string' && proofUrl.toLowerCase().startsWith('http')) {
+        await deleteFileFromStorage(proofUrl);
+      }
+    };
 
     if (submission.isBossStrike) {
       fightBoss(submission.questId, submission.studentId);
       setSubmissions(prev => prev.map(s =>
         s.id === submissionId ? { ...s, status: 'approved' } : s
       ));
-      updateSubmissionStatusInCloud(submission, 'approved');
+      const { success } = await updateSubmissionStatusInCloud(submission, 'approved');
+      if (success) await purgeProofFile();
       return;
     }
 
@@ -940,7 +972,8 @@ export function GameProvider({ children }) {
     setSubmissions(prev => prev.map(s =>
       s.id === submissionId ? { ...s, status: 'approved' } : s
     ));
-    updateSubmissionStatusInCloud(submission, 'approved');
+    const { success } = await updateSubmissionStatusInCloud(submission, 'approved');
+    if (success) await purgeProofFile();
   };
 
   const attemptQuiz = (questId, userAnswer, dynamicCorrectAnswer = null, isFinalStep = true) => {
@@ -1002,6 +1035,7 @@ export function GameProvider({ children }) {
       if (quest.type === 'multi-step') updates.multiStepQuestsCompleted = (currentUser.multiStepQuestsCompleted || 0) + 1;
       if (quest.type === 'incantation') updates.incantationQuestsCompleted = (currentUser.incantationQuestsCompleted || 0) + 1;
       if (quest.type === 'cipher') updates.cipherQuestsCompleted = (currentUser.cipherQuestsCompleted || 0) + 1;
+      if (quest.type === 'gauntlet') updates.gauntletQuestsCompleted = (currentUser.gauntletQuestsCompleted || 0) + 1;
 
       // One call handles: state update + cloud save + achievement check
       syncUserUpdate(updates);
@@ -1035,6 +1069,21 @@ export function GameProvider({ children }) {
       }
       return { success: false, message: "Incorrect answer. Try again!" };
     }
+  };
+
+  const recordGauntletFailure = (questId) => {
+    if (!currentUser) return;
+    const newSubmission = {
+      id: Date.now(),
+      questId,
+      studentId: currentUser.id,
+      studentName: currentUser.heroName,
+      status: 'failed',
+      timestamp: new Date().toLocaleDateString('en-CA'),
+      type: 'gauntlet',
+    };
+    setSubmissions(prev => [...prev, newSubmission]);
+    saveSubmissionToCloud(newSubmission);
   };
 
   const attemptScenario = (questId, isCorrect) => {
@@ -1214,6 +1263,7 @@ export function GameProvider({ children }) {
       case 'streak': requirementMet = (targetStudent.loginStreak || 0) >= boss.target; break;
       case 'journal': requirementMet = (targetStudent.journalQuestsCompleted || 0) >= boss.target; break;
       case 'ciphers': requirementMet = (targetStudent.cipherQuestsCompleted || 0) >= boss.target; break;
+      case 'gauntlet': requirementMet = (targetStudent.gauntletQuestsCompleted || 0) >= boss.target; break;
       default: requirementMet = false;
     }
 
@@ -1433,6 +1483,7 @@ export function GameProvider({ children }) {
     calculateComebackScore,
     updateStudentStats,
     attemptQuiz,
+    recordGauntletFailure,
     attemptScenario,
     clearNotifications,
     fightBoss,
@@ -1464,6 +1515,13 @@ export function GameProvider({ children }) {
     </GameContext.Provider>
   );
 }
+
+export const deleteFileFromStorage = async (fullUrl) => {
+  if (typeof GameProvider.deleteFileFromStorage !== 'function') {
+    return { success: false, message: 'GameProvider has not initialized deleteFileFromStorage' };
+  }
+  return GameProvider.deleteFileFromStorage(fullUrl);
+};
 
 export function useGame() {
   return useContext(GameContext);

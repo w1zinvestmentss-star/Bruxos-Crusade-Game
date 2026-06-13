@@ -14,7 +14,7 @@ const VICTORY_QUOTES = [
 
 const QuestBoard = () => {
   const navigate = useNavigate();
-  const { quests, submitQuest, getQuestStatus, currentUser, attemptQuiz, attemptScenario, submitWellnessCheck, globalEffects, resolveVoidGrasp } = useGame();
+  const { quests, submitQuest, getQuestStatus, currentUser, attemptQuiz, attemptScenario, submitWellnessCheck, globalEffects, resolveVoidGrasp, recordGauntletFailure } = useGame();
   
   const fileInputRef = useRef(null);
   const selectedQuestRef = useRef(null);
@@ -33,6 +33,73 @@ const QuestBoard = () => {
   const [sessionAnswers, setSessionAnswers] = useState({});
   const [activeScenarios, setActiveScenarios] = useState({});
 
+  const [gauntletStep, setGauntletStep] = useState(0);
+  const [gauntletTimer, setGauntletTimer] = useState(70);
+  const [isGauntletActive, setIsGauntletActive] = useState(false);
+  const [gauntletQuestion, setGauntletQuestion] = useState(null);
+  const [gauntletAnswer, setGauntletAnswer] = useState('');
+
+  const generateGauntletMath = () => {
+    const ops = ['+', '-', '*'];
+    const op = ops[Math.floor(Math.random() * ops.length)];
+    let a, b;
+    if (op === '+') { a = Math.floor(Math.random() * 20); b = Math.floor(Math.random() * 20); }
+    else if (op === '-') { a = Math.floor(Math.random() * 20) + 10; b = Math.floor(Math.random() * a); }
+    else { a = Math.floor(Math.random() * 10); b = Math.floor(Math.random() * 10); }
+    return { q: `Solve: ${a} ${op} ${b}`, a: eval(`${a} ${op} ${b}`).toString() };
+  };
+
+  useEffect(() => {
+    let timerId;
+    if (isGauntletActive && gauntletTimer > 0) {
+      timerId = setInterval(() => {
+        setGauntletTimer(prev => {
+          if (prev <= 1) {
+            clearInterval(timerId);
+            recordGauntletFailure(999);
+            alert('TRIAL FAILED: TIME EXPIRED');
+            setIsGauntletActive(false);
+            setGauntletStep(0);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 100);
+    }
+    return () => clearInterval(timerId);
+  }, [isGauntletActive, gauntletTimer]);
+
+  const handleGauntletSubmit = async () => {
+    if (gauntletAnswer.trim() === gauntletQuestion.a) {
+      if (gauntletStep + 1 >= 5) {
+        setIsGauntletActive(false);
+        const result = await attemptQuiz(999, gauntletAnswer, gauntletQuestion.a, true);
+        if (result.success) {
+          triggerVictory(result.message);
+        } else {
+          alert(result.message);
+        }
+      } else {
+        setGauntletStep(prev => prev + 1);
+        setGauntletTimer(70);
+        setGauntletQuestion(generateGauntletMath());
+        setGauntletAnswer('');
+      }
+    } else {
+      setIsGauntletActive(false);
+      recordGauntletFailure(999);
+      alert('TRIAL FAILED: WRONG ANSWER!');
+      setGauntletStep(0);
+    }
+  };
+
+  const startGauntlet = () => {
+    setGauntletStep(0);
+    setGauntletTimer(70);
+    setGauntletQuestion(generateGauntletMath());
+    setGauntletAnswer('');
+    setIsGauntletActive(true);
+  };
 
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
 
@@ -194,6 +261,7 @@ const QuestBoard = () => {
         case 'scout-sports': return <Swords size={20} />;
         case 'scout-arts': return <Palette size={20} />;
         case 'wellness': return <Heart size={20} />;
+        case 'gauntlet': return <AlertTriangle size={20} />;
         default: return <Brain size={20} />;
     }
   }
@@ -208,7 +276,8 @@ const QuestBoard = () => {
     'scout-sports': { title: 'Athletics & Training', desc: 'Real-world physical challenges. Upload proof of your feats of strength.' },
     'scout-arts': { title: "The Artisan's Canvas", desc: 'Creative missions. Upload your artwork, music, or creative projects.' },
     'wellness': { title: 'The Tavern Rest', desc: 'Take a moment to check in with the realm. How fares your spirit today?' },
-    'journal': { title: "The Dreamer's Log", desc: 'Reflect on your journey and write down your thoughts.' }
+    'journal': { title: "The Dreamer's Log", desc: 'Reflect on your journey and write down your thoughts.' },
+    'gauntlet': { title: 'The Gauntlet', desc: 'A high-intensity trial. One attempt per day. No mistakes allowed.' }
   };
 
   return (
@@ -274,6 +343,7 @@ const QuestBoard = () => {
               const isScenario = quest.type === 'scenario';
               const isUpload = ['upload', 'scout-sports', 'scout-arts'].includes(quest.type);
               const isWellness = quest.type === 'wellness';
+              const isGauntlet = quest.type === 'gauntlet';
               const session = activeSessions[quest.id];
               const currentAnswer = sessionAnswers[quest.id] || '';
               const currentScenario = activeScenarios[quest.id];
@@ -282,6 +352,8 @@ const QuestBoard = () => {
 
               const getBorderColor = () => {
                 if (status === 'approved' || status === 'read_only') return 'border-l-green-500 bg-green-900/40';
+                if (status === 'failed') return 'border-l-red-800 bg-red-950/40';
+                if (isGauntlet) return 'border-l-red-600 bg-red-950/40';
                 if (isMultiStep) return 'border-l-purple-500';
                 if (isScenario) return 'border-l-orange-500';
                 if (quest.type === 'incantation') return 'border-l-cyan-500';
@@ -337,6 +409,29 @@ const QuestBoard = () => {
                                 <Zap size={18} /> {quest.type === 'incantation' ? 'START INCANTATION' : `START SPEED RUN (${quest.timeLimit}s)`}
                             </button>
                           )
+                        ) : isGauntlet ? (
+                          isGauntletActive ? (
+                            <div className="relative p-6 bg-black rounded-lg border-2 border-red-600 shadow-[0_0_20px_rgba(220,38,38,0.8)]">
+                              <h4 className="text-red-500 font-['Press_Start_2P'] text-center mb-2 text-xs">CHALLENGE {gauntletStep + 1} OF 5</h4>
+                              <div className="text-6xl text-red-600 font-mono text-center font-bold mb-4 drop-shadow-[0_0_10px_rgba(220,38,38,0.8)]">{(gauntletTimer / 10).toFixed(1)}s</div>
+                              <p className="text-2xl text-white text-center font-mono mb-4">{gauntletQuestion?.q}</p>
+                              <div className="flex gap-2">
+                                <input 
+                                  type="text" 
+                                  value={gauntletAnswer}
+                                  onChange={(e) => setGauntletAnswer(e.target.value)}
+                                  onKeyPress={(e) => e.key === 'Enter' && handleGauntletSubmit()}
+                                  autoFocus
+                                  className="w-full bg-black border border-red-500 text-red-400 font-mono text-2xl p-2 rounded text-center focus:outline-none focus:ring-2 focus:ring-red-500"
+                                />
+                                <button onClick={handleGauntletSubmit} className="px-4 py-2 bg-red-600 text-black font-bold font-['VT323'] text-2xl rounded hover:bg-red-500">STRIKE</button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button onClick={startGauntlet} className="w-full px-4 py-4 bg-red-900 text-red-200 border-2 border-red-600 rounded-lg shadow-lg font-['Press_Start_2P'] text-sm hover:bg-red-800 flex items-center justify-center gap-2">
+                                <AlertTriangle size={18} /> ENTER THE GAUNTLET
+                            </button>
+                          )
                         ) : isMultiStep ? (
                           <div className="space-y-3">
                             <div className="text-sm text-stone-400">Step {currentStepIndex + 1} of {quest.steps.length}</div>
@@ -376,6 +471,12 @@ const QuestBoard = () => {
                         ) : null
                       ) : status === 'pending' ? (
                         <div className="px-4 py-2 bg-yellow-900/30 text-yellow-500 rounded-lg border border-yellow-700 flex items-center justify-center gap-2 font-['VT323'] text-lg w-full h-full"><Clock size={18} /> PENDING</div>
+                      ) : isGauntlet ? (
+                        <div className="px-4 py-6 bg-stone-900 border-2 border-stone-700 rounded-lg text-stone-500 font-['Press_Start_2P'] text-center text-xs leading-loose h-full flex items-center justify-center">
+                          The Gauntlet is sealed until tomorrow.
+                        </div>
+                      ) : status === 'failed' ? (
+                        <div className="px-4 py-2 bg-red-900/30 text-red-500 rounded-lg border border-red-700 flex items-center justify-center gap-2 font-['VT323'] text-lg w-full h-full"><AlertTriangle size={18} /> FAILED</div>
                       ) : (
                         <div className="px-4 py-2 bg-green-900/30 text-green-500 rounded-lg border border-green-700 flex items-center justify-center gap-2 font-['VT323'] text-lg w-full h-full"><CheckCircle size={18} /> COMPLETED</div>
                       )}

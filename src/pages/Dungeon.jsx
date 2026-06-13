@@ -65,6 +65,8 @@ const Dungeon = () => {
         return currentUser.journalQuestsCompleted || 0;
       case 'ciphers':
         return currentUser.cipherQuestsCompleted || 0;
+      case 'gauntlet':
+        return currentUser.gauntletQuestsCompleted || 0;
       default:
         return 0;
     }
@@ -83,6 +85,7 @@ const Dungeon = () => {
       case 'streak': return "Days in a Row";
       case 'journal': return "Reflections Written";
       case 'ciphers': return "Riddles Solved";
+      case 'gauntlet': return "Gauntlet Victories";
       default: return "Requirement";
     }
   };
@@ -98,7 +101,8 @@ const Dungeon = () => {
     sports: { title: 'The Earth Titans', desc: 'Complete physical education Scout Reports to challenge the earth.' },
     arts: { title: 'The Prismatic Muses', desc: 'Submit creative art Scout Reports to face the glass entities.' },
     wellness: { title: 'The Guardian Spirits', desc: 'Complete daily Tavern Check-ins to meet the guardians.' },
-    journal: { title: 'The Dream Eaters', desc: 'Write weekly Journal reflections to face your nightmares.' }
+    journal: { title: 'The Dream Eaters', desc: 'Write weekly Journal reflections to face your nightmares.' },
+    gauntlet: { title: 'Phantoms of the Blur', desc: 'Survive the 7-second Gauntlet Trials to banish these high-speed spirits.' }
   };
 
   const sortBosses = (bossList) => {
