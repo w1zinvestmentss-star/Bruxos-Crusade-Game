@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { User, LogOut, Trophy } from 'lucide-react';
@@ -69,7 +69,7 @@ const StudentDashboard = () => {
   const { currentUser, setUserRole, clearNotifications } = useGame();
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (currentUser?.notifications?.length > 0) {
       setShowWelcomeModal(true);
     }
