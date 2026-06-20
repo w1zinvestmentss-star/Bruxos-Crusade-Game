@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Plus, Check, Search, Image as ImageIcon, BookCopy, Save, Upload, Clock, Shield, Star, DollarSign, Swords, Skull, Heart, Gift, Ticket, Download, FileText } from 'lucide-react';
+import { LogOut, Plus, Check, X, Search, Image as ImageIcon, BookCopy, Save, Upload, Clock, Shield, Star, DollarSign, Swords, Skull, Heart, Gift, Ticket, Download, FileText } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const TeacherDashboard = () => {
@@ -11,6 +11,7 @@ const TeacherDashboard = () => {
     students,
     createQuest,
     approveSubmission,
+    rejectSubmission,
     setUserRole,
     updateStudentStats,
     importQuestions,
@@ -33,6 +34,7 @@ const TeacherDashboard = () => {
     timeLimit: 30,
   });
   const [gradeInputs, setGradeInputs] = useState({});
+  const [feedback, setFeedback] = useState({});
   const fileInputRef = useRef(null);
   const selectedQuestRef = useRef(null);
 
@@ -246,6 +248,9 @@ const TeacherDashboard = () => {
                   const isBossStrike = sub.isBossStrike;
                   const questDetails = quests.find(q => q.id === sub.questId);
                   const title = isBossStrike ? "🔴 BOSS FINISHING BLOW" : questDetails?.title;
+                  const imageQuestTypes = ['upload', 'scout-arts', 'scout-sports'];
+                  const isImageSubmission = imageQuestTypes.includes(sub.type);
+                  const proofUrl = sub.proofContent;
                   const containerClass = isBossStrike 
                     ? "bg-stone-800/80 p-4 rounded-xl shadow-[0_0_15px_red] border-2 border-red-500" 
                     : "bg-stone-800/80 p-4 rounded-xl shadow-lg border-l-4 border-blue-500";
@@ -258,15 +263,15 @@ const TeacherDashboard = () => {
                           <p className="text-sm text-stone-400">Student: <span className="font-bold text-blue-400">{sub.studentName}</span></p>
                         </div>
                         <div className="flex flex-col items-end gap-2">
-                          {sub.type !== 'journal' && (sub.proofContent || sub.proof_content || sub.proofImage) && (
+                          {isImageSubmission && proofUrl && (
                             <a
-                              href={sub.proofContent || sub.proof_content || sub.proofImage}
-                              download
+                              href={proofUrl}
                               target="_blank"
                               rel="noreferrer"
-                              className="bg-blue-600 text-white p-2 px-4 rounded-lg hover:bg-blue-500 shadow-md flex items-center justify-center gap-2 font-bold text-sm w-full"
+                              download
+                              className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg flex items-center justify-center gap-2 font-bold text-sm mb-2"
                             >
-                              <Download size={16} /> DOWNLOAD
+                              <Download size={18} /> DOWNLOAD
                             </a>
                           )}
                           <p className="text-[10px] text-red-400 italic max-w-[200px] text-right leading-tight">
@@ -278,35 +283,46 @@ const TeacherDashboard = () => {
                           >
                             <Check size={16} /> APPROVE
                           </button>
+                          <input
+                            type="text"
+                            value={feedback[sub.id] || ''}
+                            onChange={(e) => setFeedback(prev => ({ ...prev, [sub.id]: e.target.value }))}
+                            placeholder="Reason for rejection..."
+                            className="bg-black text-white text-xs p-2 rounded border border-stone-600 focus:outline-none focus:border-red-400"
+                          />
+                          <button
+                            onClick={async () => {
+                              const result = await rejectSubmission(sub.id, feedback[sub.id] || 'Work did not meet requirements');
+                              if (result?.success) {
+                                alert('Quest rejected and proof file shredded.');
+                              } else {
+                                alert(result?.message || 'Quest rejection failed.');
+                              }
+                            }}
+                            className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg shadow-md flex items-center justify-center gap-2 font-bold text-sm w-full"
+                          >
+                            <X size={16} /> REJECT
+                          </button>
                         </div>
                       </div>
-                      {sub.type === 'journal' ? (
-                        <div className="bg-stone-900/70 p-4 rounded border-l-4 border-yellow-500">
-                          <p className="text-xs font-bold text-stone-400 mb-2 flex items-center gap-1"><BookCopy size={12} /> JOURNAL ENTRY:</p>
-                          <p className="text-stone-300 font-serif italic">{sub.journalText}</p>
-                        </div>
-                      ) : (
+                      {isImageSubmission ? (
                         <div className="bg-stone-900/70 rounded-lg p-2 border border-stone-700">
                           <p className="text-xs font-bold text-stone-400 mb-2 flex items-center gap-1"><ImageIcon size={12} /> PROOF OF WORK:</p>
-                          {(() => {
-                            const fileUrl = sub.proofContent || sub.proof_content || sub.proofImage;
-                            if (!fileUrl) {
-                               return <div className="h-20 flex items-center justify-center text-stone-500 text-sm">No file attached</div>;
-                            }
-                            const isImage = fileUrl.match(/\.(jpeg|jpg|gif|png|webp)(\?.*)?$/i) || fileUrl.startsWith('blob:');
-                            if (isImage) {
-                               return <img src={fileUrl} alt="Proof" className="w-full h-48 object-cover rounded border border-stone-600" />;
-                            } else {
-                               return (
-                                 <div className="h-32 flex flex-col items-center justify-center text-stone-400 bg-black/50 rounded border border-stone-600">
-                                   <FileText size={48} className="mb-2 text-blue-400" />
-                                   <a href={fileUrl} target="_blank" rel="noreferrer" className="text-blue-400 hover:text-blue-300 underline font-bold">
-                                     Preview in New Tab
-                                   </a>
-                                 </div>
-                               );
-                            }
-                          })()}
+                          {proofUrl ? (
+                            <img key={proofUrl} src={proofUrl} referrerPolicy="no-referrer" alt="Proof" className="w-full h-48 object-cover rounded border border-stone-600" />
+                          ) : (
+                            <div className="h-20 flex items-center justify-center text-stone-500 text-sm">No file attached</div>
+                          )}
+                        </div>
+                      ) : sub.type === 'journal' ? (
+                        <div className="bg-stone-900/70 p-4 rounded border-l-4 border-yellow-500">
+                          <p className="text-xs font-bold text-stone-400 mb-2 flex items-center gap-1"><BookCopy size={12} /> JOURNAL ENTRY:</p>
+                          <p className="text-stone-300 font-serif italic">{proofUrl}</p>
+                        </div>
+                      ) : (
+                        <div className="bg-stone-900/70 p-4 rounded border-l-4 border-stone-500">
+                          <p className="text-xs font-bold text-stone-400 mb-2 flex items-center gap-1"><BookCopy size={12} /> SUBMISSION:</p>
+                          <p className="text-stone-300 font-serif italic">{proofUrl || 'No content attached.'}</p>
                         </div>
                       )}
                     </div>
