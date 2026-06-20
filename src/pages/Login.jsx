@@ -26,7 +26,6 @@ const Login = () => {
         navigate('/teacher-dashboard');
       } else {
         setUserRole('student');
-        setCurrentUser(students[0]); // Temporary until real student fetching
         navigate('/student-dashboard');
       }
     } else {

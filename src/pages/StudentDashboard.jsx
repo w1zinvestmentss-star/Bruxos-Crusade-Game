@@ -122,6 +122,16 @@ const StudentDashboard = () => {
     );
   };
 
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-stone-950 flex flex-col items-center justify-center z-[200]">
+        <div className="text-yellow-500 font-['Press_Start_2P'] text-xl md:text-2xl animate-pulse drop-shadow-[0_0_15px_rgba(234,179,8,0.8)]">
+          LOADING REALM...
+        </div>
+      </div>
+    );
+  }
+
   if (currentUser && (currentUser.heroName === 'New Hero' || currentUser.heroClass === 'None' || !currentUser.heroClass)) {
     return <Awakening />;
   }
