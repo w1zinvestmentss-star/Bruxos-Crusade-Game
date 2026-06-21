@@ -332,7 +332,7 @@ const QuestBoard = () => {
     'scout-sports': { title: 'Athletics & Training', desc: 'Real-world physical challenges. Upload proof of your feats of strength.' },
     'scout-arts': { title: "The Artisan's Canvas", desc: 'Creative missions. Upload your artwork, music, or creative projects.' },
     'wellness': { title: 'The Tavern Rest', desc: 'Take a moment to check in with the realm. How fares your spirit today?' },
-    'journal': { title: "The Dreamer's Log", desc: 'Reflect on your journey and write down your thoughts.' },
+    'journal': { title: "The Dream Eaters", desc: 'Reflect on your journey and write down your thoughts.' },
     'gauntlet': { title: 'The Gauntlet', desc: 'A high-intensity trial. One attempt per day. No mistakes allowed.' }
   };
 
@@ -397,6 +397,7 @@ const QuestBoard = () => {
               const isTimedChallenge = quest.type === 'incantation' && quest.questionBank?.length > 0;
               const isMultiStep = quest.type === 'multi-step';
               const isScenario = quest.type === 'scenario';
+              const isJournal = quest.type === 'journal';
               const isUpload = ['upload', 'scout-sports', 'scout-arts'].includes(quest.type);
               const isWellness = quest.type === 'wellness';
               const isGauntlet = quest.type === 'gauntlet';
@@ -645,8 +646,14 @@ const QuestBoard = () => {
                                 <button onClick={() => handleWellnessSubmit(quest.id, 'Weary')} className="px-3 py-2 rounded-lg bg-yellow-900/50 text-yellow-400 hover:bg-yellow-800 font-bold">🟡 Weary</button>
                                 <button onClick={() => handleWellnessSubmit(quest.id, 'Wounded')} className="px-3 py-2 rounded-lg bg-red-900/50 text-red-400 hover:bg-red-800 font-bold">🔴 Wounded</button>
                             </div>
-                        ) : quest.type === 'journal' ? (
-                          <div className="flex flex-col items-end gap-2"><textarea placeholder="Write your reflection..." value={journalTexts[quest.id] || ''} onChange={(e) => handleJournalTextChange(quest.id, e.target.value)} className="bg-black/80 border border-stone-600 rounded-md p-2 w-full h-24 text-stone-200 font-mono focus:ring-1 focus:ring-blue-500" /><button onClick={() => handleJournalSubmit(quest.id)} className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2 font-['VT323'] text-xl"><Upload size={18} /> SUBMIT</button></div>
+                        ) : isJournal ? (
+                          quest.id === 106 ? (
+                            <button onClick={() => navigate('/briefing/106')} className="w-full px-4 py-3 bg-gradient-to-r from-purple-700 to-yellow-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm hover:from-purple-600 hover:to-yellow-500 flex items-center justify-center gap-2">
+                              <BookText size={18} /> SPEAK TO SCRIBE
+                            </button>
+                          ) : (
+                            <div className="flex flex-col items-end gap-2"><textarea placeholder="Write your reflection..." value={journalTexts[quest.id] || ''} onChange={(e) => handleJournalTextChange(quest.id, e.target.value)} className="bg-black/80 border border-stone-600 rounded-md p-2 w-full h-24 text-stone-200 font-mono focus:ring-1 focus:ring-blue-500" /><button onClick={() => handleJournalSubmit(quest.id)} className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2 font-['VT323'] text-xl"><Upload size={18} /> SUBMIT</button></div>
+                          )
                         ) : isUpload ? (
                           <button onClick={() => triggerUpload(quest.id)} className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2 font-['VT323'] text-xl"><Upload size={18} /> SUBMIT PROOF</button>
                         ) : null

@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import StudentDashboard from './pages/StudentDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 import QuestBoard from './pages/QuestBoard';
+import BriefingRoom from './pages/BriefingRoom';
 import Leaderboard from './pages/Leaderboard';
 import Barracks from './pages/Barracks';
 import Archives from './pages/Archives';
@@ -26,6 +27,7 @@ function App() {
           <Route path="/student-dashboard" element={<StudentDashboard />} />
           <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
           <Route path="/quests" element={<QuestBoard />} />
+          <Route path="/briefing/:questId" element={<BriefingRoom />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/barracks" element={<Barracks />} />
           <Route path="/archives" element={<Archives />} />

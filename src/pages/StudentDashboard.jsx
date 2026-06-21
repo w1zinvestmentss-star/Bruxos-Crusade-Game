@@ -66,7 +66,7 @@ const Awakening = () => {
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
-  const { currentUser, setUserRole, clearNotifications } = useGame();
+  const { currentUser, setUserRole, clearNotifications, quests } = useGame();
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [isReady, setIsReady] = useState(false);
 
