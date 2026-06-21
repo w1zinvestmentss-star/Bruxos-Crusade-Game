@@ -125,14 +125,14 @@ const Login = () => {
             <h2 className="font-['Press_Start_2P'] text-3xl md:text-4xl text-center mb-16 text-yellow-400">
               GUIDE TO THE REALM
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <GuideCard
                 title="The Quest Board"
                 description="Accept daily tasks and challenges to earn Gold and Glory. Consistency is key, young hero."
               />
               <GuideCard
                 title="The Barracks"
-                description="Visit the Armory to spend your gold on legendary outfits. Customize your appearance to strike fear into your exams."
+                description="Visit the Armory to spend your gold on legendary outfits and magical companions. Customize your appearance and equip pets for powerful quest boosts!"
               />
               <GuideCard
                 title="Town Square"
@@ -142,12 +142,14 @@ const Login = () => {
                 title="The Archives"
                 description="Your permanent record. Track your Intellect (Midterm) and Wisdom (Finals). Watch your power grow."
               />
-              <div className="md:col-span-2">
-                 <GuideCard
-                    title="The Dungeon"
-                    description="A dangerous place for the brave. Battle Bosses by maintaining streaks and hitting milestones."
-                />
-              </div>
+              <GuideCard
+                title="The Dungeon"
+                description="A dangerous place for the brave. Battle Bosses by maintaining streaks and hitting milestones."
+              />
+              <GuideCard
+                title="Hall of Triumphs"
+                description="View your glorious Achievements and claim REAL-WORLD REWARDS! Enter the monthly Grand Raffle or race your peers for limited gift cards."
+              />
             </div>
           </div>
         </section>
