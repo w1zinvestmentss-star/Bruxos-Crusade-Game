@@ -287,13 +287,13 @@ export function GameProvider({ children }) {
     {
       id: 103,
       title: "Math Speed Run",
-      description: "Answer the question before the timer runs out!",
+      description: "Answer as many questions as you can in 60 seconds! Skip if you get stuck. Max rewards at 15 correct answers.",
       xp: 50,
       gold: 20,
-      type: 'quiz',
+      type: 'blitz',
       frequency: 'daily',
       unlockDate: null,
-      timeLimit: 30,
+      timeLimit: 60,
       questionBank: [
         { q: "What is 5 x 5?", a: "25" },
         { q: "What is 120 / 10?", a: "12" },
@@ -821,7 +821,7 @@ export function GameProvider({ children }) {
     if (!heroClass || heroClass === 'None') return rewardAmount;
     let multiplier = 1;
     if (heroClass === 'Warrior' && ['upload', 'scout-sports'].includes(questType)) multiplier = 1.1;
-    if (heroClass === 'Mage' && ['quiz', 'multi-step', 'cipher', 'incantation'].includes(questType)) multiplier = 1.1;
+    if (heroClass === 'Mage' && ['quiz', 'multi-step', 'cipher', 'incantation', 'blitz'].includes(questType)) multiplier = 1.1;
     if (heroClass === 'Rogue' && ['scenario', 'scout-arts', 'journal', 'wellness'].includes(questType)) multiplier = 1.15;
     return Math.floor(rewardAmount * multiplier);
   };
@@ -836,7 +836,7 @@ export function GameProvider({ children }) {
 
   const applyPetBonus = (questType, baseAmount, isGold, petName) => {
     if (!petName) return Math.floor(baseAmount);
-    if (petName === 'Mystic Owlet' && !isGold && ['quiz', 'multi-step', 'cipher', 'incantation'].includes(questType)) return Math.floor(baseAmount * 1.15);
+    if (petName === 'Mystic Owlet' && !isGold && ['quiz', 'multi-step', 'cipher', 'incantation', 'blitz'].includes(questType)) return Math.floor(baseAmount * 1.15);
     if (petName === 'Fire Whelp' && isGold && ['upload', 'scout-sports', 'scout-arts', 'journal'].includes(questType)) return Math.floor(baseAmount * 1.15);
     if (petName === 'Astral Fox') return Math.floor(baseAmount * 1.05);
     return Math.floor(baseAmount);
@@ -1582,6 +1582,41 @@ export function GameProvider({ children }) {
     }
   };
 
+  const attemptBlitz = async (questId, score) => {
+    const quest = quests.find(q => q.id === questId);
+    if (!quest) return { success: false, message: 'Quest not found' };
+    if (score === 0) return { success: false, message: 'No points scored. Try again!' };
+
+    // Cap score at 15
+    const cappedScore = Math.min(score, 15);
+
+    // Calculate Base + Bonus (Base: 50xp/20g. Each extra correct answer adds +5xp / +2g)
+    let baseXp = 50 + ((cappedScore - 1) * 5);
+    let baseGold = 20 + ((cappedScore - 1) * 2);
+
+    let xpEarned = applyClassBonus(quest.type, baseXp, currentUser.heroClass);
+    xpEarned = applyPetBonus(quest.type, xpEarned, false, currentUser.equippedPet);
+
+    let goldEarned = applyClassBonus(quest.type, baseGold, currentUser.heroClass);
+    goldEarned = applyPetBonus(quest.type, goldEarned, true, currentUser.equippedPet);
+
+    // Track as a quiz so Order of the Owl bosses and achievements still unlock!
+    syncUserUpdate({
+      xp: (currentUser.xp || 0) + xpEarned,
+      gold: (currentUser.gold || 0) + goldEarned,
+      quizQuestsCompleted: (currentUser.quizQuestsCompleted || 0) + 1,
+    });
+
+    const newSubmission = {
+      id: Date.now(), questId, studentId: currentUser.id, studentName: currentUser.heroName,
+      status: 'approved', timestamp: new Date().toLocaleDateString('en-CA'), type: 'blitz'
+    };
+    setSubmissions(prev => [...prev, newSubmission]);
+    saveSubmissionToCloud(newSubmission);
+
+    return { success: true, message: `Time's up! You scored ${score}! +${xpEarned} XP, +${goldEarned} Gold` };
+  };
+
   const value = {
     students, quests, submissions, BOSSES, ACHIEVEMENTS,
     createQuest, importQuestions, submitQuest, approveSubmission, rejectSubmission, getQuestStatus, submitWellnessCheck, submitBossStrike,
@@ -1616,7 +1651,8 @@ export function GameProvider({ children }) {
     globalEffects,
     placeMimicSnare,
     applyVoidGrasp,
-    resolveVoidGrasp
+    resolveVoidGrasp,
+    attemptBlitz
   };
 
   return (

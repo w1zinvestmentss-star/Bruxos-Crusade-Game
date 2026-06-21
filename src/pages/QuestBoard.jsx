@@ -14,7 +14,7 @@ const VICTORY_QUOTES = [
 
 const QuestBoard = () => {
   const navigate = useNavigate();
-  const { quests, submitQuest, getQuestStatus, currentUser, attemptQuiz, attemptScenario, submitWellnessCheck, globalEffects, resolveVoidGrasp, recordGauntletFailure } = useGame();
+  const { quests, submitQuest, getQuestStatus, currentUser, attemptQuiz, attemptScenario, submitWellnessCheck, globalEffects, resolveVoidGrasp, recordGauntletFailure, attemptBlitz } = useGame();
   
   const fileInputRef = useRef(null);
   const selectedQuestRef = useRef(null);
@@ -34,6 +34,8 @@ const QuestBoard = () => {
   const [activeSessions, setActiveSessions] = useState({});
   const [sessionAnswers, setSessionAnswers] = useState({});
   const [activeScenarios, setActiveScenarios] = useState({});
+  const [activeBlitz, setActiveBlitz] = useState({});
+  const [blitzInput, setBlitzInput] = useState('');
 
   const [gauntletStep, setGauntletStep] = useState(0);
   const [gauntletTimer, setGauntletTimer] = useState(70);
@@ -49,6 +51,30 @@ const QuestBoard = () => {
     else if (op === '-') { a = Math.floor(Math.random() * 20) + 10; b = Math.floor(Math.random() * a); }
     else { a = Math.floor(Math.random() * 10); b = Math.floor(Math.random() * 10); }
     return { q: `Solve: ${a} ${op} ${b}`, a: eval(`${a} ${op} ${b}`).toString() };
+  };
+
+  const startBlitz = (quest) => {
+    if (!quest.questionBank || quest.questionBank.length === 0) return;
+    const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
+    setActiveBlitz({ [quest.id]: { isActive: true, timeLeft: 60, score: 0, currentQ: randomQ } });
+    setBlitzInput('');
+  };
+
+  const handleBlitzSubmit = (quest) => {
+    const session = activeBlitz[quest.id];
+    if (!session || !session.isActive) return;
+    if (blitzInput.trim().toLowerCase() === session.currentQ.a.toString().trim().toLowerCase()) {
+      const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
+      setActiveBlitz(prev => ({ ...prev, [quest.id]: { ...prev[quest.id], score: prev[quest.id].score + 1, currentQ: randomQ } }));
+    }
+    setBlitzInput('');
+  };
+
+  const handleBlitzPass = (quest) => {
+    if (!activeBlitz[quest.id]?.isActive) return;
+    const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
+    setActiveBlitz(prev => ({ ...prev, [quest.id]: { ...prev[quest.id], currentQ: randomQ } }));
+    setBlitzInput('');
   };
 
   useEffect(() => {
@@ -71,57 +97,52 @@ const QuestBoard = () => {
     return () => clearInterval(timerId);
   }, [isGauntletActive, gauntletTimer]);
 
-  const handleGauntletSubmit = async () => {
-    if (gauntletAnswer.trim() === gauntletQuestion.a) {
-      if (gauntletStep + 1 >= 5) {
-        setIsGauntletActive(false);
-        const result = await attemptQuiz(999, gauntletAnswer, gauntletQuestion.a, true);
+  // --- BLITZ TIMER ---
+  useEffect(() => {
+    const timerId = setInterval(async () => {
+      setActiveBlitz(prev => {
+        const updated = { ...prev };
+        let changed = false;
+        for (const questId in updated) {
+          if (updated[questId].isActive && updated[questId].timeLeft > 0) {
+            updated[questId] = { ...updated[questId], timeLeft: updated[questId].timeLeft - 1 };
+            changed = true;
+          } else if (updated[questId].isActive && updated[questId].timeLeft === 0) {
+            // Fire and clear — handled outside setActiveBlitz to avoid stale closure
+            updated[questId] = { ...updated[questId], isActive: false };
+            changed = true;
+          }
+        }
+        return changed ? updated : prev;
+      });
+    }, 1000);
+    return () => clearInterval(timerId);
+  }, []);
+
+  // Separate effect: watch for expired blitz sessions and submit them
+  useEffect(() => {
+    const expiredEntry = Object.entries(activeBlitz).find(
+      ([, session]) => !session.isActive && session.score !== undefined && session.timeLeft === 0
+    );
+    if (expiredEntry) {
+      const [questId, session] = expiredEntry;
+      attemptBlitz(Number(questId), session.score).then(result => {
         if (result.success) {
           triggerVictory(result.message);
         } else {
           alert(result.message);
         }
-      } else {
-        setGauntletStep(prev => prev + 1);
-        setGauntletTimer(70);
-        setGauntletQuestion(generateGauntletMath());
-        setGauntletAnswer('');
-      }
-    } else {
-      setIsGauntletActive(false);
-      recordGauntletFailure(999);
-      alert('TRIAL FAILED: WRONG ANSWER!');
-      setGauntletStep(0);
+        setActiveBlitz(prev => {
+          const next = { ...prev };
+          delete next[questId];
+          return next;
+        });
+      });
     }
-  };
-
-  const startGauntlet = () => {
-    setGauntletStep(0);
-    setGauntletTimer(70);
-    setGauntletQuestion(generateGauntletMath());
-    setGauntletAnswer('');
-    setIsGauntletActive(true);
-  };
+  }, [activeBlitz]);
+  // --------------------
 
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
-
-  useEffect(() => {
-    const timerId = setInterval(() => {
-      setActiveSessions(prev => {
-        const updatedSessions = { ...prev };
-        let changed = false;
-        for (const questId in updatedSessions) {
-          if (updatedSessions[questId].isActive && updatedSessions[questId].timeLeft > 0) {
-            updatedSessions[questId].timeLeft -= 1;
-            changed = true;
-          }
-        }
-        return changed ? updatedSessions : prev;
-      });
-    }, 1000);
-
-    return () => clearInterval(timerId);
-  }, []);
 
   const triggerVictory = (message) => {
     const randomQuote = VICTORY_QUOTES[Math.floor(Math.random() * VICTORY_QUOTES.length)];
@@ -190,17 +211,16 @@ const QuestBoard = () => {
   const handleScenarioSubmit = async (questId, chosenOption) => {
     const scenario = activeScenarios[questId];
     const isCorrect = chosenOption === scenario.a;
-    
     if (isCorrect) {
-        const result = await attemptScenario(questId, true);
-        if (result.success) {
-            triggerVictory(`+${quests.find(q => q.id === questId).xp} XP, +${quests.find(q => q.id === questId).gold} Gold`);
-            setActiveScenarios(prev => ({ ...prev, [questId]: null }));
-        }
+      const result = await attemptScenario(questId, true);
+      if (result.success) {
+        triggerVictory(`+${quests.find(q => q.id === questId).xp} XP, +${quests.find(q => q.id === questId).gold} Gold`);
+        setActiveScenarios(prev => ({ ...prev, [questId]: null }));
+      }
     } else {
-        alert("Wrong choice! The scenario shifts...");
-        const quest = quests.find(q => q.id === questId);
-        rollScenario(quest);
+      alert("Wrong choice! The scenario shifts...");
+      const quest = quests.find(q => q.id === questId);
+      rollScenario(quest);
     }
   };
 
@@ -221,9 +241,7 @@ const QuestBoard = () => {
     const session = activeSessions[questId];
     const answer = sessionAnswers[questId] || '';
     if (!session || !session.isActive) return;
-
     const result = await attemptQuiz(questId, answer, session.currentQuestion.a);
-
     if (result.success) {
       triggerVictory(result.message);
       setActiveSessions(prev => ({...prev, [questId]: { isActive: false } }));
@@ -250,9 +268,7 @@ const QuestBoard = () => {
     const currentStep = steps[currentStepIndex];
     const answer = staticQuizAnswers[questId] || '';
     const isLast = currentStepIndex === steps.length - 1;
-
     const result = await attemptQuiz(questId, answer, currentStep.a, isLast);
-
     if (result.success) {
       if (!isLast) {
         setActiveMultiSteps(prev => ({
@@ -276,19 +292,21 @@ const QuestBoard = () => {
 
   const getQuestIcon = (quest) => {
     switch(quest.type) {
-        case 'incantation': return <MessageSquare size={20} />;
-        case 'quiz': return quest.questionBank?.length > 0 ? <Zap size={20} /> : <Brain size={20} />;
-        case 'multi-step': return <BookText size={20} />;
-        case 'scout-sports': return <Swords size={20} />;
-        case 'scout-arts': return <Palette size={20} />;
-        case 'wellness': return <Heart size={20} />;
-        case 'gauntlet': return <AlertTriangle size={20} />;
-        default: return <Brain size={20} />;
+      case 'incantation': return <MessageSquare size={20} />;
+      case 'blitz': return <Zap size={20} className="text-blue-400" />;
+      case 'quiz': return quest.questionBank?.length > 0 ? <Zap size={20} /> : <Brain size={20} />;
+      case 'multi-step': return <BookText size={20} />;
+      case 'scout-sports': return <Swords size={20} />;
+      case 'scout-arts': return <Palette size={20} />;
+      case 'wellness': return <Heart size={20} />;
+      case 'gauntlet': return <AlertTriangle size={20} />;
+      default: return <Brain size={20} />;
     }
-  }
+  };
 
   const QUEST_CATEGORIES = {
     'upload': { title: 'The Paper Trail', desc: 'Submit physical homework and standard assignments for the Game Master to review.' },
+    'blitz': { title: '⚡ The 60-Second Frenzy', desc: 'Answer as many questions as you can before time runs out! Every correct answer earns extra Gold & XP.' },
     'quiz': { title: "The Scholar's Trial", desc: 'Auto-graded tests of knowledge. Answer correctly for instant rewards.' },
     'multi-step': { title: "The Hydra's Enigma", desc: 'Complex, multi-part problems. Solve them step-by-step.' },
     'scenario': { title: 'The Crossroads', desc: 'Read the situation and make the right choice to proceed.' },
@@ -520,6 +538,52 @@ const QuestBoard = () => {
                                     ))}
                                 </div>
                             )
+                        ) : quest.type === 'blitz' ? (
+                          !activeBlitz[quest.id] ? (
+                            <button
+                              onClick={() => startBlitz(quest)}
+                              className="w-full px-4 py-3 bg-gradient-to-r from-blue-700 to-cyan-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm hover:from-blue-600 hover:to-cyan-500 flex items-center justify-center gap-2"
+                            >
+                              <Zap size={18} /> START 60s BLITZ
+                            </button>
+                          ) : (
+                            <div className="space-y-3">
+                              <div className="flex justify-between items-center">
+                                <div className={`text-4xl font-mono font-bold ${activeBlitz[quest.id].timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-cyan-400'}`}>
+                                  {activeBlitz[quest.id].timeLeft}s
+                                </div>
+                                <div className="text-yellow-400 font-['VT323'] text-2xl">
+                                  Score: {activeBlitz[quest.id].score}
+                                </div>
+                              </div>
+                              <p className="text-lg text-white font-mono text-center bg-black/50 p-2 rounded">
+                                {activeBlitz[quest.id].currentQ?.q}
+                              </p>
+                              <input
+                                type="text"
+                                value={blitzInput}
+                                onChange={(e) => setBlitzInput(e.target.value)}
+                                onKeyDown={(e) => { if (e.key === 'Enter') handleBlitzSubmit(quest); }}
+                                placeholder="> type answer..."
+                                autoFocus
+                                className="bg-black/80 border border-cyan-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-cyan-500"
+                              />
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleBlitzSubmit(quest)}
+                                  className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500 font-['VT323'] text-lg"
+                                >
+                                  SUBMIT
+                                </button>
+                                <button
+                                  onClick={() => handleBlitzPass(quest)}
+                                  className="flex-1 px-3 py-2 bg-stone-600 text-white rounded-lg hover:bg-stone-500 font-['VT323'] text-lg"
+                                >
+                                  PASS
+                                </button>
+                              </div>
+                            </div>
+                          )
                         ) : quest.type === 'quiz' ? (
                           <div className="flex items-center gap-2"><input type="text" placeholder="> enter solution..." value={staticQuizAnswers[quest.id] || ''} onChange={(e) => handleStaticQuizAnswerChange(quest.id, e.target.value)} className="bg-black/80 border border-stone-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-green-500" /><button onClick={() => handleStaticQuizSubmit(quest.id)} className="px-3 py-2 bg-yellow-600 text-black rounded-lg hover:bg-yellow-500 font-['VT323'] text-lg">EXECUTE</button></div>
                         ) : isWellness ? (
