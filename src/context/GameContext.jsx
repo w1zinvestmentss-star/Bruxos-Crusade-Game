@@ -280,8 +280,8 @@ export function GameProvider({ children }) {
   const nextYearString = nextYear.toISOString().split('T')[0];
 
   const INITIAL_QUESTS = [
-    { id: 101, title: "Math Worksheet", description: "Upload a photo of your completed algebra sheet.", xp: 50, gold: 20, type: 'upload', frequency: 'daily', unlockDate: null },
-    { id: 102, title: "Science Project", description: "Submit a picture of your science fair poster.", xp: 100, gold: 50, type: 'upload', frequency: 'daily', unlockDate: null },
+    { id: 101, title: "The Herald's Post I", description: "Deliver proof of your completed homework here (e.g., Math, Science, English, Geography, and other types of work). Take a picture of your homework as proof.", xp: 50, gold: 20, type: 'upload', frequency: 'daily', unlockDate: null },
+    { id: 102, title: "The Herald's Post II", description: "Deliver proof of additional completed homework here (e.g., Math, Science, English, Geography, etc.). Take a picture of your homework as proof.", xp: 50, gold: 20, type: 'upload', frequency: 'daily', unlockDate: null },
     {
       id: 103,
       title: "Math Speed Run",
