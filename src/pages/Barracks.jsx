@@ -29,6 +29,7 @@ const Barracks = () => {
     { id: 1012, name: 'Shadow Ninja', cost: 300, reqLevel: 5, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shadow.Ninja.png' },
     { id: 1013, name: 'Tactical Mercenary', cost: 300, reqLevel: 5, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Tactical.Mercenary.png' },
     { id: 1014, name: 'Vampire Killer', cost: 300, reqLevel: 5, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Vampire.Killer.png' },
+    { id: 1031, name: 'Kat Felis', cost: 300, reqLevel: 5, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Kat.Felis.png?v=1' },
 
     // LEVEL 3: The Slayer Collection (Cost: 1500, Level Req: 10)
     { id: 1015, name: 'Bio-Weapon', cost: 1500, reqLevel: 10, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Bio-Weapon.png' },
