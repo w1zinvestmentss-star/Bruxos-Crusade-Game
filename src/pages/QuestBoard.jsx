@@ -19,6 +19,7 @@ const QuestBoard = () => {
   const fileInputRef = useRef(null);
   const selectedQuestRef = useRef(null);
   const [staticQuizAnswers, setStaticQuizAnswers] = useState({});
+  const [activeQuizzes, setActiveQuizzes] = useState({});
   const [journalTexts, setJournalTexts] = useState({});
   const [stepTracker, setStepTracker] = useState({});
 
@@ -184,11 +185,27 @@ const QuestBoard = () => {
     alert('Journal entry submitted! Awaiting Teacher Review.');
   };
 
-  const handleStaticQuizSubmit = async (questId) => {
+  const startActiveQuiz = (quest) => {
+    if (!quest.questionBank || quest.questionBank.length === 0) return;
+    const randomQuestion = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
+    setActiveQuizzes(prev => ({ ...prev, [quest.id]: randomQuestion }));
+    setStaticQuizAnswers(prev => ({ ...prev, [quest.id]: '' }));
+  };
+
+  const handleActiveQuizSubmit = async (questId) => {
+    const activeQuestion = activeQuizzes[questId];
     const answer = staticQuizAnswers[questId] || '';
-    const result = await attemptQuiz(questId, answer);
+    if (!activeQuestion) return;
+
+    const result = await attemptQuiz(questId, answer, activeQuestion.a);
     if (result.success) {
       triggerVictory(result.message);
+      setActiveQuizzes(prev => {
+        const next = { ...prev };
+        delete next[questId];
+        return next;
+      });
+      setStaticQuizAnswers(prev => ({ ...prev, [questId]: '' }));
     } else {
       alert(result.message);
     }
@@ -377,7 +394,7 @@ const QuestBoard = () => {
                   <div className="grid gap-4">
                     {categoryQuests.map((quest) => {
               const status = getQuestStatus(quest.id);
-              const isTimedChallenge = (quest.type === 'quiz' || quest.type === 'incantation') && quest.questionBank?.length > 0;
+              const isTimedChallenge = quest.type === 'incantation' && quest.questionBank?.length > 0;
               const isMultiStep = quest.type === 'multi-step';
               const isScenario = quest.type === 'scenario';
               const isUpload = ['upload', 'scout-sports', 'scout-arts'].includes(quest.type);
@@ -585,7 +602,43 @@ const QuestBoard = () => {
                             </div>
                           )
                         ) : quest.type === 'quiz' ? (
-                          <div className="flex items-center gap-2"><input type="text" placeholder="> enter solution..." value={staticQuizAnswers[quest.id] || ''} onChange={(e) => handleStaticQuizAnswerChange(quest.id, e.target.value)} className="bg-black/80 border border-stone-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-green-500" /><button onClick={() => handleStaticQuizSubmit(quest.id)} className="px-3 py-2 bg-yellow-600 text-black rounded-lg hover:bg-yellow-500 font-['VT323'] text-lg">EXECUTE</button></div>
+                          !activeQuizzes[quest.id] ? (
+                            quest.questionBank?.length > 0 ? (
+                              <button
+                                onClick={() => startActiveQuiz(quest)}
+                                className="w-full px-4 py-3 bg-gradient-to-r from-purple-700 to-yellow-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm hover:from-purple-600 hover:to-yellow-500 flex items-center justify-center gap-2"
+                              >
+                                <Brain size={18} /> START QUIZ
+                              </button>
+                            ) : (
+                              <div className="px-4 py-3 bg-stone-900/80 text-stone-400 rounded-lg border border-stone-700 font-['VT323'] text-center">
+                                No questions loaded yet.
+                              </div>
+                            )
+                          ) : (
+                            <div className="space-y-3">
+                              <p className="text-lg text-white font-mono text-center bg-black/50 p-3 rounded">
+                                {activeQuizzes[quest.id].q}
+                              </p>
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  placeholder="> enter solution..."
+                                  value={staticQuizAnswers[quest.id] || ''}
+                                  onChange={(e) => handleStaticQuizAnswerChange(quest.id, e.target.value)}
+                                  onKeyPress={(e) => e.key === 'Enter' && handleActiveQuizSubmit(quest.id)}
+                                  className="bg-black/80 border border-stone-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-green-500"
+                                  autoFocus
+                                />
+                                <button
+                                  onClick={() => handleActiveQuizSubmit(quest.id)}
+                                  className="px-3 py-2 bg-yellow-600 text-black rounded-lg hover:bg-yellow-500 font-['VT323'] text-lg"
+                                >
+                                  EXECUTE
+                                </button>
+                              </div>
+                            </div>
+                          )
                         ) : isWellness ? (
                             <div className="flex items-center justify-around gap-2">
                                 <button onClick={() => handleWellnessSubmit(quest.id, 'Strong')} className="px-3 py-2 rounded-lg bg-green-900/50 text-green-400 hover:bg-green-800 font-bold">🟢 Strong</button>

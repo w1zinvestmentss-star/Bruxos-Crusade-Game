@@ -301,7 +301,17 @@ export function GameProvider({ children }) {
         { q: "Solve: 3 x 3 - 2", a: "7" }
       ]
     },
-    { id: 104, title: "History Check", description: "What year did WWII end?", correctAnswer: "1945", xp: 50, gold: 20, type: 'quiz', frequency: 'once', unlockDate: yesterdayString },
+    {
+      id: 104,
+      title: "History Check",
+      description: "Test your knowledge of history and geography. A new question awaits every day!",
+      xp: 50,
+      gold: 20,
+      type: 'quiz',
+      frequency: 'daily',
+      unlockDate: null,
+      questionBank: []
+    },
     {
       id: 112, // New ID
       title: "The Crossroads",
