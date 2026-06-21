@@ -206,6 +206,7 @@ const formatProfile = (dbProfile) => ({
   gauntletQuestsCompleted: dbProfile.gauntlet_quests_completed || 0,
   notifications: dbProfile.notifications || [],
   equippedPet: dbProfile.equipped_pet || null,
+  lastLoginDate: dbProfile.last_login_date || null,
 });
 
 const saveProfileToCloud = async (userId, updates) => {
@@ -225,6 +226,7 @@ const saveProfileToCloud = async (userId, updates) => {
   if (updates.notifications !== undefined) dbUpdates.notifications = updates.notifications;
   if (updates.activeBuffs !== undefined) dbUpdates.active_buffs = updates.activeBuffs;
   if (updates.equippedPet !== undefined) dbUpdates.equipped_pet = updates.equippedPet;
+  if (updates.lastLoginDate !== undefined) dbUpdates.last_login_date = updates.lastLoginDate;
 
   // Map all quest counters:
   if (updates.uploadQuestsCompleted !== undefined) dbUpdates.upload_quests_completed = updates.uploadQuestsCompleted;
@@ -431,7 +433,36 @@ export function GameProvider({ children }) {
             .eq('student_id', session.user.id);
 
           formattedProfile.inventory = inv || [];
+
+          // --- LOGIN STREAK LOGIC ---
+          const todayStr = new Date().toLocaleDateString('en-CA');
+          const yest = new Date();
+          yest.setDate(yest.getDate() - 1);
+          const yesterdayStr = yest.toLocaleDateString('en-CA');
+
+          let streakUpdated = false;
+
+          if (formattedProfile.lastLoginDate !== todayStr) {
+            if (formattedProfile.lastLoginDate === yesterdayStr) {
+              formattedProfile.loginStreak = (formattedProfile.loginStreak || 0) + 1;
+            } else {
+              formattedProfile.loginStreak = 1; // Streak broken or first login
+            }
+            formattedProfile.lastLoginDate = todayStr;
+            streakUpdated = true;
+          }
+          // --------------------------
+
           setCurrentUser(formattedProfile);
+
+          if (streakUpdated) {
+            saveProfileToCloud(session.user.id, {
+              loginStreak: formattedProfile.loginStreak,
+              lastLoginDate: formattedProfile.lastLoginDate
+            });
+            // Delay achievement check slightly to ensure students array is ready
+            setTimeout(() => checkAchievements(formattedProfile), 500);
+          }
 
           // Fetch all profiles for leaderboard
           const { data: allProfiles } = await supabase.from('profiles').select('*');
