@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Plus, Check, X, Search, Image as ImageIcon, BookCopy, Save, Upload, Clock, Shield, Star, DollarSign, Swords, Skull, Heart, Gift, Ticket, Download, FileText } from 'lucide-react';
+import { LogOut, Plus, Check, X, Search, Image as ImageIcon, BookCopy, Save, Upload, Clock, Shield, Star, DollarSign, Swords, Skull, Heart, Gift, Ticket, Download, FileText, ExternalLink } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const TeacherDashboard = () => {
@@ -264,15 +264,25 @@ const TeacherDashboard = () => {
                         </div>
                         <div className="flex flex-col items-end gap-2">
                           {isImageSubmission && proofUrl && (
-                            <a
-                              href={proofUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              download
-                              className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg flex items-center justify-center gap-2 font-bold text-sm mb-2"
-                            >
-                              <Download size={18} /> DOWNLOAD
-                            </a>
+                            <div className="flex gap-2 w-full mb-2">
+                              <a
+                                href={proofUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="bg-blue-600 hover:bg-blue-500 text-white px-2 py-2 rounded-lg flex-1 flex items-center justify-center gap-1 font-bold text-xs transition-colors"
+                              >
+                                <ExternalLink size={16} /> VIEW
+                              </a>
+                              <a
+                                href={proofUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                download
+                                className="bg-stone-600 hover:bg-stone-500 text-white px-2 py-2 rounded-lg flex-1 flex items-center justify-center gap-1 font-bold text-xs transition-colors"
+                              >
+                                <Download size={16} /> SAVE
+                              </a>
+                            </div>
                           )}
                           <p className="text-[10px] text-red-400 italic max-w-[200px] text-right leading-tight">
                             Note: Clicking Approve will permanently delete this file from the cloud server.
@@ -309,7 +319,10 @@ const TeacherDashboard = () => {
                         <div className="bg-stone-900/70 rounded-lg p-2 border border-stone-700">
                           <p className="text-xs font-bold text-stone-400 mb-2 flex items-center gap-1"><ImageIcon size={12} /> PROOF OF WORK:</p>
                           {proofUrl ? (
-                            <img key={proofUrl} src={proofUrl} referrerPolicy="no-referrer" alt="Proof" className="w-full h-48 object-cover rounded border border-stone-600" />
+                            <>
+                              <img key={proofUrl} src={proofUrl} referrerPolicy="no-referrer" alt="Proof" className="w-full h-48 object-cover rounded border border-stone-600" />
+                              <p className="mt-2 text-xs text-yellow-300 font-bold">If this preview does not load, use the VIEW or SAVE buttons above.</p>
+                            </>
                           ) : (
                             <div className="h-20 flex items-center justify-center text-stone-500 text-sm">No file attached</div>
                           )}
