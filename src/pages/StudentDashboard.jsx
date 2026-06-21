@@ -68,10 +68,20 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
   const { currentUser, setUserRole, clearNotifications } = useGame();
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [isReady, setIsReady] = useState(false);
 
-  useLayoutEffect(() => {
-    if (currentUser?.notifications?.length > 0) {
-      setShowWelcomeModal(true);
+  useEffect(() => {
+    if (currentUser) {
+      // 100ms delay ensures state settles before making rendering decisions
+      const timer = setTimeout(() => {
+        if (currentUser.notifications && currentUser.notifications.length > 0) {
+          setShowWelcomeModal(true);
+        }
+        setIsReady(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else {
+      setIsReady(false);
     }
   }, [currentUser]);
 
@@ -122,7 +132,7 @@ const StudentDashboard = () => {
     );
   };
 
-  if (!currentUser) {
+  if (!currentUser || !isReady) {
     return (
       <div className="min-h-screen bg-stone-950 flex flex-col items-center justify-center z-[200]">
         <div className="text-yellow-500 font-['Press_Start_2P'] text-xl md:text-2xl animate-pulse drop-shadow-[0_0_15px_rgba(234,179,8,0.8)]">
