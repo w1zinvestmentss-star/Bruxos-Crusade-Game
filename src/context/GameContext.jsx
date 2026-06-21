@@ -331,18 +331,46 @@ export function GameProvider({ children }) {
     { id: 106, title: "Weekly Reflection", description: "Write a short paragraph about what you learned this week.", xp: 100, gold: 50, type: 'journal', frequency: 'weekly', unlockDate: '2025-01-01' },
     {
       id: 111,
-      title: "Long Division Helper",
-      description: "Let's solve 144 / 12 step-by-step.",
+      title: "Trial of the Hydra",
+      description: "Face a multi-headed mathematical beast! Complete every step of the challenge to defeat the Hydra and earn your rewards.",
       type: 'multi-step',
       xp: 150,
       gold: 75,
       frequency: 'daily',
       unlockDate: '2025-01-01',
-      steps: [
-        { q: "Step 1: How many times does 12 go into 14?", a: "1" },
-        { q: "Step 2: What is 1 * 12?", a: "12" },
-        { q: "Step 3: Subtract 14 - 12. What is the remainder?", a: "2" },
-        { q: "Step 4: Bring down the 4. What is 24 / 12?", a: "2" }
+      stepBank: [
+        {
+          title: 'Division Hydra',
+          steps: [
+            { q: "Step 1: How many 4s in 4?", a: "1" },
+            { q: "Step 2: How many 4s in 8?", a: "2" },
+            { q: "Final: 48 / 4?", a: "12" }
+          ]
+        },
+        {
+          title: 'Multiplication Hydra',
+          steps: [
+            { q: "Step 1: 15 x 2?", a: "30" },
+            { q: "Step 2: 15 x 10?", a: "150" },
+            { q: "Final: 15 x 12?", a: "180" }
+          ]
+        },
+        {
+          title: 'Commerce Hydra',
+          steps: [
+            { q: "Step 1: Bought $6 potion + $7 shield. Total cost?", a: "13" },
+            { q: "Step 2: Paid with $20. 20 - 13?", a: "7" },
+            { q: "Final: Total Change?", a: "7" }
+          ]
+        },
+        {
+          title: 'Geometry Hydra',
+          steps: [
+            { q: "Step 1: Box A is 5x4. Area?", a: "20" },
+            { q: "Step 2: Box B is 3x2. Area?", a: "6" },
+            { q: "Final: Total Area?", a: "26" }
+          ]
+        }
       ]
     },
     { id: 108, title: "Scout Report: Athletics", description: "Complete a 1-mile walk and upload a photo of your route/shoes.", type: 'scout-sports', xp: 100, gold: 40, frequency: 'daily' },
@@ -1049,7 +1077,7 @@ export function GameProvider({ children }) {
 
     if (isCorrect) {
       if (!isFinalStep) {
-        return { success: true, message: "Correct! Keep going..." };
+        return { success: true, message: "Step Complete!" };
       }
 
       let finalXp = quest.xp;

@@ -22,6 +22,8 @@ const QuestBoard = () => {
   const [journalTexts, setJournalTexts] = useState({});
   const [stepTracker, setStepTracker] = useState({});
 
+  const [activeMultiSteps, setActiveMultiSteps] = useState({});
+
   const [showVictoryModal, setShowVictoryModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [modalQuote, setModalQuote] = useState('');
@@ -231,21 +233,40 @@ const QuestBoard = () => {
     }
   };
 
+  const startMultiStep = (quest) => {
+    const randomIndex = Math.floor(Math.random() * quest.stepBank.length);
+    setActiveMultiSteps(prev => ({
+      ...prev,
+      [quest.id]: { bankIndex: randomIndex, stepIndex: 0 }
+    }));
+  };
+
   const handleMultiStepQuizSubmit = async (questId) => {
-    const currentStepIndex = stepTracker[questId] || 0;
     const quest = quests.find(q => q.id === questId);
-    const currentStep = quest.steps[currentStepIndex];
+    const activeData = activeMultiSteps[questId];
+    const currentProblem = quest.stepBank ? quest.stepBank[activeData.bankIndex] : null;
+    const steps = currentProblem ? currentProblem.steps : (quest.steps || []);
+    const currentStepIndex = activeData ? activeData.stepIndex : (stepTracker[questId] || 0);
+    const currentStep = steps[currentStepIndex];
     const answer = staticQuizAnswers[questId] || '';
-    const isLast = currentStepIndex === quest.steps.length - 1;
+    const isLast = currentStepIndex === steps.length - 1;
 
     const result = await attemptQuiz(questId, answer, currentStep.a, isLast);
 
     if (result.success) {
       if (!isLast) {
-        setStepTracker(prev => ({ ...prev, [questId]: currentStepIndex + 1 }));
-        alert('Good job! Keep going...');
+        setActiveMultiSteps(prev => ({
+          ...prev,
+          [questId]: { ...prev[questId], stepIndex: currentStepIndex + 1 }
+        }));
+        alert(result.message);
         setStaticQuizAnswers(prev => ({ ...prev, [questId]: '' }));
       } else {
+        setActiveMultiSteps(prev => {
+          const next = { ...prev };
+          delete next[questId];
+          return next;
+        });
         triggerVictory(result.message);
       }
     } else {
@@ -347,8 +368,18 @@ const QuestBoard = () => {
               const session = activeSessions[quest.id];
               const currentAnswer = sessionAnswers[quest.id] || '';
               const currentScenario = activeScenarios[quest.id];
-              const currentStepIndex = stepTracker[quest.id] || 0;
-              const currentStep = isMultiStep ? quest.steps[currentStepIndex] : null;
+               let currentProblem = null;
+               let currentStepIndex = 0;
+               const activeSession = activeMultiSteps[quest.id];
+               if (isMultiStep) {
+                 if (activeSession) {
+                   currentProblem = quest.stepBank[activeSession.bankIndex];
+                   currentStepIndex = activeSession.stepIndex;
+                 } else if (quest.steps) {
+                   currentStepIndex = stepTracker[quest.id] || 0;
+                 }
+               }
+               const currentStep = currentProblem ? currentProblem.steps[currentStepIndex] : (quest.steps ? quest.steps[currentStepIndex] : null);
 
               const getBorderColor = () => {
                 if (status === 'approved' || status === 'read_only') return 'border-l-green-500 bg-green-900/40';
@@ -433,12 +464,45 @@ const QuestBoard = () => {
                             </button>
                           )
                         ) : isMultiStep ? (
-                          <div className="space-y-3">
-                            <div className="text-sm text-stone-400">Step {currentStepIndex + 1} of {quest.steps.length}</div>
-                            <div className="w-full bg-stone-700 rounded-full h-2.5"><div className="bg-purple-600 h-2.5 rounded-full" style={{ width: `${((currentStepIndex + 1) / quest.steps.length) * 100}%` }}></div></div>
-                            <p className="text-lg text-white">{currentStep.q}</p>
-                            <div className="flex items-center gap-2"><input type="text" placeholder="> answer" value={staticQuizAnswers[quest.id] || ''} onChange={(e) => handleStaticQuizAnswerChange(quest.id, e.target.value)} className="bg-black/80 border border-stone-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-green-500" /><button onClick={() => handleMultiStepQuizSubmit(quest.id)} className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 font-['VT323'] text-lg">CHECK STEP</button></div>
-                          </div>
+                          !activeSession ? (
+                            <div className="text-center py-4">
+                              <p className="text-stone-400 mb-4">{quest.description}</p>
+                              <button 
+                                onClick={() => startMultiStep(quest)}
+                                className="bg-red-700 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-yellow-500 animate-pulse"
+                              >
+                                AWAKEN THE HYDRA
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="bg-red-900/20 p-4 rounded-lg border border-red-500/50">
+                              <div className="text-xs font-mono text-red-300 mb-2 uppercase tracking-wider">
+                                {quest.stepBank[activeSession.bankIndex].title}
+                              </div>
+                              <div className="flex justify-between text-xs font-mono text-red-400 mb-2">
+                                <span>BATTLE IN PROGRESS</span>
+                                <span>STEP {activeSession.stepIndex + 1} OF {quest.stepBank[activeSession.bankIndex].steps.length}</span>
+                              </div>
+                              <p className="text-xl mb-4 text-white">
+                                {quest.stepBank[activeSession.bankIndex].steps[activeSession.stepIndex].q}
+                              </p>
+                              <div className="flex items-center gap-2">
+                                <input 
+                                  type="text" 
+                                  placeholder="> answer" 
+                                  value={staticQuizAnswers[quest.id] || ''} 
+                                  onChange={(e) => handleStaticQuizAnswerChange(quest.id, e.target.value)} 
+                                  className="bg-black/80 border border-stone-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-green-500" 
+                                />
+                                <button 
+                                  onClick={() => handleMultiStepQuizSubmit(quest.id)} 
+                                  className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 font-['VT323'] text-lg"
+                                >
+                                  Strike
+                                </button>
+                              </div>
+                            </div>
+                          )
                         ) : quest.type === 'scenario' ? (
                             !currentScenario ? (
                                 <button onClick={() => rollScenario(quest)} className="w-full px-4 py-3 bg-gradient-to-r from-orange-700 to-yellow-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm hover:from-orange-600 hover:to-yellow-500 flex items-center justify-center gap-2">Face a Scenario</button>
