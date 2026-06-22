@@ -177,37 +177,43 @@ const VICTORY_QUOTES = [
   'Another victory for the Archives!',
 ];
 
-const formatProfile = (dbProfile) => ({
-  ...dbProfile,
-  heroName: dbProfile.hero_name,
-  heroClass: dbProfile.hero_class || 'None',
-  realName: dbProfile.real_name,
-  currentBodySprite: dbProfile.current_body_sprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png',
-  loginStreak: dbProfile.login_streak || 0,
-  raffleTickets: dbProfile.raffle_tickets || 0,
-  totalTicketsEarned: dbProfile.total_tickets_earned || 0,
-  lootboxPity: dbProfile.lootbox_pity || 0,
-  defeatedBosses: (dbProfile.defeated_bosses || []).map(Number),
-  unlockedAchievements: dbProfile.unlocked_achievements || [],
-  unlockedTitles: dbProfile.unlocked_titles || ['The Novice'],
-  level: Math.floor((dbProfile.xp || 0) / 1000) + 1,
-  midtermGPA: dbProfile.midterm_gpa || 0,
-  finalGPA: dbProfile.final_gpa !== undefined ? dbProfile.final_gpa : null,
-  uploadQuestsCompleted: dbProfile.upload_quests_completed || 0,
-  quizQuestsCompleted: dbProfile.quiz_quests_completed || 0,
-  multiStepQuestsCompleted: dbProfile.multi_step_quests_completed || 0,
-  scenarioQuestsCompleted: dbProfile.scenario_quests_completed || 0,
-  cipherQuestsCompleted: dbProfile.cipher_quests_completed || 0,
-  incantationQuestsCompleted: dbProfile.incantation_quests_completed || 0,
-  sportsQuestsCompleted: dbProfile.sports_quests_completed || 0,
-  artsQuestsCompleted: dbProfile.arts_quests_completed || 0,
-  wellnessQuestsCompleted: dbProfile.wellness_quests_completed || 0,
-  journalQuestsCompleted: dbProfile.journal_quests_completed || 0,
-  gauntletQuestsCompleted: dbProfile.gauntlet_quests_completed || 0,
-  notifications: dbProfile.notifications || [],
-  equippedPet: dbProfile.equipped_pet || null,
-  lastLoginDate: dbProfile.last_login_date || null,
-});
+const formatProfile = (dbProfile = {}) => {
+  const profile = dbProfile || {};
+
+  return {
+    ...profile,
+    heroName: profile.hero_name,
+    heroClass: profile.hero_class || 'None',
+    realName: profile.real_name,
+    currentBodySprite: profile.current_body_sprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png',
+    loginStreak: profile.login_streak || 0,
+    raffleTickets: profile.raffle_tickets || 0,
+    totalTicketsEarned: profile.total_tickets_earned || 0,
+    lootboxPity: profile.lootbox_pity || 0,
+    inventory: profile.inventory || [],
+    notifications: profile.notifications || [],
+    pendingPrizes: profile.pendingPrizes || [],
+    defeatedBosses: (profile.defeated_bosses || []).map(Number),
+    unlockedAchievements: profile.unlocked_achievements || [],
+    unlockedTitles: profile.unlocked_titles || ['The Novice'],
+    level: Math.floor((profile.xp || 0) / 1000) + 1,
+    midtermGPA: profile.midterm_gpa || 0,
+    finalGPA: profile.final_gpa !== undefined ? profile.final_gpa : null,
+    uploadQuestsCompleted: profile.upload_quests_completed || 0,
+    quizQuestsCompleted: profile.quiz_quests_completed || 0,
+    multiStepQuestsCompleted: profile.multi_step_quests_completed || 0,
+    scenarioQuestsCompleted: profile.scenario_quests_completed || 0,
+    cipherQuestsCompleted: profile.cipher_quests_completed || 0,
+    incantationQuestsCompleted: profile.incantation_quests_completed || 0,
+    sportsQuestsCompleted: profile.sports_quests_completed || 0,
+    artsQuestsCompleted: profile.arts_quests_completed || 0,
+    wellnessQuestsCompleted: profile.wellness_quests_completed || 0,
+    journalQuestsCompleted: profile.journal_quests_completed || 0,
+    gauntletQuestsCompleted: profile.gauntlet_quests_completed || 0,
+    equippedPet: profile.equipped_pet || null,
+    lastLoginDate: profile.last_login_date || null,
+  };
+};
 
 const saveProfileToCloud = async (userId, updates) => {
   // Map JS camelCase back to Database snake_case
@@ -429,8 +435,10 @@ export function GameProvider({ children }) {
           const formattedProfile = formatProfile(profileToSet);
 
           // Preserve some critical base defaults not covered by the user adapter
+          formattedProfile.inventory = formattedProfile.inventory || [];
           formattedProfile.notifications = formattedProfile.notifications || [];
           formattedProfile.pendingPrizes = formattedProfile.pendingPrizes || [];
+          formattedProfile.defeatedBosses = formattedProfile.defeatedBosses || [];
           formattedProfile.xp = formattedProfile.xp || 0;
           formattedProfile.gold = formattedProfile.gold || 0;
           formattedProfile.level = formattedProfile.level || 1;
@@ -1251,8 +1259,8 @@ export function GameProvider({ children }) {
       return 'locked';
     }
 
-    const userSubmissions = submissions
-      .filter(s => s.questId === questId && s.studentId === currentUser.id)
+    const userSubmissions = (submissions || [])
+      .filter(s => s.questId === questId && s.studentId === currentUser?.id)
       .sort((a, b) => {
         const dateA = new Date(a.created_at || a.timestamp).getTime();
         const dateB = new Date(b.created_at || b.timestamp).getTime();

@@ -54,6 +54,36 @@ const QuestBoard = () => {
     return { q: `Solve: ${a} ${op} ${b}`, a: eval(`${a} ${op} ${b}`).toString() };
   };
 
+  const startGauntlet = () => {
+    setGauntletStep(0);
+    setGauntletTimer(70); // 7.0 seconds
+    setGauntletQuestion(generateGauntletMath());
+    setGauntletAnswer('');
+    setIsGauntletActive(true);
+  };
+
+  const handleGauntletSubmit = async () => {
+    if (gauntletAnswer.trim() === gauntletQuestion.a.trim()) {
+      if (gauntletStep < 4) {
+        setGauntletStep(prev => prev + 1);
+        setGauntletTimer(70);
+        setGauntletQuestion(generateGauntletMath());
+        setGauntletAnswer('');
+      } else {
+        setIsGauntletActive(false);
+        const result = await attemptQuiz(999, 'correct', 'correct', true);
+        if (result.success) {
+          triggerVictory(result.message);
+        }
+      }
+    } else {
+      recordGauntletFailure(999);
+      alert('TRIAL FAILED: INCORRECT ANSWER');
+      setIsGauntletActive(false);
+      setGauntletStep(0);
+    }
+  };
+
   const startBlitz = (quest) => {
     if (!quest.questionBank || quest.questionBank.length === 0) return;
     const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
@@ -65,7 +95,7 @@ const QuestBoard = () => {
     const session = activeBlitz[quest.id];
     if (!session || !session.isActive) return;
     if (blitzInput.trim().toLowerCase() === session.currentQ.a.toString().trim().toLowerCase()) {
-      const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
+      const randomQ = quest.questionBank?.[Math.floor(Math.random() * (quest.questionBank?.length || 0))];
       setActiveBlitz(prev => ({ ...prev, [quest.id]: { ...prev[quest.id], score: prev[quest.id].score + 1, currentQ: randomQ } }));
     }
     setBlitzInput('');
@@ -73,7 +103,7 @@ const QuestBoard = () => {
 
   const handleBlitzPass = (quest) => {
     if (!activeBlitz[quest.id]?.isActive) return;
-    const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
+    const randomQ = quest.questionBank?.[Math.floor(Math.random() * (quest.questionBank?.length || 0))];
     setActiveBlitz(prev => ({ ...prev, [quest.id]: { ...prev[quest.id], currentQ: randomQ } }));
     setBlitzInput('');
   };
@@ -221,6 +251,7 @@ const QuestBoard = () => {
   };
 
   const rollScenario = (quest) => {
+    if (!quest.questionBank || quest.questionBank.length === 0) return;
     const randomScenario = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
     setActiveScenarios(prev => ({ ...prev, [quest.id]: randomScenario }));
   };
@@ -269,6 +300,7 @@ const QuestBoard = () => {
   };
 
   const startMultiStep = (quest) => {
+    if (!quest.stepBank || quest.stepBank.length === 0) return;
     const randomIndex = Math.floor(Math.random() * quest.stepBank.length);
     setActiveMultiSteps(prev => ({
       ...prev,
@@ -336,6 +368,16 @@ const QuestBoard = () => {
     'gauntlet': { title: 'The Gauntlet', desc: 'A high-intensity trial. One attempt per day. No mistakes allowed.' }
   };
 
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-stone-950 flex flex-col items-center justify-center z-[200]">
+        <div className="text-yellow-500 font-['Press_Start_2P'] text-xl md:text-2xl animate-pulse drop-shadow-[0_0_15px_rgba(234,179,8,0.8)]">
+          LOADING QUESTS...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen text-stone-200 p-6 relative">
       <img src={MAP_BG} alt="Background Map" className="absolute inset-0 w-full h-full object-cover" />
@@ -390,34 +432,23 @@ const QuestBoard = () => {
               return (
                 <div key={categoryKey} className="mb-12">
                   <h2 className="text-2xl text-yellow-500 font-['Press_Start_2P'] border-b border-stone-700 pb-2 mb-2 mt-12">{categoryInfo.title}</h2>
-                  <p className="text-stone-400 mb-6 font-['VT323'] text-xl">{categoryInfo.desc}</p>
-                  <div className="grid gap-4">
-                    {categoryQuests.map((quest) => {
-              const status = getQuestStatus(quest.id);
-              const isTimedChallenge = quest.type === 'incantation' && quest.questionBank?.length > 0;
-              const isMultiStep = quest.type === 'multi-step';
-              const isScenario = quest.type === 'scenario';
-              const isJournal = quest.type === 'journal';
-              const isUpload = ['upload', 'scout-sports', 'scout-arts'].includes(quest.type);
-              const isWellness = quest.type === 'wellness';
-              const isGauntlet = quest.type === 'gauntlet';
-              const session = activeSessions[quest.id];
-              const currentAnswer = sessionAnswers[quest.id] || '';
-              const currentScenario = activeScenarios[quest.id];
-               let currentProblem = null;
-               let currentStepIndex = 0;
-               const activeSession = activeMultiSteps[quest.id];
-               if (isMultiStep) {
-                 if (activeSession) {
-                   currentProblem = quest.stepBank[activeSession.bankIndex];
-                   currentStepIndex = activeSession.stepIndex;
-                 } else if (quest.steps) {
-                   currentStepIndex = stepTracker[quest.id] || 0;
-                 }
-               }
-               const currentStep = currentProblem ? currentProblem.steps[currentStepIndex] : (quest.steps ? quest.steps[currentStepIndex] : null);
+<p className="text-stone-400 mb-6 font-['VT323'] text-xl">{categoryInfo.desc}</p>
+                    <div className="grid gap-4">
+                      {categoryQuests.map((quest) => {
+                        const status = getQuestStatus(quest.id);
+                        const isTimedChallenge = quest.type === 'incantation' && quest.questionBank?.length > 0;
+                        const isMultiStep = quest.type === 'multi-step';
+                        const isScenario = quest.type === 'scenario';
+                        const isJournal = quest.type === 'journal';
+                        const isUpload = ['upload', 'scout-sports', 'scout-arts'].includes(quest.type);
+                        const isWellness = quest.type === 'wellness';
+                        const isGauntlet = quest.type === 'gauntlet';
+                        const session = activeSessions[quest.id];
+                        const currentAnswer = sessionAnswers[quest.id] || '';
+                        const currentScenario = activeScenarios[quest.id];
+                        const activeSession = activeMultiSteps[quest.id];
 
-              const getBorderColor = () => {
+                        const getBorderColor = () => {
                 if (status === 'approved' || status === 'read_only') return 'border-l-green-500 bg-green-900/40';
                 if (status === 'failed') return 'border-l-red-800 bg-red-950/40';
                 if (isGauntlet) return 'border-l-red-600 bg-red-950/40';
@@ -513,14 +544,14 @@ const QuestBoard = () => {
                           ) : (
                             <div className="bg-red-900/20 p-4 rounded-lg border border-red-500/50">
                               <div className="text-xs font-mono text-red-300 mb-2 uppercase tracking-wider">
-                                {quest.stepBank[activeSession.bankIndex].title}
+                                {quest.stepBank?.[activeSession.bankIndex]?.title}
                               </div>
                               <div className="flex justify-between text-xs font-mono text-red-400 mb-2">
                                 <span>BATTLE IN PROGRESS</span>
-                                <span>STEP {activeSession.stepIndex + 1} OF {quest.stepBank[activeSession.bankIndex].steps.length}</span>
+                                <span>STEP {activeSession.stepIndex + 1} OF {quest.stepBank?.[activeSession.bankIndex]?.steps?.length}</span>
                               </div>
                               <p className="text-xl mb-4 text-white">
-                                {quest.stepBank[activeSession.bankIndex].steps[activeSession.stepIndex].q}
+                                {quest.stepBank?.[activeSession.bankIndex]?.steps?.[activeSession.stepIndex]?.q}
                               </p>
                               <div className="flex items-center gap-2">
                                 <input 
@@ -542,10 +573,10 @@ const QuestBoard = () => {
                         ) : quest.type === 'scenario' ? (
                             !currentScenario ? (
                                 <button onClick={() => rollScenario(quest)} className="w-full px-4 py-3 bg-gradient-to-r from-orange-700 to-yellow-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm hover:from-orange-600 hover:to-yellow-500 flex items-center justify-center gap-2">Face a Scenario</button>
-                            ) : (
+                              ) : (
                                 <div>
-                                    <p className="text-lg text-white mb-3">{currentScenario.q}</p>
-                                    {currentScenario.options.map(option => (
+                                    <p className="text-lg text-white mb-3">{currentScenario?.q}</p>
+                                    {(currentScenario?.options || []).map(option => (
                                         <button 
                                             key={option} 
                                             onClick={() => handleScenarioSubmit(quest.id, option)}
@@ -555,7 +586,7 @@ const QuestBoard = () => {
                                         </button>
                                     ))}
                                 </div>
-                            )
+                              )
                         ) : quest.type === 'blitz' ? (
                           !activeBlitz[quest.id] ? (
                             <button
