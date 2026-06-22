@@ -28,15 +28,14 @@ const BriefingRoom = () => {
   const [isAccepted, setIsAccepted] = useState(false);
   const [journalText, setJournalText] = useState('');
   const [typedText, setTypedText] = useState('');
-  const [activeStep, setActiveStep] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(quest?.timeLimit || 45);
+  const [timeLeft, setTimeLeft] = useState(0);
   const [isTrialActive, setIsTrialActive] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [currentQ, setCurrentQ] = useState(null);
 
   const startTrial = () => {
     if (!quest?.questionBank || quest.questionBank.length === 0) return;
     const randomIndex = Math.floor(Math.random() * quest.questionBank.length);
-    setActiveStep(randomIndex);
+    setCurrentQ(quest.questionBank[randomIndex]);
     setTypedText('');
     setTimeLeft(quest.timeLimit || 45);
     setIsTrialActive(true);
@@ -44,24 +43,16 @@ const BriefingRoom = () => {
 
   const handleAccept = () => {
     setIsAccepted(true);
-    if (isIncantation) {
-      startTrial();
-    }
   };
 
-  const handleIncantationSubmit = () => {
-    const targetAnswer = quest.questionBank[activeStep]?.a;
-    if (!targetAnswer) return;
-
-    const result = attemptQuiz(quest.id, typedText, targetAnswer, true);
-
+  const handleIncantationSubmit = async () => {
+    if (!currentQ) return;
+    const result = await attemptQuiz(quest.id, typedText, currentQ.a, true);
     if (result.success) {
-      alert(result.message);
-      setIsTrialActive(false);
-      setIsAccepted(false);
-      setTypedText('');
+      alert('Success! ' + result.message);
+      navigate('/quests');
     } else {
-      alert(result.message);
+      alert('Incorrect! Keep trying!');
       setTypedText('');
     }
   };
@@ -76,30 +67,20 @@ const BriefingRoom = () => {
       alert('Please complete this task before submitting.');
       return;
     }
-
     await submitQuest(quest.id, journalText, quest.type);
-    setIsSubmitted(true);
+    alert('Journal entry submitted! Awaiting Teacher Review.');
+    navigate('/quests');
   };
 
   useEffect(() => {
-    if (!isTrialActive) return;
-    const timerId = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timerId);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(timerId);
-  }, [isTrialActive]);
-
-  useEffect(() => {
-    if (!isTrialActive || timeLeft > 0) return;
-    setIsTrialActive(false);
-    setTypedText('');
-    alert('Time Expired!');
+    let interval;
+    if (isTrialActive && timeLeft > 0) {
+      interval = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+    } else if (isTrialActive && timeLeft <= 0) {
+      setIsTrialActive(false);
+      alert('Time expired! The spell fizzled.');
+    }
+    return () => clearInterval(interval);
   }, [isTrialActive, timeLeft]);
 
   if (!quest) {
@@ -131,94 +112,76 @@ const BriefingRoom = () => {
         </button>
 
         <div className="bg-black/75 backdrop-blur-md p-8 rounded-2xl border-2 border-yellow-500/30 max-w-2xl mx-auto mt-20">
-          {!isSubmitted ? (
-            !isAccepted ? (
-              <div className="grid md:grid-cols-[0.85fr_1.15fr] gap-6 items-center">
-                <div className="flex items-center justify-center">
-                  <img src={theme.npc} alt="Scribe NPC" className="h-64 object-contain drop-shadow-[0_0_25px_rgba(234,179,8,0.35)]" />
-                </div>
-                <div>
-                  <div className="text-yellow-400 font-['VT323'] text-lg mb-2">
-                    {theme.title}
-                  </div>
-                  <h1 className="text-yellow-400 font-['Press_Start_2P'] text-2xl md:text-3xl mb-4">
-                    {quest.title}
-                  </h1>
-                  <p className="font-['VT323'] text-2xl text-stone-200 leading-relaxed mb-8">
-                    {theme.dialogue}
-                  </p>
-                  <button onClick={handleAccept} className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-yellow-600 to-yellow-400 text-stone-950 rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base hover:from-yellow-500 hover:to-yellow-300 transition-colors">
-                    ACCEPT MISSION
-                  </button>
-                </div>
+          {!isAccepted ? (
+            <div className="grid md:grid-cols-[0.85fr_1.15fr] gap-6 items-center">
+              <div className="flex items-center justify-center">
+                <img src={theme.npc} alt="Scribe NPC" className="h-64 object-contain drop-shadow-[0_0_25px_rgba(234,179,8,0.35)]" />
               </div>
-            ) : isIncantation ? (
               <div>
+                <div className="text-yellow-400 font-['VT323'] text-lg mb-2">
+                  {theme.title}
+                </div>
+                <h1 className="text-yellow-400 font-['Press_Start_2P'] text-2xl md:text-3xl mb-4">
+                  {quest.title}
+                </h1>
+                <p className="font-['VT323'] text-2xl text-stone-200 leading-relaxed mb-8">
+                  {theme.dialogue}
+                </p>
+                <button onClick={handleAccept} className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-yellow-600 to-yellow-400 text-stone-950 rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base hover:from-yellow-500 hover:to-yellow-300 transition-colors">
+                  ACCEPT MISSION
+                </button>
+              </div>
+            </div>
+          ) : isIncantation ? (
+            !isTrialActive ? (
+              <div className="text-center">
                 <h1 className="text-yellow-400 font-['Press_Start_2P'] text-2xl md:text-3xl mb-4">
                   The Memory Spell
                 </h1>
-                {isTrialActive ? (
-                  <div className="space-y-5">
-                    <div className="text-center">
-                      <div className="text-stone-400 font-['VT323'] text-lg mb-2">TIME REMAINING</div>
-                      <div className={`text-5xl font-mono font-bold ${timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-cyan-400'}`}>
-                        {timeLeft}s
-                      </div>
-                    </div>
-                    <div className={`transition-opacity duration-300 ${typedText.length > 0 ? 'opacity-0' : 'opacity-100'}`}>
-                      <p className="text-lg text-white font-mono text-center bg-black/50 p-3 rounded">
-                        {quest.questionBank[activeStep]?.q}
-                      </p>
-                    </div>
-                    <textarea
-                      value={typedText}
-                      onChange={(event) => setTypedText(event.target.value)}
-                      onPaste={handlePasteBlock}
-                      placeholder="Type the phrase from memory..."
-                      className="w-full h-56 bg-stone-950/90 border-2 border-cyan-500/50 rounded-lg p-4 text-stone-100 font-['VT323'] text-xl focus:outline-none focus:border-cyan-300 resize-none"
-                    />
-                    <button onClick={handleIncantationSubmit} className="w-full px-8 py-4 bg-gradient-to-r from-red-800 to-yellow-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base hover:from-red-700 hover:to-yellow-500 transition-colors">
-                      SUBMIT STRIKE
-                    </button>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <p className="font-['VT323'] text-xl text-stone-300 mb-6">The memory trial has ended. Start a new attempt or return to the Quest Board.</p>
-                    <button onClick={startTrial} className="w-full px-8 py-4 bg-gradient-to-r from-cyan-800 to-yellow-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base hover:from-cyan-700 hover:to-yellow-500 transition-colors">
-                      RETRY MEMORY SPELL
-                    </button>
-                  </div>
-                )}
+                <p className="font-['VT323'] text-xl text-stone-300 mb-6">
+                  Memorize the ancient text and cast it flawlessly before time runs out.
+                </p>
+                <button onClick={startTrial} className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-cyan-800 to-blue-700 text-cyan-200 rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base hover:from-cyan-700 hover:to-blue-600 transition-colors">
+                  START TRIAL
+                </button>
               </div>
             ) : (
-              <div>
-                <h1 className="text-yellow-400 font-['Press_Start_2P'] text-2xl md:text-3xl mb-4">
-                  Record Your Journey
-                </h1>
-                <p className="font-['VT323'] text-xl text-stone-300 mb-6">
-                  Write your reflection, then submit it for Game Master review.
-                </p>
-                <textarea
-                  value={journalText}
-                  onChange={(event) => setJournalText(event.target.value)}
-                  placeholder="Write your journal entry here..."
-                  className="w-full h-56 bg-stone-950/90 border-2 border-yellow-500/40 rounded-lg p-4 text-stone-100 font-['VT323'] text-xl focus:outline-none focus:border-yellow-300 resize-none"
+              <div className="flex flex-col items-center w-full">
+                <div className="text-4xl text-red-500 font-mono text-center mb-4">{timeLeft}s</div>
+                <div className={`text-xl text-cyan-300 font-mono mb-4 text-center transition-opacity duration-300 ${typedText.length > 0 ? 'opacity-0' : 'opacity-100'}`}>
+                  {currentQ?.q}
+                </div>
+                <textarea 
+                  value={typedText} 
+                  onChange={e => setTypedText(e.target.value)} 
+                  onPaste={e => e.preventDefault()} 
+                  className="w-full bg-black/80 border-2 border-cyan-500 rounded-lg p-4 text-white font-mono h-32 focus:outline-none focus:ring-2 focus:ring-cyan-300 resize-none mb-4" 
+                  placeholder="Type the incantation perfectly..." 
                 />
-                <button onClick={handleSubmit} className="mt-6 w-full px-8 py-4 bg-gradient-to-r from-red-800 to-yellow-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base hover:from-red-700 hover:to-yellow-500 transition-colors">
-                  SUBMIT ENTRY
+                <button 
+                  onClick={handleIncantationSubmit} 
+                  className="px-6 py-3 bg-cyan-700 text-white rounded-lg hover:bg-cyan-600 font-['Press_Start_2P'] text-sm"
+                >
+                  CAST SPELL
                 </button>
               </div>
             )
           ) : (
-            <div className="text-center">
-              <h1 className="text-green-400 font-['Press_Start_2P'] text-3xl md:text-4xl mb-6">
-                MISSION COMPLETE
+            <div>
+              <h1 className="text-yellow-400 font-['Press_Start_2P'] text-2xl md:text-3xl mb-4">
+                Record Your Journey
               </h1>
-              <p className="font-['VT323'] text-2xl text-stone-200 mb-8">
-                {isIncantation ? 'Your incantation has been submitted for review.' : 'Your journal entry has been submitted for review.'}
+              <p className="font-['VT323'] text-xl text-stone-300 mb-6">
+                Write your reflection, then submit it for Game Master review.
               </p>
-              <button onClick={() => navigate('/quests')} className="w-full px-8 py-4 bg-gradient-to-r from-green-700 to-green-500 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base hover:from-green-600 hover:to-green-400 transition-colors">
-                RETURN TO KINGDOM
+              <textarea
+                value={journalText}
+                onChange={(event) => setJournalText(event.target.value)}
+                placeholder="Write your journal entry here..."
+                className="w-full h-56 bg-stone-950/90 border-2 border-yellow-500/40 rounded-lg p-4 text-stone-100 font-['VT323'] text-xl focus:outline-none focus:border-yellow-300 resize-none"
+              />
+              <button onClick={handleSubmit} className="mt-6 w-full px-8 py-4 bg-gradient-to-r from-red-800 to-yellow-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base hover:from-red-700 hover:to-yellow-500 transition-colors">
+                SUBMIT ENTRY
               </button>
             </div>
           )}

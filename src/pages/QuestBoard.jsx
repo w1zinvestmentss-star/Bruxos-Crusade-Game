@@ -436,15 +436,12 @@ const QuestBoard = () => {
                     <div className="grid gap-4">
                       {categoryQuests.map((quest) => {
                         const status = getQuestStatus(quest.id);
-                        const isTimedChallenge = quest.type === 'incantation' && quest.questionBank?.length > 0;
                         const isMultiStep = quest.type === 'multi-step';
                         const isScenario = quest.type === 'scenario';
                         const isJournal = quest.type === 'journal';
                         const isUpload = ['upload', 'scout-sports', 'scout-arts'].includes(quest.type);
                         const isWellness = quest.type === 'wellness';
                         const isGauntlet = quest.type === 'gauntlet';
-                        const session = activeSessions[quest.id];
-                        const currentAnswer = sessionAnswers[quest.id] || '';
                         const currentScenario = activeScenarios[quest.id];
                         const activeSession = activeMultiSteps[quest.id];
 
@@ -474,39 +471,10 @@ const QuestBoard = () => {
                     </div>
                     <div className="flex-shrink-0 w-1/2 ml-4">
                       {status === 'available' ? (
-                        isTimedChallenge ? (
-                           session?.isActive && session.timeLeft > 0 ? (
-                             <div className="space-y-3">
-                                {currentUser?.activeBuffs?.oath && (
-                                  <div className="text-purple-400 font-['Press_Start_2P'] text-xs mb-2 animate-pulse text-center">OATH ACTIVE: 4x REWARDS / HALF TIME</div>
-                                )}
-                                <div className="text-center font-bold text-4xl text-red-500 font-mono">{session.timeLeft}s</div>
-                               <p className={`text-lg text-center text-white transition-opacity duration-500 ${(quest.type === 'incantation' && currentAnswer.length > 0) ? 'opacity-0' : 'opacity-100'}`}>
-                                   {session.currentQuestion.q}
-                               </p>
-                               <div className="flex items-center gap-2">
-                                   <input 
-                                       type="text" 
-                                       value={currentAnswer}
-                                       onChange={(e) => setSessionAnswers(p => ({...p, [quest.id]: e.target.value}))} 
-                                       onKeyPress={(e) => e.key === 'Enter' && handleDynamicQuizSubmit(quest.id)} 
-                                       onPaste={(e) => quest.type === 'incantation' && e.preventDefault()} 
-                                       placeholder="> type here..."
-                                       className="bg-black/80 border border-stone-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-green-500" 
-                                       autoFocus 
-                                   />
-                                   <button onClick={() => handleDynamicQuizSubmit(quest.id)} className="px-3 py-2 bg-yellow-600 text-black rounded-lg hover:bg-yellow-500 font-['VT323'] text-lg">
-                                       {quest.type === 'incantation' ? 'CAST' : 'CHECK'}
-                                   </button>
-                               </div>
-                           </div>
-                          ) : session?.isActive && session.timeLeft === 0 ? (
-                            <div className="text-center"><div className="p-2 bg-red-900/50 text-red-400 rounded-lg flex items-center justify-center gap-2 font-bold"><AlertTriangle size={18}/>Time's Up!</div><button onClick={() => startDynamicQuiz(quest)} className="mt-2 w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 font-['Press_Start_2P'] text-xs">TRY AGAIN</button></div>
-                          ) : (
-                            <button onClick={() => startDynamicQuiz(quest)} className="w-full px-4 py-3 bg-gradient-to-r from-red-700 to-yellow-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm hover:from-red-600 hover:to-yellow-500 flex items-center justify-center gap-2">
-                                <Zap size={18} /> {quest.type === 'incantation' ? 'START INCANTATION' : `START SPEED RUN (${quest.timeLimit}s)`}
-                            </button>
-                          )
+                        quest.type === 'incantation' && quest.questionBank?.length > 0 ? (
+                          <button onClick={() => navigate('/briefing/' + quest.id)} className="w-full px-4 py-3 bg-gradient-to-r from-cyan-900 to-blue-900 text-cyan-200 border-2 border-cyan-700 rounded-lg shadow-[0_0_15px_rgba(6,182,212,0.4)] font-['Press_Start_2P'] text-xs hover:bg-cyan-900 transition-colors flex items-center justify-center gap-2">
+                            ENTER SCRIPTORIUM
+                          </button>
                         ) : isGauntlet ? (
                           isGauntletActive ? (
                             <div className="relative p-6 bg-black rounded-lg border-2 border-red-600 shadow-[0_0_20px_rgba(220,38,38,0.8)]">
