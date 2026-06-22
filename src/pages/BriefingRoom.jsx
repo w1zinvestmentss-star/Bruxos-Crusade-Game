@@ -31,6 +31,24 @@ const BriefingRoom = () => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [isTrialActive, setIsTrialActive] = useState(false);
   const [currentQ, setCurrentQ] = useState(null);
+  const [showVictoryModal, setShowVictoryModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalQuote, setModalQuote] = useState('');
+
+  const VICTORY_QUOTES = [
+    'Your mind is as sharp as a sword!',
+    'A legendary feat!',
+    'The Kingdom grows stronger with your knowledge.',
+    'Knowledge is the ultimate weapon!',
+    'Another victory for the Archives!',
+  ];
+
+  const triggerVictory = (message) => {
+    const randomQuote = VICTORY_QUOTES[Math.floor(Math.random() * VICTORY_QUOTES.length)];
+    setModalMessage(message);
+    setModalQuote(randomQuote);
+    setShowVictoryModal(true);
+  };
 
   const startTrial = () => {
     if (!quest?.questionBank || quest.questionBank.length === 0) return;
@@ -49,8 +67,7 @@ const BriefingRoom = () => {
     if (!currentQ) return;
     const result = await attemptQuiz(quest.id, typedText, currentQ.a, true);
     if (result.success) {
-      alert('Success! ' + result.message);
-      navigate('/quests');
+      triggerVictory(result.message);
     } else {
       alert('Incorrect! Keep trying!');
       setTypedText('');
@@ -68,8 +85,7 @@ const BriefingRoom = () => {
       return;
     }
     await submitQuest(quest.id, journalText, quest.type);
-    alert('Journal entry submitted! Awaiting Teacher Review.');
-    navigate('/quests');
+    triggerVictory('Journal entry submitted! +XP and Gold awarded.');
   };
 
   useEffect(() => {
@@ -187,6 +203,24 @@ const BriefingRoom = () => {
           )}
         </div>
       </div>
+      {showVictoryModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[200] font-['VT323']">
+          <div className="bg-stone-900 border-2 border-yellow-500 rounded-lg p-8 text-center max-w-sm mx-auto shadow-[0_0_30px_rgba(234,179,8,0.3)]">
+            <h2 className="text-3xl text-yellow-500 mb-4 font-['Press_Start_2P']">QUEST COMPLETE</h2>
+            <p className="text-xl text-white mb-4">{modalMessage}</p>
+            <p className="text-lg text-stone-300 italic mb-6">"{modalQuote}"</p>
+            <button 
+              onClick={() => {
+                setShowVictoryModal(false);
+                navigate('/quests');
+              }} 
+              className="px-6 py-2 bg-yellow-600 text-black rounded-lg hover:bg-yellow-500 shadow-lg border-2 border-yellow-400 text-xl font-bold"
+            >
+              Huzzah!
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
