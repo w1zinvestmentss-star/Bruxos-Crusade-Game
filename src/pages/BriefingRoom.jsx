@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useGame } from '../context/GameContext';
@@ -15,6 +15,12 @@ const THEMES = {
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Spectral.Scribe.png',
     title: "The Scribe's Sanctum",
     dialogue: "Halt, traveler. You seek to master the ancient incantations? Prove your memory is as swift as your mind." 
+  },
+  upload: {
+    bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ravens.Roost.png',
+    npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Messenger.Raven.png',
+    title: 'The Aviary',
+    dialogue: 'The flock is ready. Attach your parchment, and it shall be delivered swiftly to the Game Master for review.'
   }
 };
 
@@ -27,6 +33,8 @@ const BriefingRoom = () => {
   const isIncantation = quest?.type === 'incantation';
   const [isAccepted, setIsAccepted] = useState(false);
   const [journalText, setJournalText] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = useRef(null);
   const [typedText, setTypedText] = useState('');
   const [timeLeft, setTimeLeft] = useState(0);
   const [isTrialActive, setIsTrialActive] = useState(false);
@@ -128,6 +136,7 @@ const BriefingRoom = () => {
         </button>
 
         <div className="bg-black/75 backdrop-blur-md p-8 rounded-2xl border-2 border-yellow-500/30 max-w-2xl mx-auto mt-20">
+          <input type="file" ref={fileInputRef} className="hidden" accept="image/*,.pdf,.doc,.docx,.txt" capture="environment" onChange={(e) => setSelectedFile(e.target.files[0])} />
           {!isAccepted ? (
             <div className="grid md:grid-cols-[0.85fr_1.15fr] gap-6 items-center">
               <div className="flex items-center justify-center">
@@ -182,6 +191,22 @@ const BriefingRoom = () => {
                 </button>
               </div>
             )
+          ) : quest.type === 'upload' ? (
+            <div className="flex flex-col items-center w-full gap-4">
+              <button onClick={() => fileInputRef.current.click()} className="px-6 py-4 bg-stone-800 border-2 border-dashed border-stone-500 text-stone-300 rounded-lg hover:bg-stone-700 hover:text-white font-['VT323'] text-2xl w-full transition-colors truncate">
+                {selectedFile ? selectedFile.name : '+ ATTACH PARCHMENT'}
+              </button>
+              <button 
+                onClick={() => {
+                  if (!selectedFile) return alert('Please attach a parchment first!');
+                  submitQuest(quest.id, selectedFile, 'upload');
+                  triggerVictory('The Raven takes flight! Your work has been dispatched for review.');
+                }} 
+                className="px-6 py-3 bg-blue-700 text-white rounded-lg hover:bg-blue-600 font-['Press_Start_2P'] text-sm w-full mt-4"
+              >
+                SEND MESSENGER
+              </button>
+            </div>
           ) : (
             <div>
               <h1 className="text-yellow-400 font-['Press_Start_2P'] text-2xl md:text-3xl mb-4">
