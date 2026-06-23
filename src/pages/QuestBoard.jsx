@@ -38,52 +38,6 @@ const QuestBoard = () => {
   const [activeBlitz, setActiveBlitz] = useState({});
   const [blitzInput, setBlitzInput] = useState('');
 
-  const [gauntletStep, setGauntletStep] = useState(0);
-  const [gauntletTimer, setGauntletTimer] = useState(70);
-  const [isGauntletActive, setIsGauntletActive] = useState(false);
-  const [gauntletQuestion, setGauntletQuestion] = useState(null);
-  const [gauntletAnswer, setGauntletAnswer] = useState('');
-
-  const generateGauntletMath = () => {
-    const ops = ['+', '-', '*'];
-    const op = ops[Math.floor(Math.random() * ops.length)];
-    let a, b;
-    if (op === '+') { a = Math.floor(Math.random() * 20); b = Math.floor(Math.random() * 20); }
-    else if (op === '-') { a = Math.floor(Math.random() * 20) + 10; b = Math.floor(Math.random() * a); }
-    else { a = Math.floor(Math.random() * 10); b = Math.floor(Math.random() * 10); }
-    return { q: `Solve: ${a} ${op} ${b}`, a: eval(`${a} ${op} ${b}`).toString() };
-  };
-
-  const startGauntlet = () => {
-    setGauntletStep(0);
-    setGauntletTimer(70); // 7.0 seconds
-    setGauntletQuestion(generateGauntletMath());
-    setGauntletAnswer('');
-    setIsGauntletActive(true);
-  };
-
-  const handleGauntletSubmit = async () => {
-    if (gauntletAnswer.trim() === gauntletQuestion.a.trim()) {
-      if (gauntletStep < 4) {
-        setGauntletStep(prev => prev + 1);
-        setGauntletTimer(70);
-        setGauntletQuestion(generateGauntletMath());
-        setGauntletAnswer('');
-      } else {
-        setIsGauntletActive(false);
-        const result = await attemptQuiz(999, 'correct', 'correct', true);
-        if (result.success) {
-          triggerVictory(result.message);
-        }
-      }
-    } else {
-      recordGauntletFailure(999);
-      alert('TRIAL FAILED: INCORRECT ANSWER');
-      setIsGauntletActive(false);
-      setGauntletStep(0);
-    }
-  };
-
   const startBlitz = (quest) => {
     if (!quest.questionBank || quest.questionBank.length === 0) return;
     const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
@@ -107,26 +61,6 @@ const QuestBoard = () => {
     setActiveBlitz(prev => ({ ...prev, [quest.id]: { ...prev[quest.id], currentQ: randomQ } }));
     setBlitzInput('');
   };
-
-  useEffect(() => {
-    let timerId;
-    if (isGauntletActive && gauntletTimer > 0) {
-      timerId = setInterval(() => {
-        setGauntletTimer(prev => {
-          if (prev <= 1) {
-            clearInterval(timerId);
-            recordGauntletFailure(999);
-            alert('TRIAL FAILED: TIME EXPIRED');
-            setIsGauntletActive(false);
-            setGauntletStep(0);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 100);
-    }
-    return () => clearInterval(timerId);
-  }, [isGauntletActive, gauntletTimer]);
 
   // --- BLITZ TIMER ---
   useEffect(() => {
@@ -476,28 +410,9 @@ const QuestBoard = () => {
                             ENTER SCRIPTORIUM
                           </button>
                         ) : isGauntlet ? (
-                          isGauntletActive ? (
-                            <div className="relative p-6 bg-black rounded-lg border-2 border-red-600 shadow-[0_0_20px_rgba(220,38,38,0.8)]">
-                              <h4 className="text-red-500 font-['Press_Start_2P'] text-center mb-2 text-xs">CHALLENGE {gauntletStep + 1} OF 5</h4>
-                              <div className="text-6xl text-red-600 font-mono text-center font-bold mb-4 drop-shadow-[0_0_10px_rgba(220,38,38,0.8)]">{(gauntletTimer / 10).toFixed(1)}s</div>
-                              <p className="text-2xl text-white text-center font-mono mb-4">{gauntletQuestion?.q}</p>
-                              <div className="flex gap-2">
-                                <input 
-                                  type="text" 
-                                  value={gauntletAnswer}
-                                  onChange={(e) => setGauntletAnswer(e.target.value)}
-                                  onKeyPress={(e) => e.key === 'Enter' && handleGauntletSubmit()}
-                                  autoFocus
-                                  className="w-full bg-black border border-red-500 text-red-400 font-mono text-2xl p-2 rounded text-center focus:outline-none focus:ring-2 focus:ring-red-500"
-                                />
-                                <button onClick={handleGauntletSubmit} className="px-4 py-2 bg-red-600 text-black font-bold font-['VT323'] text-2xl rounded hover:bg-red-500">STRIKE</button>
-                              </div>
-                            </div>
-                          ) : (
-                            <button onClick={startGauntlet} className="w-full px-4 py-4 bg-red-900 text-red-200 border-2 border-red-600 rounded-lg shadow-lg font-['Press_Start_2P'] text-sm hover:bg-red-800 flex items-center justify-center gap-2">
-                                <AlertTriangle size={18} /> ENTER THE GAUNTLET
-                            </button>
-                          )
+                          <button onClick={() => navigate('/briefing/' + quest.id)} className="w-full px-4 py-4 bg-red-900 text-red-200 border-2 border-red-600 rounded-lg shadow-lg font-['Press_Start_2P'] text-sm hover:bg-red-800 flex items-center justify-center gap-2">
+                            <AlertTriangle size={18} /> ENTER THE DOJO
+                          </button>
                         ) : isMultiStep ? (
                           !activeSession ? (
                             <div className="text-center py-4">

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, AlertTriangle } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const THEMES = {
@@ -21,16 +21,23 @@ const THEMES = {
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Messenger.Raven.png',
     title: 'The Aviary',
     dialogue: 'The flock is ready. Attach your parchment, and it shall be delivered swiftly to the Game Master for review.'
+  },
+  gauntlet: {
+    bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shadow.Dojo.png',
+    npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shadow.Master.png',
+    title: 'The Shadow Dojo',
+    dialogue: 'Speed and precision are the marks of a true master. You have 7 seconds per strike. Do not falter.'
   }
 };
 
 const BriefingRoom = () => {
   const navigate = useNavigate();
   const { questId } = useParams();
-  const { quests, submitQuest, attemptQuiz } = useGame();
+  const { quests, submitQuest, attemptQuiz, recordGauntletFailure } = useGame();
   const quest = quests.find(q => String(q.id) === String(questId));
   const theme = quest ? (THEMES[quest.type] || THEMES.journal) : THEMES.journal;
   const isIncantation = quest?.type === 'incantation';
+  const isGauntlet = quest?.type === 'gauntlet';
   const [isAccepted, setIsAccepted] = useState(false);
   const [journalText, setJournalText] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
@@ -42,6 +49,11 @@ const BriefingRoom = () => {
   const [showVictoryModal, setShowVictoryModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [modalQuote, setModalQuote] = useState('');
+
+  const [gauntletStep, setGauntletStep] = useState(0);
+  const [gauntletTimer, setGauntletTimer] = useState(70);
+  const [gauntletQuestion, setGauntletQuestion] = useState(null);
+  const [gauntletAnswer, setGauntletAnswer] = useState('');
 
   const VICTORY_QUOTES = [
     'Your mind is as sharp as a sword!',
@@ -68,7 +80,41 @@ const BriefingRoom = () => {
   };
 
   const handleAccept = () => {
+    if (quest?.type === 'gauntlet') {
+      setGauntletStep(0);
+      setGauntletTimer(70);
+      setGauntletQuestion(generateGauntletMath());
+      setGauntletAnswer('');
+    }
     setIsAccepted(true);
+  };
+
+  const generateGauntletMath = () => {
+    const ops = ['+', '-', '*'];
+    const op = ops[Math.floor(Math.random() * ops.length)];
+    let a, b;
+    if (op === '+') { a = Math.floor(Math.random() * 20); b = Math.floor(Math.random() * 20); }
+    else if (op === '-') { a = Math.floor(Math.random() * 20) + 10; b = Math.floor(Math.random() * a); }
+    else { a = Math.floor(Math.random() * 10); b = Math.floor(Math.random() * 10); }
+    return { q: `Solve: ${a} ${op} ${b}`, a: eval(`${a} ${op} ${b}`).toString() };
+  };
+
+  const handleGauntletSubmit = async () => {
+    if (gauntletAnswer.trim() === gauntletQuestion.a.trim()) {
+      if (gauntletStep < 4) {
+        setGauntletStep(prev => prev + 1);
+        setGauntletTimer(70);
+        setGauntletQuestion(generateGauntletMath());
+        setGauntletAnswer('');
+      } else {
+        const result = await attemptQuiz(quest.id, 'correct', 'correct', true);
+        if (result.success) triggerVictory(result.message);
+      }
+    } else {
+      recordGauntletFailure(quest.id);
+      alert('TRIAL FAILED: INCORRECT ANSWER');
+      navigate('/quests');
+    }
   };
 
   const handleIncantationSubmit = async () => {
@@ -106,6 +152,25 @@ const BriefingRoom = () => {
     }
     return () => clearInterval(interval);
   }, [isTrialActive, timeLeft]);
+
+  useEffect(() => {
+    let timerId;
+    if (isAccepted && quest?.type === 'gauntlet' && gauntletTimer > 0) {
+      timerId = setInterval(() => {
+        setGauntletTimer(prev => {
+          if (prev <= 1) {
+            clearInterval(timerId);
+            recordGauntletFailure(quest.id);
+            alert('TRIAL FAILED: TIME EXPIRED');
+            navigate('/quests');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 100);
+    }
+    return () => clearInterval(timerId);
+  }, [isAccepted, quest, gauntletTimer]);
 
   if (!quest) {
     return (
@@ -191,6 +256,16 @@ const BriefingRoom = () => {
                 </button>
               </div>
             )
+          ) : isGauntlet ? (
+            <div className="relative p-6 w-full bg-black/90 rounded-lg border-2 border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.8)] animate-pulse">
+              <h4 className="text-red-500 font-['Press_Start_2P'] text-center mb-4 text-sm">CHALLENGE {gauntletStep + 1} OF 5</h4>
+              <div className="text-7xl text-red-600 font-mono text-center font-bold mb-6 drop-shadow-[0_0_15px_rgba(220,38,38,0.9)]">{(gauntletTimer / 10).toFixed(1)}s</div>
+              <p className="text-3xl text-white text-center font-mono mb-6">{gauntletQuestion?.q}</p>
+              <div className="flex gap-4">
+                <input type="text" value={gauntletAnswer} onChange={(e) => setGauntletAnswer(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleGauntletSubmit()} autoFocus className="w-full bg-black border-2 border-red-500 text-red-400 font-mono text-3xl p-4 rounded text-center focus:outline-none focus:ring-4 focus:ring-red-600" />
+                <button onClick={handleGauntletSubmit} className="px-8 py-4 bg-red-700 text-white font-bold font-['Press_Start_2P'] text-lg rounded hover:bg-red-600 transition-colors">STRIKE</button>
+              </div>
+            </div>
           ) : quest.type === 'upload' ? (
             <div className="flex flex-col items-center w-full gap-4">
               <button onClick={() => fileInputRef.current.click()} className="px-6 py-4 bg-stone-800 border-2 border-dashed border-stone-500 text-stone-300 rounded-lg hover:bg-stone-700 hover:text-white font-['VT323'] text-2xl w-full transition-colors truncate">
