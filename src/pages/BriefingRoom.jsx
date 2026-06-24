@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, Zap } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const THEMES = {
@@ -27,13 +27,19 @@ const THEMES = {
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shadow.Master.png',
     title: 'The Shadow Dojo',
     dialogue: 'Speed and precision are the marks of a true master. You have 7 seconds per strike. Do not falter.'
+  },
+  blitz: {
+    bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Alchemists.Lab.png',
+    npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mad.Alchemist.png',
+    title: "The Alchemist's Lab",
+    dialogue: 'Time is of the essence! Answer quickly and accurately to synthesize the ultimate reward. You have 60 seconds.'
   }
 };
 
 const BriefingRoom = () => {
   const navigate = useNavigate();
   const { questId } = useParams();
-  const { quests, submitQuest, attemptQuiz, recordGauntletFailure } = useGame();
+  const { quests, submitQuest, attemptQuiz, recordGauntletFailure, attemptBlitz } = useGame();
   const quest = quests.find(q => String(q.id) === String(questId));
   const theme = quest ? (THEMES[quest.type] || THEMES.journal) : THEMES.journal;
   const isIncantation = quest?.type === 'incantation';
@@ -54,6 +60,8 @@ const BriefingRoom = () => {
   const [gauntletTimer, setGauntletTimer] = useState(70);
   const [gauntletQuestion, setGauntletQuestion] = useState(null);
   const [gauntletAnswer, setGauntletAnswer] = useState('');
+  const [activeBlitz, setActiveBlitz] = useState(null);
+  const [blitzInput, setBlitzInput] = useState('');
 
   const VICTORY_QUOTES = [
     'Your mind is as sharp as a sword!',
@@ -85,6 +93,10 @@ const BriefingRoom = () => {
       setGauntletTimer(70);
       setGauntletQuestion(generateGauntletMath());
       setGauntletAnswer('');
+    }
+    if (quest?.type === 'blitz') {
+      const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
+      setActiveBlitz({ isActive: true, timeLeft: 60, score: 0, currentQ: randomQ });
     }
     setIsAccepted(true);
   };
@@ -172,6 +184,47 @@ const BriefingRoom = () => {
     return () => clearInterval(timerId);
   }, [isAccepted, quest, gauntletTimer]);
 
+  useEffect(() => {
+    let timerId;
+    if (isAccepted && quest?.type === 'blitz' && activeBlitz?.timeLeft > 0) {
+      timerId = setInterval(() => {
+        setActiveBlitz(prev => {
+          if (prev.timeLeft <= 1) {
+            clearInterval(timerId);
+            attemptBlitz(quest.id, prev.score).then(res => {
+              if(res.success) {
+                triggerVictory(res.message);
+              } else {
+                alert(res.message);
+                setIsAccepted(false);
+                setActiveBlitz(null);
+              }
+            });
+            return { ...prev, timeLeft: 0 };
+          }
+          return { ...prev, timeLeft: prev.timeLeft - 1 };
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timerId);
+  }, [isAccepted, quest, activeBlitz?.timeLeft]);
+
+  const handleBlitzSubmit = () => {
+    if (!activeBlitz) return;
+    if (blitzInput.trim().toLowerCase() === activeBlitz.currentQ.a.toString().trim().toLowerCase()) {
+      const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
+      setActiveBlitz(prev => ({ ...prev, score: prev.score + 1, currentQ: randomQ }));
+    }
+    setBlitzInput('');
+  };
+
+  const handleBlitzPass = () => {
+    if (!activeBlitz) return;
+    const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
+    setActiveBlitz(prev => ({ ...prev, currentQ: randomQ }));
+    setBlitzInput('');
+  };
+
   if (!quest) {
     return (
       <div className="relative min-h-screen overflow-hidden bg-black text-stone-100">
@@ -214,59 +267,72 @@ const BriefingRoom = () => {
                 <h1 className="text-yellow-400 font-['Press_Start_2P'] text-2xl md:text-3xl mb-4">
                   {quest.title}
                 </h1>
-                <p className="font-['VT323'] text-2xl text-stone-200 leading-relaxed mb-8">
-                  {theme.dialogue}
-                </p>
-                <button onClick={handleAccept} className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-yellow-600 to-yellow-400 text-stone-950 rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base hover:from-yellow-500 hover:to-yellow-300 transition-colors">
-                  ACCEPT MISSION
-                </button>
-              </div>
-            </div>
-          ) : isIncantation ? (
-            !isTrialActive ? (
-              <div className="text-center">
-                <h1 className="text-yellow-400 font-['Press_Start_2P'] text-2xl md:text-3xl mb-4">
-                  The Memory Spell
-                </h1>
-                <p className="font-['VT323'] text-xl text-stone-300 mb-6">
-                  Memorize the ancient text and cast it flawlessly before time runs out.
-                </p>
-                <button onClick={startTrial} className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-cyan-800 to-blue-700 text-cyan-200 rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base hover:from-cyan-700 hover:to-blue-600 transition-colors">
-                  START TRIAL
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center w-full">
-                <div className="text-4xl text-red-500 font-mono text-center mb-4">{timeLeft}s</div>
-                <div className={`text-xl text-cyan-300 font-mono mb-4 text-center transition-opacity duration-300 ${typedText.length > 0 ? 'opacity-0' : 'opacity-100'}`}>
-                  {currentQ?.q}
-                </div>
-                <textarea 
-                  value={typedText} 
-                  onChange={e => setTypedText(e.target.value)} 
-                  onPaste={e => e.preventDefault()} 
-                  className="w-full bg-black/80 border-2 border-cyan-500 rounded-lg p-4 text-white font-mono h-32 focus:outline-none focus:ring-2 focus:ring-cyan-300 resize-none mb-4" 
-                  placeholder="Type the incantation perfectly..." 
-                />
-                <button 
-                  onClick={handleIncantationSubmit} 
-                  className="px-6 py-3 bg-cyan-700 text-white rounded-lg hover:bg-cyan-600 font-['Press_Start_2P'] text-sm"
-                >
-                  CAST SPELL
-                </button>
-              </div>
-            )
-          ) : isGauntlet ? (
-            <div className="relative p-6 w-full bg-black/90 rounded-lg border-2 border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.8)] animate-pulse">
-              <h4 className="text-red-500 font-['Press_Start_2P'] text-center mb-4 text-sm">CHALLENGE {gauntletStep + 1} OF 5</h4>
-              <div className="text-7xl text-red-600 font-mono text-center font-bold mb-6 drop-shadow-[0_0_15px_rgba(220,38,38,0.9)]">{(gauntletTimer / 10).toFixed(1)}s</div>
-              <p className="text-3xl text-white text-center font-mono mb-6">{gauntletQuestion?.q}</p>
-              <div className="flex gap-4">
-                <input type="text" value={gauntletAnswer} onChange={(e) => setGauntletAnswer(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleGauntletSubmit()} autoFocus className="w-full bg-black border-2 border-red-500 text-red-400 font-mono text-3xl p-4 rounded text-center focus:outline-none focus:ring-4 focus:ring-red-600" />
-                <button onClick={handleGauntletSubmit} className="px-8 py-4 bg-red-700 text-white font-bold font-['Press_Start_2P'] text-lg rounded hover:bg-red-600 transition-colors">STRIKE</button>
-              </div>
-            </div>
-          ) : quest.type === 'upload' ? (
+<p className="font-['VT323'] text-2xl text-stone-200 leading-relaxed mb-8">
+                   {theme.dialogue}
+                 </p>
+                 <button onClick={handleAccept} className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-yellow-600 to-yellow-400 text-stone-950 rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base hover:from-yellow-500 hover:to-yellow-300 transition-colors">
+                   ACCEPT MISSION
+                 </button>
+               </div>
+             </div>
+           ) : isIncantation ? (
+             !isTrialActive ? (
+               <div className="text-center">
+                 <h1 className="text-yellow-400 font-['Press_Start_2P'] text-2xl md:text-3xl mb-4">
+                   The Memory Spell
+                 </h1>
+                 <p className="font-['VT323'] text-xl text-stone-300 mb-6">
+                   Memorize the ancient text and cast it flawlessly before time runs out.
+                 </p>
+                 <button onClick={startTrial} className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-cyan-800 to-blue-700 text-cyan-200 rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base hover:from-cyan-700 hover:to-blue-600 transition-colors">
+                   START TRIAL
+                 </button>
+               </div>
+             ) : (
+               <div className="flex flex-col items-center w-full">
+                 <div className="text-4xl text-red-500 font-mono text-center mb-4">{timeLeft}s</div>
+                 <div className={`text-xl text-cyan-300 font-mono mb-4 text-center transition-opacity duration-300 ${typedText.length > 0 ? 'opacity-0' : 'opacity-100'}`}>
+                   {currentQ?.q}
+                 </div>
+                 <textarea 
+                   value={typedText} 
+                   onChange={e => setTypedText(e.target.value)} 
+                   onPaste={e => e.preventDefault()} 
+                   className="w-full bg-black/80 border-2 border-cyan-500 rounded-lg p-4 text-white font-mono h-32 focus:outline-none focus:ring-2 focus:ring-cyan-300 resize-none mb-4" 
+                   placeholder="Type the incantation perfectly..." 
+                 />
+                 <button 
+                   onClick={handleIncantationSubmit} 
+                   className="px-6 py-3 bg-cyan-700 text-white rounded-lg hover:bg-cyan-600 font-['Press_Start_2P'] text-sm"
+                 >
+                   CAST SPELL
+                 </button>
+               </div>
+             )
+           ) : isGauntlet ? (
+             <div className="relative p-6 w-full bg-black/90 rounded-lg border-2 border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.8)] animate-pulse">
+               <h4 className="text-red-500 font-['Press_Start_2P'] text-center mb-4 text-sm">CHALLENGE {gauntletStep + 1} OF 5</h4>
+               <div className="text-7xl text-red-600 font-mono text-center font-bold mb-6 drop-shadow-[0_0_15px_rgba(220,38,38,0.9)]">{(gauntletTimer / 10).toFixed(1)}s</div>
+               <p className="text-3xl text-white text-center font-mono mb-6">{gauntletQuestion?.q}</p>
+               <div className="flex gap-4">
+                 <input type="text" value={gauntletAnswer} onChange={(e) => setGauntletAnswer(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleGauntletSubmit()} autoFocus className="w-full bg-black border-2 border-red-500 text-red-400 font-mono text-3xl p-4 rounded text-center focus:outline-none focus:ring-4 focus:ring-red-600" />
+                 <button onClick={handleGauntletSubmit} className="px-8 py-4 bg-red-700 text-white font-bold font-['Press_Start_2P'] text-lg rounded hover:bg-red-600 transition-colors">STRIKE</button>
+               </div>
+             </div>
+           ) : quest.type === 'blitz' && activeBlitz ? (
+             <div className="relative p-6 w-full bg-black/90 rounded-lg border-2 border-cyan-600 shadow-[0_0_30px_rgba(6,182,212,0.6)]">
+               <div className="flex justify-between items-center mb-4">
+                 <div className={`text-5xl font-mono font-bold ${activeBlitz.timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-cyan-400'}`}>{activeBlitz.timeLeft}s</div>
+                 <div className="text-yellow-400 font-['Press_Start_2P'] text-xl">Score: {activeBlitz.score}</div>
+               </div>
+               <p className="text-3xl text-white text-center font-mono mb-6 bg-stone-900 p-4 rounded-lg border border-stone-700">{activeBlitz.currentQ?.q}</p>
+               <input type="text" value={blitzInput} onChange={(e) => setBlitzInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleBlitzSubmit(); }} autoFocus className="w-full bg-black border-2 border-cyan-500 text-cyan-400 font-mono text-3xl p-4 rounded text-center focus:outline-none focus:ring-4 focus:ring-cyan-600 mb-4" placeholder="> Enter answer..." />
+               <div className="flex gap-4">
+                 <button onClick={handleBlitzSubmit} className="flex-1 px-4 py-4 bg-cyan-700 text-white font-bold font-['Press_Start_2P'] text-sm rounded hover:bg-cyan-600 transition-colors">SUBMIT</button>
+                 <button onClick={handleBlitzPass} className="flex-1 px-4 py-4 bg-stone-700 text-white font-bold font-['Press_Start_2P'] text-sm rounded hover:bg-stone-600 transition-colors">PASS</button>
+               </div>
+             </div>
+           ) : quest.type === 'upload' ? (
             <div className="flex flex-col items-center w-full gap-4">
               <button onClick={() => fileInputRef.current.click()} className="px-6 py-4 bg-stone-800 border-2 border-dashed border-stone-500 text-stone-300 rounded-lg hover:bg-stone-700 hover:text-white font-['VT323'] text-2xl w-full transition-colors truncate">
                 {selectedFile ? selectedFile.name : '+ ATTACH PARCHMENT'}

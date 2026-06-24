@@ -453,10 +453,10 @@ export function GameProvider({ children }) {
           formattedProfile.inventory = inv || [];
 
           // --- LOGIN STREAK LOGIC ---
-          const todayStr = new Date().toLocaleDateString('en-CA');
+          const todayStr = new Date().toISOString().split('T')[0];
           const yest = new Date();
           yest.setDate(yest.getDate() - 1);
-          const yesterdayStr = yest.toLocaleDateString('en-CA');
+          const yesterdayStr = yest.toISOString().split('T')[0];
 
           let streakUpdated = false;
 
@@ -511,7 +511,7 @@ export function GameProvider({ children }) {
               type: s.type,
               status: s.status,
               proofContent: s.proof_content,
-              timestamp: s.created_at ? new Date(s.created_at).toLocaleDateString('en-CA') : s.timestamp
+              timestamp: s.created_at ? new Date(s.created_at).toISOString().split('T')[0] : s.timestamp
             }));
             setSubmissions(mappedSubs);
           }
@@ -899,7 +899,7 @@ export function GameProvider({ children }) {
       studentId: currentUser.id,
       studentName: currentUser.heroName,
       status: 'pending',
-      timestamp: new Date().toLocaleDateString('en-CA'),
+      timestamp: new Date().toISOString().split('T')[0],
       type,
       proofImage: finalProofUrl,
       journalText: finalJournalText
@@ -928,7 +928,7 @@ export function GameProvider({ children }) {
       studentName: currentUser.heroName,
       status: 'pending',
       isBossStrike: true,
-      timestamp: new Date().toLocaleDateString('en-CA'),
+      timestamp: new Date().toISOString().split('T')[0],
       type: submissionType,
       proofContent: finalContent
     };
@@ -972,7 +972,7 @@ export function GameProvider({ children }) {
       feeling: feeling,
       type: 'wellness',
       status: 'read_only',
-      timestamp: new Date().toLocaleDateString('en-CA'),
+      timestamp: new Date().toISOString().split('T')[0],
     };
     setSubmissions(prev => [...prev, newSubmission]);
     saveSubmissionToCloud(newSubmission);
@@ -1174,7 +1174,7 @@ export function GameProvider({ children }) {
         studentId: currentUser.id,
         studentName: currentUser.heroName,
         status: 'approved',
-        timestamp: new Date().toLocaleDateString('en-CA'),
+        timestamp: new Date().toISOString().split('T')[0],
         type: quest.type || 'quiz',
       };
       setSubmissions(prev => [...prev, newSubmission]);
@@ -1207,7 +1207,7 @@ export function GameProvider({ children }) {
       studentId: currentUser.id,
       studentName: currentUser.heroName,
       status: 'failed',
-      timestamp: new Date().toLocaleDateString('en-CA'),
+      timestamp: new Date().toISOString().split('T')[0],
       type: 'gauntlet',
     };
     setSubmissions(prev => [...prev, newSubmission]);
@@ -1237,7 +1237,7 @@ export function GameProvider({ children }) {
         studentId: currentUser.id,
         studentName: currentUser.heroName,
         status: 'approved',
-        timestamp: new Date().toLocaleDateString('en-CA'),
+        timestamp: new Date().toISOString().split('T')[0],
         type: 'scenario',
       };
       setSubmissions(prev => [...prev, newSubmission]);
@@ -1275,15 +1275,13 @@ export function GameProvider({ children }) {
 
     if (quest.frequency === 'daily' || quest.frequency === 'weekly') {
       // Get today's date strictly as YYYY-MM-DD
-      const todayString = new Date().toLocaleDateString('en-CA');
+      const todayString = new Date().toISOString().split('T')[0];
 
       // Extract the submission date strictly as YYYY-MM-DD
       let submissionDateString = '';
       if (mostRecentSubmission.created_at) {
-        // If from Supabase, convert the ISO string to local YYYY-MM-DD
-        submissionDateString = new Date(mostRecentSubmission.created_at).toLocaleDateString('en-CA');
+        submissionDateString = new Date(mostRecentSubmission.created_at).toISOString().split('T')[0];
       } else {
-        // If local, it is already YYYY-MM-DD
         submissionDateString = mostRecentSubmission.timestamp;
       }
 
@@ -1627,7 +1625,7 @@ export function GameProvider({ children }) {
 
     const newSubmission = {
       id: Date.now(), questId, studentId: currentUser.id, studentName: currentUser.heroName,
-      status: 'approved', timestamp: new Date().toLocaleDateString('en-CA'), type: 'blitz'
+      status: 'approved', timestamp: new Date().toISOString().split('T')[0], type: 'blitz'
     };
     setSubmissions(prev => [...prev, newSubmission]);
     saveSubmissionToCloud(newSubmission);

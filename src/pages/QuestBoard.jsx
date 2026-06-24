@@ -14,7 +14,7 @@ const VICTORY_QUOTES = [
 
 const QuestBoard = () => {
   const navigate = useNavigate();
-  const { quests, submitQuest, getQuestStatus, currentUser, attemptQuiz, attemptScenario, submitWellnessCheck, globalEffects, resolveVoidGrasp, recordGauntletFailure, attemptBlitz } = useGame();
+  const { quests, submitQuest, getQuestStatus, currentUser, attemptQuiz, attemptScenario, submitWellnessCheck, globalEffects, resolveVoidGrasp, recordGauntletFailure, submissions } = useGame();
   
   const fileInputRef = useRef(null);
   const selectedQuestRef = useRef(null);
@@ -35,77 +35,6 @@ const QuestBoard = () => {
   const [activeSessions, setActiveSessions] = useState({});
   const [sessionAnswers, setSessionAnswers] = useState({});
   const [activeScenarios, setActiveScenarios] = useState({});
-  const [activeBlitz, setActiveBlitz] = useState({});
-  const [blitzInput, setBlitzInput] = useState('');
-
-  const startBlitz = (quest) => {
-    if (!quest.questionBank || quest.questionBank.length === 0) return;
-    const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
-    setActiveBlitz({ [quest.id]: { isActive: true, timeLeft: 60, score: 0, currentQ: randomQ } });
-    setBlitzInput('');
-  };
-
-  const handleBlitzSubmit = (quest) => {
-    const session = activeBlitz[quest.id];
-    if (!session || !session.isActive) return;
-    if (blitzInput.trim().toLowerCase() === session.currentQ.a.toString().trim().toLowerCase()) {
-      const randomQ = quest.questionBank?.[Math.floor(Math.random() * (quest.questionBank?.length || 0))];
-      setActiveBlitz(prev => ({ ...prev, [quest.id]: { ...prev[quest.id], score: prev[quest.id].score + 1, currentQ: randomQ } }));
-    }
-    setBlitzInput('');
-  };
-
-  const handleBlitzPass = (quest) => {
-    if (!activeBlitz[quest.id]?.isActive) return;
-    const randomQ = quest.questionBank?.[Math.floor(Math.random() * (quest.questionBank?.length || 0))];
-    setActiveBlitz(prev => ({ ...prev, [quest.id]: { ...prev[quest.id], currentQ: randomQ } }));
-    setBlitzInput('');
-  };
-
-  // --- BLITZ TIMER ---
-  useEffect(() => {
-    const timerId = setInterval(async () => {
-      setActiveBlitz(prev => {
-        const updated = { ...prev };
-        let changed = false;
-        for (const questId in updated) {
-          if (updated[questId].isActive && updated[questId].timeLeft > 0) {
-            updated[questId] = { ...updated[questId], timeLeft: updated[questId].timeLeft - 1 };
-            changed = true;
-          } else if (updated[questId].isActive && updated[questId].timeLeft === 0) {
-            // Fire and clear — handled outside setActiveBlitz to avoid stale closure
-            updated[questId] = { ...updated[questId], isActive: false };
-            changed = true;
-          }
-        }
-        return changed ? updated : prev;
-      });
-    }, 1000);
-    return () => clearInterval(timerId);
-  }, []);
-
-  // Separate effect: watch for expired blitz sessions and submit them
-  useEffect(() => {
-    const expiredEntry = Object.entries(activeBlitz).find(
-      ([, session]) => !session.isActive && session.score !== undefined && session.timeLeft === 0
-    );
-    if (expiredEntry) {
-      const [questId, session] = expiredEntry;
-      attemptBlitz(Number(questId), session.score).then(result => {
-        if (result.success) {
-          triggerVictory(result.message);
-        } else {
-          alert(result.message);
-        }
-        setActiveBlitz(prev => {
-          const next = { ...prev };
-          delete next[questId];
-          return next;
-        });
-      });
-    }
-  }, [activeBlitz]);
-  // --------------------
 
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
 
@@ -471,51 +400,9 @@ const QuestBoard = () => {
                                 </div>
                               )
                         ) : quest.type === 'blitz' ? (
-                          !activeBlitz[quest.id] ? (
-                            <button
-                              onClick={() => startBlitz(quest)}
-                              className="w-full px-4 py-3 bg-gradient-to-r from-blue-700 to-cyan-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm hover:from-blue-600 hover:to-cyan-500 flex items-center justify-center gap-2"
-                            >
-                              <Zap size={18} /> START 60s BLITZ
-                            </button>
-                          ) : (
-                            <div className="space-y-3">
-                              <div className="flex justify-between items-center">
-                                <div className={`text-4xl font-mono font-bold ${activeBlitz[quest.id].timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-cyan-400'}`}>
-                                  {activeBlitz[quest.id].timeLeft}s
-                                </div>
-                                <div className="text-yellow-400 font-['VT323'] text-2xl">
-                                  Score: {activeBlitz[quest.id].score}
-                                </div>
-                              </div>
-                              <p className="text-lg text-white font-mono text-center bg-black/50 p-2 rounded">
-                                {activeBlitz[quest.id].currentQ?.q}
-                              </p>
-                              <input
-                                type="text"
-                                value={blitzInput}
-                                onChange={(e) => setBlitzInput(e.target.value)}
-                                onKeyDown={(e) => { if (e.key === 'Enter') handleBlitzSubmit(quest); }}
-                                placeholder="> type answer..."
-                                autoFocus
-                                className="bg-black/80 border border-cyan-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-cyan-500"
-                              />
-                              <div className="flex gap-2">
-                                <button
-                                  onClick={() => handleBlitzSubmit(quest)}
-                                  className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500 font-['VT323'] text-lg"
-                                >
-                                  SUBMIT
-                                </button>
-                                <button
-                                  onClick={() => handleBlitzPass(quest)}
-                                  className="flex-1 px-3 py-2 bg-stone-600 text-white rounded-lg hover:bg-stone-500 font-['VT323'] text-lg"
-                                >
-                                  PASS
-                                </button>
-                              </div>
-                            </div>
-                          )
+                          <button onClick={() => navigate('/briefing/' + quest.id)} className="w-full px-4 py-3 bg-gradient-to-r from-blue-700 to-cyan-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-[10px] hover:from-blue-600 hover:to-cyan-500 flex items-center justify-center gap-2">
+                            <Zap size={18} /> ENTER THE LABORATORY
+                          </button>
                         ) : quest.type === 'quiz' ? (
                           !activeQuizzes[quest.id] ? (
                             quest.questionBank?.length > 0 ? (
