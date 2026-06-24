@@ -302,7 +302,7 @@ const QuestBoard = () => {
                         const isMultiStep = quest.type === 'multi-step';
                         const isScenario = quest.type === 'scenario';
                         const isJournal = quest.type === 'journal';
-                        const isScout = ['scout-sports', 'scout-arts'].includes(quest.type);
+                        const isScout = ['scout-sports'].includes(quest.type);
                         const isWellness = quest.type === 'wellness';
                         const isGauntlet = quest.type === 'gauntlet';
                         const currentScenario = activeScenarios[quest.id];
@@ -458,6 +458,10 @@ const QuestBoard = () => {
                         ) : quest.type === 'upload' ? (
                           <button onClick={() => navigate('/briefing/' + quest.id)} className="w-full px-4 py-3 bg-gradient-to-r from-stone-700 to-stone-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-[10px] hover:from-stone-600 hover:to-stone-500 flex items-center justify-center gap-2">
                             <Upload size={18} /> DISPATCH RAVEN
+                          </button>
+                        ) : quest.type === 'scout-arts' ? (
+                          <button onClick={() => navigate('/briefing/' + quest.id)} className="w-full px-4 py-3 bg-gradient-to-r from-pink-900 to-purple-800 text-pink-200 border-2 border-pink-700 rounded-lg shadow-[0_0_15px_rgba(236,72,153,0.4)] font-['Press_Start_2P'] text-[10px] hover:bg-pink-900 transition-colors flex items-center justify-center gap-2">
+                            <Palette size={18} /> ENTER THE STUDIO
                           </button>
                         ) : isScout ? (
                           <button onClick={() => triggerUpload(quest.id)} className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2 font-['VT323'] text-xl"><Upload size={18} /> SUBMIT PROOF</button>

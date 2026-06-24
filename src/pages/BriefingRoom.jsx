@@ -33,6 +33,12 @@ const THEMES = {
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mad.Alchemist.png',
     title: "The Alchemist's Lab",
     dialogue: 'Time is of the essence! Answer quickly and accurately to synthesize the ultimate reward. You have 60 seconds.'
+  },
+  'scout-arts': {
+    bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Grand.Studio.png',
+    npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Master.Artisan.png',
+    title: 'The Artisan\'s Studio',
+    dialogue: 'True power requires creation, not just destruction. Show me your masterpiece. Ensure your work captures the essence of the realm.'
   }
 };
 
@@ -332,7 +338,7 @@ const BriefingRoom = () => {
                  <button onClick={handleBlitzPass} className="flex-1 px-4 py-4 bg-stone-700 text-white font-bold font-['Press_Start_2P'] text-sm rounded hover:bg-stone-600 transition-colors">PASS</button>
                </div>
              </div>
-           ) : quest.type === 'upload' ? (
+            ) : quest.type === 'upload' ? (
             <div className="flex flex-col items-center w-full gap-4">
               <button onClick={() => fileInputRef.current.click()} className="px-6 py-4 bg-stone-800 border-2 border-dashed border-stone-500 text-stone-300 rounded-lg hover:bg-stone-700 hover:text-white font-['VT323'] text-2xl w-full transition-colors truncate">
                 {selectedFile ? selectedFile.name : '+ ATTACH PARCHMENT'}
@@ -346,6 +352,22 @@ const BriefingRoom = () => {
                 className="px-6 py-3 bg-blue-700 text-white rounded-lg hover:bg-blue-600 font-['Press_Start_2P'] text-sm w-full mt-4"
               >
                 SEND MESSENGER
+              </button>
+            </div>
+          ) : quest.type === 'scout-arts' ? (
+            <div className="flex flex-col items-center w-full gap-4">
+              <button onClick={() => fileInputRef.current.click()} className="px-6 py-4 bg-stone-800 border-2 border-dashed border-pink-500 text-pink-300 rounded-lg hover:bg-stone-700 hover:text-white font-['VT323'] text-2xl w-full transition-colors truncate">
+                {selectedFile ? selectedFile.name : '+ UPLOAD MASTERPIECE'}
+              </button>
+              <button 
+                onClick={() => {
+                  if (!selectedFile) return alert('Please attach your masterpiece first!');
+                  submitQuest(quest.id, selectedFile, 'scout-arts');
+                  triggerVictory('Masterpiece submitted! Awaiting the Game Master\'s critique.');
+                }} 
+                className="px-6 py-3 bg-pink-700 text-white rounded-lg hover:bg-pink-600 font-['Press_Start_2P'] text-sm w-full mt-4 shadow-[0_0_15px_rgba(236,72,153,0.6)]"
+              >
+                PRESENT ARTWORK
               </button>
             </div>
           ) : (
