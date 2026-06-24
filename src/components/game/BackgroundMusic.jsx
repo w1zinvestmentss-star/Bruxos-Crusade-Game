@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useGame } from '../../context/GameContext';
 import { Music, Music2 } from 'lucide-react';
 
-const playlist = {
+const ROUTE_TRACKS = {
   '/': 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Title%20Theme%20song%20(The%20w1z).mp3',
   '/login': 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-hero-teacher-select-screen.mp3',
   '/student-dashboard': 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Thehub-map-theme.mp3',
@@ -13,11 +14,13 @@ const playlist = {
   '/quests': 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-questboard-theme.mp3',
   '/dungeon': 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Alcards%20Theme.mp3',
   '/trophies': 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Jameels.interlude.mp3',
-  '/briefing': 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-barracks-theme.mp3',
 };
+
+const DEFAULT_TRACK = '';
 
 const BackgroundMusic = () => {
   const location = useLocation();
+  const { quests } = useGame();
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef(null);
   const [currentTrack, setCurrentTrack] = useState('');
@@ -28,30 +31,48 @@ const BackgroundMusic = () => {
       audioRef.current.loop = true;
     }
 
-    const path = location.pathname;
-    let newTrack = playlist[path];
-    if (!newTrack && path.startsWith('/briefing')) {
-      newTrack = playlist['/briefing'];
+    let targetTrack = null;
+
+    if (location.pathname.startsWith('/briefing/')) {
+      const questId = parseInt(location.pathname.split('/').pop());
+      const quest = quests.find(q => q.id === questId);
+
+      if (quest) {
+        switch (quest.type) {
+          case 'incantation':
+            targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Ice.in.my.veins.mp3';
+            break;
+          case 'scout-sports':
+            targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-barracks-theme.mp3';
+            break;
+          case 'upload':
+            targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-Archive-theme.mp3';
+            break;
+          default:
+            targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Thehub-map-theme.mp3';
+        }
+      }
+    } else {
+      targetTrack = ROUTE_TRACKS[location.pathname] || DEFAULT_TRACK;
     }
 
-    // Only change source if the track is different
-    if (newTrack && newTrack !== currentTrack) {
-      setCurrentTrack(newTrack);
-      audioRef.current.src = newTrack;
+    if (targetTrack && targetTrack !== currentTrack) {
+      setCurrentTrack(targetTrack);
+      audioRef.current.src = targetTrack;
       audioRef.current.play().catch(error => console.error("Audio playback failed:", error));
-    } else if (!newTrack && audioRef.current.src) {
+    } else if (!targetTrack && audioRef.current.src) {
        audioRef.current.pause();
-       setCurrentTrack(''); // Reset current track
+       setCurrentTrack('');
     }
 
-  }, [location, currentTrack]);
+  }, [location, quests, currentTrack]);
 
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.muted = isMuted;
     }
   }, [isMuted]);
-  
+   
   const toggleMute = () => {
     setIsMuted(!isMuted);
   };
