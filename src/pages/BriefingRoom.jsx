@@ -39,6 +39,12 @@ const THEMES = {
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Master.Artisan.png',
     title: 'The Artisan\'s Studio',
     dialogue: 'True power requires creation, not just destruction. Show me your masterpiece. Ensure your work captures the essence of the realm.'
+  },
+  'scout-sports': {
+    bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Proving.Grounds.png',
+    npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Drillmaster.png',
+    title: 'The Proving Grounds',
+    dialogue: 'Words will not save you in battle. Only strength and endurance. Show me proof of your physical training, recruit!'
   }
 };
 
@@ -354,23 +360,39 @@ const BriefingRoom = () => {
                 SEND MESSENGER
               </button>
             </div>
-          ) : quest.type === 'scout-arts' ? (
-            <div className="flex flex-col items-center w-full gap-4">
-              <button onClick={() => fileInputRef.current.click()} className="px-6 py-4 bg-stone-800 border-2 border-dashed border-pink-500 text-pink-300 rounded-lg hover:bg-stone-700 hover:text-white font-['VT323'] text-2xl w-full transition-colors truncate">
-                {selectedFile ? selectedFile.name : '+ UPLOAD MASTERPIECE'}
-              </button>
-              <button 
-                onClick={() => {
-                  if (!selectedFile) return alert('Please attach your masterpiece first!');
-                  submitQuest(quest.id, selectedFile, 'scout-arts');
-                  triggerVictory('Masterpiece submitted! Awaiting the Game Master\'s critique.');
-                }} 
-                className="px-6 py-3 bg-pink-700 text-white rounded-lg hover:bg-pink-600 font-['Press_Start_2P'] text-sm w-full mt-4 shadow-[0_0_15px_rgba(236,72,153,0.6)]"
-              >
-                PRESENT ARTWORK
-              </button>
-            </div>
-          ) : (
+           ) : quest.type === 'scout-arts' ? (
+             <div className="flex flex-col items-center w-full gap-4">
+               <button onClick={() => fileInputRef.current.click()} className="px-6 py-4 bg-stone-800 border-2 border-dashed border-pink-500 text-pink-300 rounded-lg hover:bg-stone-700 hover:text-white font-['VT323'] text-2xl w-full transition-colors truncate">
+                 {selectedFile ? selectedFile.name : '+ UPLOAD MASTERPIECE'}
+               </button>
+               <button 
+                 onClick={() => {
+                   if (!selectedFile) return alert('Please attach your masterpiece first!');
+                   submitQuest(quest.id, selectedFile, 'scout-arts');
+                   triggerVictory('Masterpiece submitted! Awaiting the Game Master\'s critique.');
+                 }} 
+                 className="px-6 py-3 bg-pink-700 text-white rounded-lg hover:bg-pink-600 font-['Press_Start_2P'] text-sm w-full mt-4 shadow-[0_0_15px_rgba(236,72,153,0.6)]"
+               >
+                 PRESENT ARTWORK
+               </button>
+             </div>
+           ) : quest.type === 'scout-sports' ? (
+             <div className="flex flex-col items-center w-full gap-4">
+               <button onClick={() => fileInputRef.current.click()} className="px-6 py-4 bg-stone-800 border-2 border-dashed border-orange-500 text-orange-300 rounded-lg hover:bg-stone-700 hover:text-white font-['VT323'] text-2xl w-full transition-colors truncate">
+                 {selectedFile ? selectedFile.name : '+ UPLOAD TRAINING PROOF'}
+               </button>
+               <button 
+                 onClick={() => {
+                   if (!selectedFile) return alert('Please attach proof of your training first!');
+                   submitQuest(quest.id, selectedFile, 'scout-sports');
+                   triggerVictory('Training report submitted! The Drillmaster will evaluate your effort.');
+                 }} 
+                 className="px-6 py-3 bg-orange-700 text-white rounded-lg hover:bg-orange-600 font-['Press_Start_2P'] text-sm w-full mt-4 shadow-[0_0_15px_rgba(249,115,22,0.6)]"
+               >
+                 PRESENT REPORT
+               </button>
+             </div>
+           ) : (
             <div>
               <h1 className="text-yellow-400 font-['Press_Start_2P'] text-2xl md:text-3xl mb-4">
                 Record Your Journey

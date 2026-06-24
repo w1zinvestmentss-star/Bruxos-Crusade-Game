@@ -13,6 +13,7 @@ const playlist = {
   '/quests': 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-questboard-theme.mp3',
   '/dungeon': 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Alcards%20Theme.mp3',
   '/trophies': 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Jameels.interlude.mp3',
+  '/briefing': 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-barracks-theme.mp3',
 };
 
 const BackgroundMusic = () => {
@@ -28,7 +29,10 @@ const BackgroundMusic = () => {
     }
 
     const path = location.pathname;
-    const newTrack = playlist[path];
+    let newTrack = playlist[path];
+    if (!newTrack && path.startsWith('/briefing')) {
+      newTrack = playlist['/briefing'];
+    }
 
     // Only change source if the track is different
     if (newTrack && newTrack !== currentTrack) {
