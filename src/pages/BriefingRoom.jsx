@@ -28,6 +28,12 @@ const THEMES = {
     title: 'The Shadow Dojo',
     dialogue: 'Speed and precision are the marks of a true master. You have 7 seconds per strike. Do not falter.'
   },
+103: {
+    bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Hunters.Archives.png',
+    npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Insight.Hunter.png',
+    title: "The Hunter's Archives",
+    dialogue: "Insight is gained through speed and logic. Prove your worth before the nightmare claims you. You have 60 seconds."
+  },
   blitz: {
     bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Alchemists.Lab.png',
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mad.Alchemist.png',

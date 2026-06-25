@@ -38,18 +38,22 @@ const BackgroundMusic = () => {
       const quest = quests.find(q => q.id === questId);
 
       if (quest) {
-        switch (quest.type) {
-          case 'incantation':
-            targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Ice.in.my.veins.mp3';
-            break;
-          case 'scout-sports':
-            targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-barracks-theme.mp3';
-            break;
-          case 'upload':
-            targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-Archive-theme.mp3';
-            break;
-          default:
-            targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Thehub-map-theme.mp3';
+        if (questId === 103) {
+          targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Father%20gascoigne%20freestyle.mp3';
+        } else {
+          switch (quest.type) {
+            case 'incantation':
+              targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Ice.in.my.veins.mp3';
+              break;
+            case 'scout-sports':
+              targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-barracks-theme.mp3';
+              break;
+            case 'upload':
+              targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-Archive-theme.mp3';
+              break;
+            default:
+              targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Thehub-map-theme.mp3';
+          }
         }
       }
     } else {
