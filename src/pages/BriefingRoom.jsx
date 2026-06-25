@@ -34,6 +34,12 @@ const THEMES = {
     title: "The Alchemist's Lab",
     dialogue: 'Time is of the essence! Answer quickly and accurately to synthesize the ultimate reward. You have 60 seconds.'
   },
+  112: {
+    bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Alchemists.Lab.png',
+    npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mad.Alchemist.png',
+    title: 'The Grand Observatory',
+    dialogue: 'The laws of nature await your discovery. Answer swiftly to uncover the truth of the realm. You have 60 seconds.'
+  },
   'scout-arts': {
     bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Grand.Studio.png',
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Master.Artisan.png',
@@ -53,7 +59,8 @@ const BriefingRoom = () => {
   const { questId } = useParams();
   const { quests, submitQuest, attemptQuiz, recordGauntletFailure, attemptBlitz } = useGame();
   const quest = quests.find(q => String(q.id) === String(questId));
-  const theme = quest ? (THEMES[quest.type] || THEMES.journal) : THEMES.journal;
+  const currentTheme = quest ? (THEMES[quest.id] || THEMES[quest.type] || THEMES.journal) : THEMES.journal;
+  const theme = currentTheme;
   const isIncantation = quest?.type === 'incantation';
   const isGauntlet = quest?.type === 'gauntlet';
   const [isAccepted, setIsAccepted] = useState(false);
@@ -221,9 +228,10 @@ const BriefingRoom = () => {
     return () => clearInterval(timerId);
   }, [isAccepted, quest, activeBlitz?.timeLeft]);
 
-  const handleBlitzSubmit = () => {
+  const handleBlitzSubmit = (selectedOption = null) => {
     if (!activeBlitz) return;
-    if (blitzInput.trim().toLowerCase() === activeBlitz.currentQ.a.toString().trim().toLowerCase()) {
+    const answerToCheck = selectedOption !== null ? selectedOption : blitzInput;
+    if (answerToCheck.toString().trim().toLowerCase() === activeBlitz.currentQ.a.toString().trim().toLowerCase()) {
       const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
       setActiveBlitz(prev => ({ ...prev, score: prev.score + 1, currentQ: randomQ }));
     }
@@ -331,19 +339,35 @@ const BriefingRoom = () => {
                  <button onClick={handleGauntletSubmit} className="px-8 py-4 bg-red-700 text-white font-bold font-['Press_Start_2P'] text-lg rounded hover:bg-red-600 transition-colors">STRIKE</button>
                </div>
              </div>
-           ) : quest.type === 'blitz' && activeBlitz ? (
-             <div className="relative p-6 w-full bg-black/90 rounded-lg border-2 border-cyan-600 shadow-[0_0_30px_rgba(6,182,212,0.6)]">
-               <div className="flex justify-between items-center mb-4">
-                 <div className={`text-5xl font-mono font-bold ${activeBlitz.timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-cyan-400'}`}>{activeBlitz.timeLeft}s</div>
-                 <div className="text-yellow-400 font-['Press_Start_2P'] text-xl">Score: {activeBlitz.score}</div>
-               </div>
-               <p className="text-3xl text-white text-center font-mono mb-6 bg-stone-900 p-4 rounded-lg border border-stone-700">{activeBlitz.currentQ?.q}</p>
-               <input type="text" value={blitzInput} onChange={(e) => setBlitzInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleBlitzSubmit(); }} autoFocus className="w-full bg-black border-2 border-cyan-500 text-cyan-400 font-mono text-3xl p-4 rounded text-center focus:outline-none focus:ring-4 focus:ring-cyan-600 mb-4" placeholder="> Enter answer..." />
-               <div className="flex gap-4">
-                 <button onClick={handleBlitzSubmit} className="flex-1 px-4 py-4 bg-cyan-700 text-white font-bold font-['Press_Start_2P'] text-sm rounded hover:bg-cyan-600 transition-colors">SUBMIT</button>
-                 <button onClick={handleBlitzPass} className="flex-1 px-4 py-4 bg-stone-700 text-white font-bold font-['Press_Start_2P'] text-sm rounded hover:bg-stone-600 transition-colors">PASS</button>
-               </div>
-             </div>
+) : quest.type === 'blitz' && activeBlitz ? (
+              <div className="relative p-6 w-full bg-black/90 rounded-lg border-2 border-cyan-600 shadow-[0_0_30px_rgba(6,182,212,0.6)]">
+                <div className="flex justify-between items-center mb-4">
+                  <div className={`text-5xl font-mono font-bold ${activeBlitz.timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-cyan-400'}`}>{activeBlitz.timeLeft}s</div>
+                  <div className="text-yellow-400 font-['Press_Start_2P'] text-xl">Score: {activeBlitz.score}</div>
+                </div>
+                <p className="text-3xl text-white text-center font-mono mb-6 bg-stone-900 p-4 rounded-lg border border-stone-700">{activeBlitz.currentQ?.q}</p>
+{activeBlitz.currentQ?.options ? (
+                  <div className="flex flex-col gap-3 mb-4 w-full">
+                    {activeBlitz.currentQ.options.map((opt, idx) => (
+                      <button 
+                        key={idx} 
+                        onClick={() => handleBlitzSubmit(opt)}
+                        className="w-full text-left p-4 bg-black/80 border-2 border-cyan-700 rounded hover:bg-stone-700 hover:border-cyan-400 transition-colors text-white font-mono text-xl md:text-2xl"
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <>
+                    <input type="text" value={blitzInput} onChange={(e) => setBlitzInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleBlitzSubmit(); }} autoFocus className="w-full bg-black border-2 border-cyan-500 text-cyan-400 font-mono text-3xl p-4 rounded text-center focus:outline-none focus:ring-4 focus:ring-cyan-600 mb-4" placeholder="> Enter answer..." />
+                    <div className="flex gap-4">
+                      <button onClick={() => handleBlitzSubmit()} className="flex-1 px-4 py-4 bg-cyan-700 text-white font-bold font-['Press_Start_2P'] text-sm rounded hover:bg-cyan-600 transition-colors">SUBMIT</button>
+                      <button onClick={handleBlitzPass} className="flex-1 px-4 py-4 bg-stone-700 text-white font-bold font-['Press_Start_2P'] text-sm rounded hover:bg-stone-600 transition-colors">PASS</button>
+                    </div>
+                  </>
+                )}
+              </div>
             ) : quest.type === 'upload' ? (
             <div className="flex flex-col items-center w-full gap-4">
               <button onClick={() => fileInputRef.current.click()} className="px-6 py-4 bg-stone-800 border-2 border-dashed border-stone-500 text-stone-300 rounded-lg hover:bg-stone-700 hover:text-white font-['VT323'] text-2xl w-full transition-colors truncate">

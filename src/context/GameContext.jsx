@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { HISTORY_BANK, MATH_BLITZ_BANK, SCIENCE_BLITZ_BANK, GAUNTLET_BANK, INCANTATION_BANK, MULTISTEP_BANK } from '../data/questionBanks';
 
 const GameContext = createContext();
 
@@ -300,12 +301,7 @@ export function GameProvider({ children }) {
       frequency: 'daily',
       unlockDate: null,
       timeLimit: 60,
-      questionBank: [
-        { q: "What is 5 x 5?", a: "25" },
-        { q: "What is 120 / 10?", a: "12" },
-        { q: "What is 9 + 10?", a: "19" },
-        { q: "Solve: 3 x 3 - 2", a: "7" }
-      ]
+      questionBank: MATH_BLITZ_BANK
     },
     {
       id: 104,
@@ -313,25 +309,12 @@ export function GameProvider({ children }) {
       description: "Test your knowledge of history and geography. A new question awaits every day!",
       xp: 50,
       gold: 20,
-      type: 'quiz',
+      type: 'blitz',
       frequency: 'daily',
       unlockDate: null,
-      questionBank: []
+      questionBank: HISTORY_BANK
     },
-    {
-      id: 112, // New ID
-      title: "The Crossroads",
-      description: "A series of critical choices await.",
-      type: 'scenario',
-      xp: 50,
-      gold: 25,
-      frequency: 'once',
-      questionBank: [
-        { q: "You encounter a troll. What do you do?", options: ["Pay toll", "Attack", "Flee"], a: "Pay toll" },
-        { q: "A merchant offers a glowing potion. Do you:", options: ["Drink it", "Inspect it", "Ignore it"], a: "Inspect it" },
-        { q: "You find a locked chest. Do you:", options: ["Smash it", "Pick lock", "Leave it"], a: "Pick lock" }
-      ]
-    },
+    { id: 112, title: "Science Speed Run", description: "Answer as many science questions as you can in 60 seconds!", type: 'blitz', xp: 50, gold: 20, frequency: 'daily', timeLimit: 60, questionBank: SCIENCE_BLITZ_BANK },
     {
       id: 107,
       title: "The Memory Spell",
@@ -341,10 +324,7 @@ export function GameProvider({ children }) {
       gold: 20,
       frequency: 'daily',
       timeLimit: 45,
-      questionBank: [
-        { q: "To be, or not to be, that is the question.", a: "To be, or not to be, that is the question." },
-        { q: "The quick brown fox jumps over the lazy dog.", a: "The quick brown fox jumps over the lazy dog." }
-      ]
+      questionBank: INCANTATION_BANK
     },
     { id: 106, title: "Weekly Reflection", description: "Write a short paragraph about what you learned this week.", xp: 100, gold: 50, type: 'journal', frequency: 'weekly', unlockDate: '2025-01-01' },
     {
@@ -356,45 +336,12 @@ export function GameProvider({ children }) {
       gold: 75,
       frequency: 'daily',
       unlockDate: '2025-01-01',
-      stepBank: [
-        {
-          title: 'Division Hydra',
-          steps: [
-            { q: "Step 1: How many 4s in 4?", a: "1" },
-            { q: "Step 2: How many 4s in 8?", a: "2" },
-            { q: "Final: 48 / 4?", a: "12" }
-          ]
-        },
-        {
-          title: 'Multiplication Hydra',
-          steps: [
-            { q: "Step 1: 15 x 2?", a: "30" },
-            { q: "Step 2: 15 x 10?", a: "150" },
-            { q: "Final: 15 x 12?", a: "180" }
-          ]
-        },
-        {
-          title: 'Commerce Hydra',
-          steps: [
-            { q: "Step 1: Bought $6 potion + $7 shield. Total cost?", a: "13" },
-            { q: "Step 2: Paid with $20. 20 - 13?", a: "7" },
-            { q: "Final: Total Change?", a: "7" }
-          ]
-        },
-        {
-          title: 'Geometry Hydra',
-          steps: [
-            { q: "Step 1: Box A is 5x4. Area?", a: "20" },
-            { q: "Step 2: Box B is 3x2. Area?", a: "6" },
-            { q: "Final: Total Area?", a: "26" }
-          ]
-        }
-      ]
+      stepBank: MULTISTEP_BANK
     },
     { id: 108, title: "Scout Report: Athletics", description: "Complete a 1-mile walk and upload a photo of your route/shoes.", type: 'scout-sports', xp: 100, gold: 40, frequency: 'daily' },
     { id: 109, title: "Scout Report: The Arts", description: "Draw a sketch of a castle and upload a picture of it.", type: 'scout-arts', xp: 100, gold: 40, frequency: 'weekly' },
     { id: 110, title: "Tavern Rest", description: "How rests your spirit today, hero?", type: 'wellness', xp: 10, gold: 10, frequency: 'daily' },
-    { id: 999, title: "The Gauntlet", description: "5 Questions. 7 Seconds each. No mistakes allowed. One attempt per day.", type: 'gauntlet', xp: 100, gold: 40, frequency: 'daily', totalSteps: 5, timePerStep: 7 }
+    { id: 999, title: "The Gauntlet", description: "5 Questions. 7 Seconds each. No mistakes allowed. One attempt per day.", type: 'gauntlet', xp: 100, gold: 40, frequency: 'daily', totalSteps: 5, timePerStep: 7, questionBank: GAUNTLET_BANK }
   ];
 
   const [students, setStudents] = useState(INITIAL_STUDENTS);
@@ -1617,11 +1564,19 @@ export function GameProvider({ children }) {
     goldEarned = applyPetBonus(quest.type, goldEarned, true, currentUser.equippedPet);
 
     // Track as a quiz so Order of the Owl bosses and achievements still unlock!
-    syncUserUpdate({
+    const updates = {
       xp: (currentUser.xp || 0) + xpEarned,
       gold: (currentUser.gold || 0) + goldEarned,
-      quizQuestsCompleted: (currentUser.quizQuestsCompleted || 0) + 1,
-    });
+    };
+
+    // Route to separate boss tracks based on quest ID
+    if (questId === 103) {
+      updates.quizQuestsCompleted = (currentUser.quizQuestsCompleted || 0) + 1; // Feeds Owls
+    } else if (questId === 112) {
+      updates.scenarioQuestsCompleted = (currentUser.scenarioQuestsCompleted || 0) + 1; // Feeds Volcanic Dragons
+    }
+
+    syncUserUpdate(updates);
 
     const newSubmission = {
       id: Date.now(), questId, studentId: currentUser.id, studentName: currentUser.heroName,
