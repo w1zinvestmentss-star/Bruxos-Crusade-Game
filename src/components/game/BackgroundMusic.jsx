@@ -53,6 +53,9 @@ const BackgroundMusic = () => {
             case 'upload':
               targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-Archive-theme.mp3';
               break;
+            case 'gauntlet':
+              targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Unbreakable%20Determination.mp3';
+              break;
             default:
               targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Thehub-map-theme.mp3';
           }
