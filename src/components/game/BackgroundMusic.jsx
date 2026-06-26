@@ -48,7 +48,7 @@ const BackgroundMusic = () => {
               targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Ice.in.my.veins.mp3';
               break;
             case 'scout-sports':
-              targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-barracks-theme.mp3';
+              targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Kunckle.up.mp3';
               break;
             case 'upload':
               targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-Archive-theme.mp3';
