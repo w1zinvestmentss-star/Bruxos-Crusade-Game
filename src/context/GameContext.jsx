@@ -352,6 +352,7 @@ export function GameProvider({ children }) {
   const [currentRafflePrize, setCurrentRafflePrize] = useState('Mystery Prize');
   const [session, setSession] = useState(null);
   const [globalEffects, setGlobalEffects] = useState([]);
+  const [blitzHighScores, setBlitzHighScores] = useState({});
 
   useEffect(() => {
     const handleAuthChange = async (session) => {
@@ -1578,6 +1579,18 @@ export function GameProvider({ children }) {
 
     syncUserUpdate(updates);
 
+    // Update blitz high score if this is a new record
+    setBlitzHighScores(prev => {
+      const current = prev[questId];
+      if (!current || cappedScore > current.score) {
+        return {
+          ...prev,
+          [questId]: { score: cappedScore, player: currentUser.heroName }
+        };
+      }
+      return prev;
+    });
+
     const newSubmission = {
       id: Date.now(), questId, studentId: currentUser.id, studentName: currentUser.heroName,
       status: 'approved', timestamp: new Date().toISOString().split('T')[0], type: 'blitz'
@@ -1586,6 +1599,10 @@ export function GameProvider({ children }) {
     saveSubmissionToCloud(newSubmission);
 
     return { success: true, message: `Time's up! You scored ${score}! +${xpEarned} XP, +${goldEarned} Gold` };
+  };
+
+  const getHighScore = (questId) => {
+    return blitzHighScores[questId] || null;
   };
 
   const value = {
@@ -1623,7 +1640,8 @@ export function GameProvider({ children }) {
     placeMimicSnare,
     applyVoidGrasp,
     resolveVoidGrasp,
-    attemptBlitz
+    attemptBlitz,
+    getHighScore
   };
 
   return (

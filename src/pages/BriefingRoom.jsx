@@ -69,7 +69,7 @@ const THEMES = {
 const BriefingRoom = () => {
   const navigate = useNavigate();
   const { questId } = useParams();
-  const { quests, submitQuest, attemptQuiz, recordGauntletFailure, attemptBlitz } = useGame();
+  const { quests, submitQuest, attemptQuiz, recordGauntletFailure, attemptBlitz, getHighScore } = useGame();
   const quest = quests.find(q => String(q.id) === String(questId));
   const currentTheme = quest ? (THEMES[quest.id] || THEMES[quest.type] || THEMES.journal) : THEMES.journal;
   const theme = currentTheme;
@@ -301,10 +301,20 @@ const BriefingRoom = () => {
                 </h1>
 <p className="font-['VT323'] text-2xl text-stone-200 leading-relaxed mb-8">
                    {theme.dialogue}
-                 </p>
-                 <button onClick={handleAccept} className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-yellow-600 to-yellow-400 text-stone-950 rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base hover:from-yellow-500 hover:to-yellow-300 transition-colors">
-                   ACCEPT MISSION
-                 </button>
+                  </p>
+                  {quest.type === 'blitz' && (
+                    <div className="mt-4 p-3 bg-black/60 border border-yellow-500/50 rounded-lg text-center">
+                      <div className="text-yellow-500 font-['Press_Start_2P'] text-xs mb-2">CURRENT RECORD</div>
+                      {getHighScore(quest.id) ? (
+                        <div className="text-2xl text-white font-['VT323']">{getHighScore(quest.id).score} points by <span className="text-yellow-400">{getHighScore(quest.id).player}</span></div>
+                      ) : (
+                        <div className="text-xl text-stone-400 font-['VT323']">The record is unclaimed.</div>
+                      )}
+                    </div>
+                  )}
+                  <button onClick={handleAccept} className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-yellow-600 to-yellow-400 text-stone-950 rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base hover:from-yellow-500 hover:to-yellow-300 transition-colors">
+                    ACCEPT MISSION
+                  </button>
                </div>
              </div>
            ) : isIncantation ? (

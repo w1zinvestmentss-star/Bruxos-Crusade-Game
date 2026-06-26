@@ -14,7 +14,7 @@ const VICTORY_QUOTES = [
 
 const QuestBoard = () => {
   const navigate = useNavigate();
-  const { quests, submitQuest, getQuestStatus, currentUser, attemptQuiz, attemptScenario, submitWellnessCheck, globalEffects, resolveVoidGrasp, recordGauntletFailure, submissions } = useGame();
+  const { quests, submitQuest, getQuestStatus, currentUser, attemptQuiz, attemptScenario, submitWellnessCheck, globalEffects, resolveVoidGrasp, recordGauntletFailure, submissions, getHighScore } = useGame();
   
   const fileInputRef = useRef(null);
   const selectedQuestRef = useRef(null);
@@ -398,18 +398,32 @@ const QuestBoard = () => {
                                     ))}
                                 </div>
                               )
-                        ) : quest.type === 'blitz' ? (
-                          <button 
-                            onClick={() => navigate('/briefing/' + quest.id)} 
-                            className={`w-full px-4 py-3 rounded-lg shadow-lg font-['Press_Start_2P'] text-[10px] text-white flex items-center justify-center gap-2 transition-colors ${
-                              quest.id === 104 ? 'bg-gradient-to-r from-yellow-700 to-amber-600 hover:from-yellow-600 hover:to-amber-500' :
-                              quest.id === 103 ? 'bg-gradient-to-r from-stone-800 to-stone-600 border border-stone-500 hover:from-stone-700 hover:to-stone-500' :
-                              'bg-gradient-to-r from-blue-700 to-cyan-600 hover:from-blue-600 hover:to-cyan-500'
-                            }`}
-                          >
-                            {quest.id === 104 ? <Star size={18} /> : <Zap size={18} />} 
-                            {quest.id === 104 ? 'ENTER THE PALACE' : quest.id === 103 ? 'SEEK INSIGHT' : 'ENTER THE LABORATORY'}
-                          </button>
+) : quest.type === 'blitz' ? (
+                          <div className="w-full flex flex-col gap-2">
+                            {(() => {
+                              const hs = getHighScore(quest.id);
+                              return hs ? (
+                                <div className="text-center text-yellow-400 font-['VT323'] text-lg bg-yellow-900/30 rounded py-1 border border-yellow-500/30">
+                                  👑 HIGH SCORE: {hs.score} by {hs.player}
+                                </div>
+                              ) : (
+                                <div className="text-center text-stone-500 font-['VT323'] text-lg bg-stone-900/50 rounded py-1 border border-stone-700">
+                                  No high score yet. Be the first!
+                                </div>
+                              );
+                            })()}
+                            <button 
+                              onClick={() => navigate('/briefing/' + quest.id)} 
+                              className={`w-full px-4 py-3 rounded-lg shadow-lg font-['Press_Start_2P'] text-[10px] text-white flex items-center justify-center gap-2 transition-colors ${
+                                quest.id === 104 ? 'bg-gradient-to-r from-yellow-700 to-amber-600 hover:from-yellow-600 hover:to-amber-500' :
+                                quest.id === 103 ? 'bg-gradient-to-r from-stone-800 to-stone-600 border border-stone-500 hover:from-stone-700 hover:to-stone-500' :
+                                'bg-gradient-to-r from-blue-700 to-cyan-600 hover:from-blue-600 hover:to-cyan-500'
+                              }`}
+                            >
+                              {quest.id === 104 ? <Star size={18} /> : <Zap size={18} />} 
+                              {quest.id === 104 ? 'ENTER THE PALACE' : quest.id === 103 ? 'SEEK INSIGHT' : 'ENTER THE LABORATORY'}
+                            </button>
+                          </div>
                         ) : quest.type === 'quiz' ? (
                           !activeQuizzes[quest.id] ? (
                             quest.questionBank?.length > 0 ? (
