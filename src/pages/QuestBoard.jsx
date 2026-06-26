@@ -399,15 +399,23 @@ const QuestBoard = () => {
                                 </div>
                               )
                         ) : quest.type === 'blitz' ? (
-                          <button onClick={() => navigate('/briefing/' + quest.id)} className="w-full px-4 py-3 bg-gradient-to-r from-blue-700 to-cyan-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-[10px] hover:from-blue-600 hover:to-cyan-500 flex items-center justify-center gap-2">
-                            <Zap size={18} /> {quest.id === 103 ? 'SEEK INSIGHT' : 'ENTER THE LABORATORY'}
+                          <button 
+                            onClick={() => navigate('/briefing/' + quest.id)} 
+                            className={`w-full px-4 py-3 rounded-lg shadow-lg font-['Press_Start_2P'] text-[10px] text-white flex items-center justify-center gap-2 transition-colors ${
+                              quest.id === 104 ? 'bg-gradient-to-r from-yellow-700 to-amber-600 hover:from-yellow-600 hover:to-amber-500' :
+                              quest.id === 103 ? 'bg-gradient-to-r from-stone-800 to-stone-600 border border-stone-500 hover:from-stone-700 hover:to-stone-500' :
+                              'bg-gradient-to-r from-blue-700 to-cyan-600 hover:from-blue-600 hover:to-cyan-500'
+                            }`}
+                          >
+                            {quest.id === 104 ? <Star size={18} /> : <Zap size={18} />} 
+                            {quest.id === 104 ? 'ENTER THE PALACE' : quest.id === 103 ? 'SEEK INSIGHT' : 'ENTER THE LABORATORY'}
                           </button>
                         ) : quest.type === 'quiz' ? (
                           !activeQuizzes[quest.id] ? (
                             quest.questionBank?.length > 0 ? (
 <button
                                  onClick={() => startActiveQuiz(quest)}
-                                 className="w-full px-4 py-3 bg-gradient-to-r from-purple-700 to-yellow-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm hover:from-purple-600 hover:to-yellow-500 flex items-center justify-center gap-2"
+                                 className={`w-full px-4 py-3 rounded-lg shadow-lg font-['Press_Start_2P'] text-sm text-white flex items-center justify-center gap-2 ${quest.id === 104 ? 'bg-gradient-to-r from-yellow-700 to-amber-600 hover:from-yellow-600 hover:to-amber-500' : 'bg-gradient-to-r from-purple-700 to-yellow-600 hover:from-purple-600 hover:to-yellow-500'}`}
                                >
                                  <Brain size={18} /> {quest.id === 104 ? 'ENTER THE PALACE' : 'START QUIZ'}
                                </button>
