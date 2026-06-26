@@ -405,12 +405,12 @@ const QuestBoard = () => {
                         ) : quest.type === 'quiz' ? (
                           !activeQuizzes[quest.id] ? (
                             quest.questionBank?.length > 0 ? (
-                              <button
-                                onClick={() => startActiveQuiz(quest)}
-                                className="w-full px-4 py-3 bg-gradient-to-r from-purple-700 to-yellow-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm hover:from-purple-600 hover:to-yellow-500 flex items-center justify-center gap-2"
-                              >
-                                <Brain size={18} /> START QUIZ
-                              </button>
+<button
+                                 onClick={() => startActiveQuiz(quest)}
+                                 className="w-full px-4 py-3 bg-gradient-to-r from-purple-700 to-yellow-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm hover:from-purple-600 hover:to-yellow-500 flex items-center justify-center gap-2"
+                               >
+                                 <Brain size={18} /> {quest.id === 104 ? 'ENTER THE PALACE' : 'START QUIZ'}
+                               </button>
                             ) : (
                               <div className="px-4 py-3 bg-stone-900/80 text-stone-400 rounded-lg border border-stone-700 font-['VT323'] text-center">
                                 No questions loaded yet.

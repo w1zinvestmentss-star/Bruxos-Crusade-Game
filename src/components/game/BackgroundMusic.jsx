@@ -40,6 +40,8 @@ const BackgroundMusic = () => {
       if (quest) {
         if (questId === 103) {
           targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Father%20gascoigne%20freestyle.mp3';
+        } else if (questId === 104) {
+          targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.LegendofFahad.mp3';
         } else {
           switch (quest.type) {
             case 'incantation':

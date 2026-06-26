@@ -34,6 +34,12 @@ const THEMES = {
     title: "The Hunter's Archives",
     dialogue: "Insight is gained through speed and logic. Prove your worth before the nightmare claims you. You have 60 seconds."
   },
+  104: {
+    bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Sunken.Palace.png',
+    npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Time-Weaver.png',
+    title: "The Sunken Palace",
+    dialogue: "The sands of time hide many truths. Peer into the past and recount the history of the realm."
+  },
   blitz: {
     bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Alchemists.Lab.png',
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mad.Alchemist.png',
