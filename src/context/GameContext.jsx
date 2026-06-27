@@ -116,7 +116,7 @@ const BOSSES = [
   // Track 5: The Volcanic Lineage / Scenarios
   { id: 501, name: 'The Ember Whelp', requirement: 'scenarios', target: 10, rewardXp: 150, rewardGold: 75, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ember.Whelp.png', finishingBlow: { type: 'auto', prompt: 'What has to be broken before you can use it?', answer: 'an egg', timeLimit: 60 } },
   { id: 502, name: 'The Ash Drake', requirement: 'scenarios', target: 25, rewardXp: 400, rewardGold: 200, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ash.Drake.png', finishingBlow: { type: 'auto', prompt: 'I’m tall when I’m young, and I’m short when I’m old. What am I?', answer: 'a candle', timeLimit: 50 } },
-  { id: 503, name: 'The Obsidian Wyvern', requirement: 'scenarios', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Obsidian.Wyvern.png', finishingBlow: { type: 'auto', prompt: 'What month of the year has 28 days?', answer: 'all of them', timeLimit: 40 } },
+  { id: 503, name: 'The Obsidian Wyvern', requirement: 'scenarios', target: 50, rewardXp: 1200, rewardGold: 600, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Obsidian.Wyvern.png?v=2', finishingBlow: { type: 'auto', prompt: 'What month of the year has 28 days?', answer: 'all of them', timeLimit: 40 } },
   { id: 504, name: 'The Molten Sovereign', requirement: 'scenarios', target: 100, rewardXp: 6000, rewardGold: 2500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Molten.Sovereign.png', finishingBlow: { type: 'auto', prompt: 'Solve the anagram to find a 6-letter word: SILENT', answer: 'listen', timeLimit: 30 } },
 
   // Track 11: The Dream Eaters / Journals
@@ -260,7 +260,7 @@ const saveSubmissionToCloud = async (submission) => {
     status: submission.status,
     type: submission.type || 'upload',
     is_boss_strike: submission.isBossStrike || false,
-    proof_content: submission.proofImage || submission.journalText || null
+    proof_content: submission.proofContent || null // STRICT MAPPING
   };
   const { error } = await supabase.from('submissions').insert([dbSub]);
   if (error) console.error("Error saving submission:", error);
@@ -828,17 +828,19 @@ export function GameProvider({ children }) {
 
   const submitQuest = async (questId, content, type) => {
     const isImageQuest = ['upload', 'scout-arts', 'scout-sports'].includes(type);
-    let finalProofUrl = null;
-    let finalJournalText = null;
+    let cloudUrl = null;
+    let localPreview = null;
+    let textContent = null;
 
-    if (isImageQuest && content) {
-      // Show local preview instantly for the student
-      finalProofUrl = URL.createObjectURL(content); 
-      // Upload to cloud for the teacher
-      const cloudUrl = await uploadFileToStorage(content);
-      if (cloudUrl) finalProofUrl = cloudUrl; 
+    if (isImageQuest && content instanceof File) {
+      localPreview = URL.createObjectURL(content); // For instant local UI
+      cloudUrl = await uploadFileToStorage(content);
+      if (!cloudUrl) {
+        alert("Cloud upload failed! Please check Supabase Storage policies.");
+        return; // Stop the submission
+      }
     } else if (type === 'journal') {
-      finalJournalText = content;
+      textContent = content;
     }
 
     const newSubmission = {
@@ -847,10 +849,11 @@ export function GameProvider({ children }) {
       studentId: currentUser.id,
       studentName: currentUser.heroName,
       status: 'pending',
-      timestamp: new Date().toISOString().split('T')[0],
+      timestamp: new Date().toLocaleDateString('en-CA'),
       type,
-      proofImage: finalProofUrl,
-      journalText: finalJournalText
+      proofContent: cloudUrl || textContent, // The permanent link
+      proofImage: localPreview || cloudUrl, // For immediate local UI viewing
+      journalText: textContent
     };
 
     setSubmissions(prev => [...prev, newSubmission]);
@@ -858,15 +861,22 @@ export function GameProvider({ children }) {
   };
 
   const submitBossStrike = async (bossId, content) => {
-    let finalContent = content;
+    let cloudUrl = null;
+    let localPreview = null;
+    let textContent = null;
     let submissionType = 'journal';
 
     if (content instanceof File) {
-      finalContent = await uploadFileToStorage(content);
       submissionType = 'upload';
+      localPreview = URL.createObjectURL(content);
+      cloudUrl = await uploadFileToStorage(content);
+      if (!cloudUrl) {
+        alert("Cloud upload failed! Please check Supabase Storage policies.");
+        return;
+      }
     } else if (typeof content === 'string') {
-      finalContent = content;
       submissionType = 'journal';
+      textContent = content;
     }
 
     const newSubmission = {
@@ -876,23 +886,15 @@ export function GameProvider({ children }) {
       studentName: currentUser.heroName,
       status: 'pending',
       isBossStrike: true,
-      timestamp: new Date().toISOString().split('T')[0],
+      timestamp: new Date().toLocaleDateString('en-CA'),
       type: submissionType,
-      proofContent: finalContent
+      proofContent: cloudUrl || textContent,
+      proofImage: localPreview || cloudUrl,
+      journalText: textContent
     };
 
     setSubmissions(prev => [...prev, newSubmission]);
-
-    const dbSub = {
-      quest_id: bossId,
-      student_id: currentUser.id,
-      student_name: currentUser.heroName,
-      status: 'pending',
-      type: submissionType,
-      is_boss_strike: true,
-      proof_content: finalContent || null
-    };
-    await supabase.from('submissions').insert([dbSub]);
+    saveSubmissionToCloud(newSubmission);
   };
 
   const submitWellnessCheck = (questId, feeling) => {
