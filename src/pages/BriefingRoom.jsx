@@ -28,7 +28,7 @@ const THEMES = {
     title: 'The Shadow Dojo',
     dialogue: 'Speed and precision are the marks of a true master. You have 7 seconds per strike. Do not falter.'
   },
-103: {
+  103: {
     bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Hunters.Archives.png',
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Insight.Hunter.png',
     title: "The Hunter's Archives",
@@ -288,109 +288,115 @@ const BriefingRoom = () => {
         <div className="bg-black/75 backdrop-blur-md p-8 rounded-2xl border-2 border-yellow-500/30 max-w-2xl mx-auto mt-20">
           <input type="file" ref={fileInputRef} className="hidden" accept="image/*,.pdf,.doc,.docx,.txt" capture="environment" onChange={(e) => setSelectedFile(e.target.files[0])} />
           {!isAccepted ? (
-            <div className="grid md:grid-cols-[0.85fr_1.15fr] gap-6 items-center">
+            <div className="flex flex-col md:flex-row items-center gap-8 w-full">
               <div className="flex items-center justify-center">
                 <img src={theme.npc} alt="Scribe NPC" className="h-64 object-contain drop-shadow-[0_0_25px_rgba(234,179,8,0.35)]" />
               </div>
-              <div>
-                <div className="text-yellow-400 font-['VT323'] text-lg mb-2">
-                  {theme.title}
-                </div>
-                <h1 className="text-yellow-400 font-['Press_Start_2P'] text-2xl md:text-3xl mb-4">
-                  {quest.title}
-                </h1>
-<p className="font-['VT323'] text-2xl text-stone-200 leading-relaxed mb-8">
-                   {theme.dialogue}
+              <div className="flex flex-col justify-center gap-6 flex-1 w-full">
+                <div>
+                  <h3 className="text-yellow-500 font-['Press_Start_2P'] text-[10px] uppercase mb-2 opacity-80">{currentTheme.title}</h3>
+                  <h2 className="text-3xl md:text-4xl text-yellow-400 font-['Press_Start_2P'] mb-4 leading-tight">{quest.title}</h2>
+                  <p className="font-['VT323'] text-2xl text-stone-200 leading-relaxed tracking-wide">
+                    "{currentTheme.dialogue}"
                   </p>
-                  {quest.type === 'blitz' && (
-                    <div className="mt-4 p-3 bg-black/60 border border-yellow-500/50 rounded-lg text-center">
-                      <div className="text-yellow-500 font-['Press_Start_2P'] text-xs mb-2">CURRENT RECORD</div>
-                      {getHighScore(quest.id) ? (
-                        <div className="text-2xl text-white font-['VT323']">{getHighScore(quest.id).score} points by <span className="text-yellow-400">{getHighScore(quest.id).player}</span></div>
-                      ) : (
-                        <div className="text-xl text-stone-400 font-['VT323']">The record is unclaimed.</div>
-                      )}
-                    </div>
-                  )}
-                  <button onClick={handleAccept} className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-yellow-600 to-yellow-400 text-stone-950 rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base hover:from-yellow-500 hover:to-yellow-300 transition-colors">
-                    ACCEPT MISSION
-                  </button>
-               </div>
-             </div>
-           ) : isIncantation ? (
-             !isTrialActive ? (
-               <div className="text-center">
-                 <h1 className="text-yellow-400 font-['Press_Start_2P'] text-2xl md:text-3xl mb-4">
-                   The Memory Spell
-                 </h1>
-                 <p className="font-['VT323'] text-xl text-stone-300 mb-6">
-                   Memorize the ancient text and cast it flawlessly before time runs out.
-                 </p>
-                 <button onClick={startTrial} className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-cyan-800 to-blue-700 text-cyan-200 rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base hover:from-cyan-700 hover:to-blue-600 transition-colors">
-                   START TRIAL
-                 </button>
-               </div>
-             ) : (
-               <div className="flex flex-col items-center w-full">
-                 <div className="text-4xl text-red-500 font-mono text-center mb-4">{timeLeft}s</div>
-                 <div className={`text-xl text-cyan-300 font-mono mb-4 text-center transition-opacity duration-300 ${typedText.length > 0 ? 'opacity-0' : 'opacity-100'}`}>
-                   {currentQ?.q}
-                 </div>
-                 <textarea 
-                   value={typedText} 
-                   onChange={e => setTypedText(e.target.value)} 
-                   onPaste={e => e.preventDefault()} 
-                   className="w-full bg-black/80 border-2 border-cyan-500 rounded-lg p-4 text-white font-mono h-32 focus:outline-none focus:ring-2 focus:ring-cyan-300 resize-none mb-4" 
-                   placeholder="Type the incantation perfectly..." 
-                 />
-                 <button 
-                   onClick={handleIncantationSubmit} 
-                   className="px-6 py-3 bg-cyan-700 text-white rounded-lg hover:bg-cyan-600 font-['Press_Start_2P'] text-sm"
-                 >
-                   CAST SPELL
-                 </button>
-               </div>
-             )
-           ) : isGauntlet ? (
-             <div className="relative p-6 w-full bg-black/90 rounded-lg border-2 border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.8)] animate-pulse">
-               <h4 className="text-red-500 font-['Press_Start_2P'] text-center mb-4 text-sm">CHALLENGE {gauntletStep + 1} OF 5</h4>
-               <div className="text-7xl text-red-600 font-mono text-center font-bold mb-6 drop-shadow-[0_0_15px_rgba(220,38,38,0.9)]">{(gauntletTimer / 10).toFixed(1)}s</div>
-               <p className="text-3xl text-white text-center font-mono mb-6">{gauntletQuestion?.q}</p>
-               <div className="flex gap-4">
-                 <input type="text" value={gauntletAnswer} onChange={(e) => setGauntletAnswer(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleGauntletSubmit()} autoFocus className="w-full bg-black border-2 border-red-500 text-red-400 font-mono text-3xl p-4 rounded text-center focus:outline-none focus:ring-4 focus:ring-red-600" />
-                 <button onClick={handleGauntletSubmit} className="px-8 py-4 bg-red-700 text-white font-bold font-['Press_Start_2P'] text-lg rounded hover:bg-red-600 transition-colors">STRIKE</button>
-               </div>
-             </div>
-) : quest.type === 'blitz' && activeBlitz ? (
-              <div className="relative p-6 w-full bg-black/90 rounded-lg border-2 border-cyan-600 shadow-[0_0_30px_rgba(6,182,212,0.6)]">
-                <div className="flex justify-between items-center mb-4">
-                  <div className={`text-5xl font-mono font-bold ${activeBlitz.timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-cyan-400'}`}>{activeBlitz.timeLeft}s</div>
-                  <div className="text-yellow-400 font-['Press_Start_2P'] text-xl">Score: {activeBlitz.score}</div>
                 </div>
-                <p className="text-3xl text-white text-center font-mono mb-6 bg-stone-900 p-4 rounded-lg border border-stone-700">{activeBlitz.currentQ?.q}</p>
-{activeBlitz.currentQ?.options ? (
-                  <div className="flex flex-col gap-3 mb-4 w-full">
-                    {activeBlitz.currentQ.options.map((opt, idx) => (
-                      <button 
-                        key={idx} 
-                        onClick={() => handleBlitzSubmit(opt)}
-                        className="w-full text-left p-4 bg-black/80 border-2 border-cyan-700 rounded hover:bg-stone-700 hover:border-cyan-400 transition-colors text-white font-mono text-xl md:text-2xl"
-                      >
-                        {opt}
-                      </button>
-                    ))}
+
+                {quest.type === 'blitz' && (
+                  <div className="bg-black/60 border border-yellow-500/30 rounded-xl p-4 text-center shadow-inner">
+                    <div className="text-yellow-500/80 font-['Press_Start_2P'] text-[10px] uppercase tracking-widest mb-3">👑 Current Record</div>
+                    {getHighScore(quest.id) ? (
+                      <div className="text-2xl text-white font-['VT323']">
+                        <span className="text-3xl text-yellow-400 mr-2">{getHighScore(quest.id).score}</span> 
+                        points by <span className="text-cyan-300 ml-1">{getHighScore(quest.id).player}</span>
+                      </div>
+                    ) : (
+                      <div className="text-xl text-stone-500 font-['VT323'] italic">The record is unclaimed.</div>
+                    )}
                   </div>
-                ) : (
-                  <>
-                    <input type="text" value={blitzInput} onChange={(e) => setBlitzInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleBlitzSubmit(); }} autoFocus className="w-full bg-black border-2 border-cyan-500 text-cyan-400 font-mono text-3xl p-4 rounded text-center focus:outline-none focus:ring-4 focus:ring-cyan-600 mb-4" placeholder="> Enter answer..." />
-                    <div className="flex gap-4">
-                      <button onClick={() => handleBlitzSubmit()} className="flex-1 px-4 py-4 bg-cyan-700 text-white font-bold font-['Press_Start_2P'] text-sm rounded hover:bg-cyan-600 transition-colors">SUBMIT</button>
-                      <button onClick={handleBlitzPass} className="flex-1 px-4 py-4 bg-stone-700 text-white font-bold font-['Press_Start_2P'] text-sm rounded hover:bg-stone-600 transition-colors">PASS</button>
-                    </div>
-                  </>
                 )}
+
+                <button 
+                  onClick={handleAccept} 
+                  className="w-full py-4 bg-gradient-to-r from-yellow-700 to-yellow-600 hover:from-yellow-500 hover:to-yellow-400 text-black font-bold font-['Press_Start_2P'] text-sm rounded-lg border-2 border-yellow-400 shadow-[0_0_20px_rgba(202,138,4,0.4)] transition-all duration-300"
+                >
+                  ACCEPT MISSION
+                </button>
               </div>
-            ) : quest.type === 'upload' ? (
+            </div>
+          ) : isIncantation ? (
+            !isTrialActive ? (
+              <div className="text-center">
+                <h1 className="text-yellow-400 font-['Press_Start_2P'] text-2xl md:text-3xl mb-4">
+                  The Memory Spell
+                </h1>
+                <p className="font-['VT323'] text-xl text-stone-300 mb-6">
+                  Memorize the ancient text and cast it flawlessly before time runs out.
+                </p>
+                <button onClick={startTrial} className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-cyan-800 to-blue-700 text-cyan-200 rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base hover:from-cyan-700 hover:to-blue-600 transition-colors">
+                  START TRIAL
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center w-full">
+                <div className="text-4xl text-red-500 font-mono text-center mb-4">{timeLeft}s</div>
+                <div className={`text-xl text-cyan-300 font-mono mb-4 text-center transition-opacity duration-300 ${typedText.length > 0 ? 'opacity-0' : 'opacity-100'}`}>
+                  {currentQ?.q}
+                </div>
+                <textarea 
+                  value={typedText} 
+                  onChange={e => setTypedText(e.target.value)} 
+                  onPaste={e => e.preventDefault()} 
+                  className="w-full bg-black/80 border-2 border-cyan-500 rounded-lg p-4 text-white font-mono h-32 focus:outline-none focus:ring-2 focus:ring-cyan-300 resize-none mb-4" 
+                  placeholder="Type the incantation perfectly..." 
+                />
+                <button 
+                  onClick={handleIncantationSubmit} 
+                  className="px-6 py-3 bg-cyan-700 text-white rounded-lg hover:bg-cyan-600 font-['Press_Start_2P'] text-sm"
+                >
+                  CAST SPELL
+                </button>
+              </div>
+            )
+          ) : isGauntlet ? (
+            <div className="relative p-6 w-full bg-black/90 rounded-lg border-2 border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.8)] animate-pulse">
+              <h4 className="text-red-500 font-['Press_Start_2P'] text-center mb-4 text-sm">CHALLENGE {gauntletStep + 1} OF 5</h4>
+              <div className="text-7xl text-red-600 font-mono text-center font-bold mb-6 drop-shadow-[0_0_15px_rgba(220,38,38,0.9)]">{(gauntletTimer / 10).toFixed(1)}s</div>
+              <p className="text-3xl text-white text-center font-mono mb-6">{gauntletQuestion?.q}</p>
+              <div className="flex gap-4">
+                <input type="text" value={gauntletAnswer} onChange={(e) => setGauntletAnswer(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleGauntletSubmit()} autoFocus className="w-full bg-black border-2 border-red-500 text-red-400 font-mono text-3xl p-4 rounded text-center focus:outline-none focus:ring-4 focus:ring-red-600" />
+                <button onClick={handleGauntletSubmit} className="px-8 py-4 bg-red-700 text-white font-bold font-['Press_Start_2P'] text-lg rounded hover:bg-red-600 transition-colors">STRIKE</button>
+              </div>
+            </div>
+          ) : quest.type === 'blitz' && activeBlitz ? (
+            <div className="relative p-6 w-full bg-black/90 rounded-lg border-2 border-cyan-600 shadow-[0_0_30px_rgba(6,182,212,0.6)]">
+              <div className="flex justify-between items-center mb-4">
+                <div className={`text-5xl font-mono font-bold ${activeBlitz.timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-cyan-400'}`}>{activeBlitz.timeLeft}s</div>
+                <div className="text-yellow-400 font-['Press_Start_2P'] text-xl">Score: {activeBlitz.score}</div>
+              </div>
+              <p className="text-3xl text-white text-center font-mono mb-6 bg-stone-900 p-4 rounded-lg border border-stone-700">{activeBlitz.currentQ?.q}</p>
+              {activeBlitz.currentQ?.options ? (
+                <div className="flex flex-col gap-3 mb-4 w-full">
+                  {activeBlitz.currentQ.options.map((opt, idx) => (
+                    <button 
+                      key={idx} 
+                      onClick={() => handleBlitzSubmit(opt)}
+                      className="w-full text-left p-4 bg-black/80 border-2 border-cyan-700 rounded hover:bg-stone-700 hover:border-cyan-400 transition-colors text-white font-mono text-xl md:text-2xl"
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <input type="text" value={blitzInput} onChange={(e) => setBlitzInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleBlitzSubmit(); }} autoFocus className="w-full bg-black border-2 border-cyan-500 text-cyan-400 font-mono text-3xl p-4 rounded text-center focus:outline-none focus:ring-4 focus:ring-cyan-600 mb-4" placeholder="> Enter answer..." />
+                  <div className="flex gap-4">
+                    <button onClick={() => handleBlitzSubmit()} className="flex-1 px-4 py-4 bg-cyan-700 text-white font-bold font-['Press_Start_2P'] text-sm rounded hover:bg-cyan-600 transition-colors">SUBMIT</button>
+                    <button onClick={handleBlitzPass} className="flex-1 px-4 py-4 bg-stone-700 text-white font-bold font-['Press_Start_2P'] text-sm rounded hover:bg-stone-600 transition-colors">PASS</button>
+                  </div>
+                </>
+              )}
+            </div>
+          ) : quest.type === 'upload' ? (
             <div className="flex flex-col items-center w-full gap-4">
               <button onClick={() => fileInputRef.current.click()} className="px-6 py-4 bg-stone-800 border-2 border-dashed border-stone-500 text-stone-300 rounded-lg hover:bg-stone-700 hover:text-white font-['VT323'] text-2xl w-full transition-colors truncate">
                 {selectedFile ? selectedFile.name : '+ ATTACH PARCHMENT'}
@@ -406,39 +412,39 @@ const BriefingRoom = () => {
                 SEND MESSENGER
               </button>
             </div>
-           ) : quest.type === 'scout-arts' ? (
-             <div className="flex flex-col items-center w-full gap-4">
-               <button onClick={() => fileInputRef.current.click()} className="px-6 py-4 bg-stone-800 border-2 border-dashed border-pink-500 text-pink-300 rounded-lg hover:bg-stone-700 hover:text-white font-['VT323'] text-2xl w-full transition-colors truncate">
-                 {selectedFile ? selectedFile.name : '+ UPLOAD MASTERPIECE'}
-               </button>
-               <button 
-                 onClick={() => {
-                   if (!selectedFile) return alert('Please attach your masterpiece first!');
-                   submitQuest(quest.id, selectedFile, 'scout-arts');
-                   triggerVictory('Masterpiece submitted! Awaiting the Game Master\'s critique.');
-                 }} 
-                 className="px-6 py-3 bg-pink-700 text-white rounded-lg hover:bg-pink-600 font-['Press_Start_2P'] text-sm w-full mt-4 shadow-[0_0_15px_rgba(236,72,153,0.6)]"
-               >
-                 PRESENT ARTWORK
-               </button>
-             </div>
-           ) : quest.type === 'scout-sports' ? (
-             <div className="flex flex-col items-center w-full gap-4">
-               <button onClick={() => fileInputRef.current.click()} className="px-6 py-4 bg-stone-800 border-2 border-dashed border-orange-500 text-orange-300 rounded-lg hover:bg-stone-700 hover:text-white font-['VT323'] text-2xl w-full transition-colors truncate">
-                 {selectedFile ? selectedFile.name : '+ UPLOAD TRAINING PROOF'}
-               </button>
-               <button 
-                 onClick={() => {
-                   if (!selectedFile) return alert('Please attach proof of your training first!');
-                   submitQuest(quest.id, selectedFile, 'scout-sports');
-                   triggerVictory('Training report submitted! The Drillmaster will evaluate your effort.');
-                 }} 
-                 className="px-6 py-3 bg-orange-700 text-white rounded-lg hover:bg-orange-600 font-['Press_Start_2P'] text-sm w-full mt-4 shadow-[0_0_15px_rgba(249,115,22,0.6)]"
-               >
-                 PRESENT REPORT
-               </button>
-             </div>
-           ) : (
+          ) : quest.type === 'scout-arts' ? (
+            <div className="flex flex-col items-center w-full gap-4">
+              <button onClick={() => fileInputRef.current.click()} className="px-6 py-4 bg-stone-800 border-2 border-dashed border-pink-500 text-pink-300 rounded-lg hover:bg-stone-700 hover:text-white font-['VT323'] text-2xl w-full transition-colors truncate">
+                {selectedFile ? selectedFile.name : '+ UPLOAD MASTERPIECE'}
+              </button>
+              <button 
+                onClick={() => {
+                  if (!selectedFile) return alert('Please attach your masterpiece first!');
+                  submitQuest(quest.id, selectedFile, 'scout-arts');
+                  triggerVictory('Masterpiece submitted! Awaiting the Game Master\'s critique.');
+                }} 
+                className="px-6 py-3 bg-pink-700 text-white rounded-lg hover:bg-pink-600 font-['Press_Start_2P'] text-sm w-full mt-4 shadow-[0_0_15px_rgba(236,72,153,0.6)]"
+              >
+                PRESENT ARTWORK
+              </button>
+            </div>
+          ) : quest.type === 'scout-sports' ? (
+            <div className="flex flex-col items-center w-full gap-4">
+              <button onClick={() => fileInputRef.current.click()} className="px-6 py-4 bg-stone-800 border-2 border-dashed border-orange-500 text-orange-300 rounded-lg hover:bg-stone-700 hover:text-white font-['VT323'] text-2xl w-full transition-colors truncate">
+                {selectedFile ? selectedFile.name : '+ UPLOAD TRAINING PROOF'}
+              </button>
+              <button 
+                onClick={() => {
+                  if (!selectedFile) return alert('Please attach proof of your training first!');
+                  submitQuest(quest.id, selectedFile, 'scout-sports');
+                  triggerVictory('Training report submitted! The Drillmaster will evaluate your effort.');
+                }} 
+                className="px-6 py-3 bg-orange-700 text-white rounded-lg hover:bg-orange-600 font-['Press_Start_2P'] text-sm w-full mt-4 shadow-[0_0_15px_rgba(249,115,22,0.6)]"
+              >
+                PRESENT REPORT
+              </button>
+            </div>
+          ) : (
             <div>
               <h1 className="text-yellow-400 font-['Press_Start_2P'] text-2xl md:text-3xl mb-4">
                 Record Your Journey
