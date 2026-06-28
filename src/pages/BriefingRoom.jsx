@@ -86,6 +86,7 @@ const BriefingRoom = () => {
   const [showVictoryModal, setShowVictoryModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [modalQuote, setModalQuote] = useState('');
+  const [isGauntletFinished, setIsGauntletFinished] = useState(false);
 
   const [gauntletStep, setGauntletStep] = useState(0);
   const [gauntletTimer, setGauntletTimer] = useState(70);
@@ -120,6 +121,7 @@ const BriefingRoom = () => {
 
   const handleAccept = () => {
     if (quest?.type === 'gauntlet') {
+      setIsGauntletFinished(false);
       setGauntletStep(0);
       setGauntletTimer(70);
       setGauntletQuestion(generateGauntletMath());
@@ -150,10 +152,12 @@ const BriefingRoom = () => {
         setGauntletQuestion(generateGauntletMath());
         setGauntletAnswer('');
       } else {
+        setIsGauntletFinished(true);
         const result = await attemptQuiz(quest.id, 'correct', 'correct', true);
         if (result.success) triggerVictory(result.message);
       }
     } else {
+      setIsGauntletFinished(true);
       recordGauntletFailure(quest.id);
       alert('TRIAL FAILED: INCORRECT ANSWER');
       navigate('/quests');
@@ -198,7 +202,7 @@ const BriefingRoom = () => {
 
   useEffect(() => {
     let timerId;
-    if (isAccepted && quest?.type === 'gauntlet' && gauntletTimer > 0) {
+    if (isAccepted && quest?.type === 'gauntlet' && gauntletTimer > 0 && !isGauntletFinished) {
       timerId = setInterval(() => {
         setGauntletTimer(prev => {
           if (prev <= 1) {
@@ -213,7 +217,7 @@ const BriefingRoom = () => {
       }, 100);
     }
     return () => clearInterval(timerId);
-  }, [isAccepted, quest, gauntletTimer]);
+  }, [isAccepted, quest, gauntletTimer, isGauntletFinished]);
 
   useEffect(() => {
     let timerId;
