@@ -242,11 +242,18 @@ const BriefingRoom = () => {
 
   const handleBlitzSubmit = (selectedOption = null) => {
     if (!activeBlitz) return;
+
     const answerToCheck = selectedOption !== null ? selectedOption : blitzInput;
-    if (answerToCheck.toString().trim().toLowerCase() === activeBlitz.currentQ.a.toString().trim().toLowerCase()) {
-      const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
+    const isCorrect = answerToCheck.toString().trim().toLowerCase() === activeBlitz.currentQ.a.toString().trim().toLowerCase();
+
+    const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
+
+    if (isCorrect) {
       setActiveBlitz(prev => ({ ...prev, score: prev.score + 1, currentQ: randomQ }));
+    } else {
+      setActiveBlitz(prev => ({ ...prev, currentQ: randomQ }));
     }
+
     setBlitzInput('');
   };
 
