@@ -828,55 +828,78 @@ export function GameProvider({ children }) {
 
   const submitQuest = async (questId, content, type) => {
     const isImageQuest = ['upload', 'scout-arts', 'scout-sports'].includes(type);
-    let cloudUrl = null;
     let localPreview = null;
-    let textContent = null;
 
+    // 1. Create a local preview instantly if it's a file
     if (isImageQuest && content instanceof File) {
-      localPreview = URL.createObjectURL(content); // For instant local UI
-      cloudUrl = await uploadFileToStorage(content);
-      if (!cloudUrl) {
-        alert("Cloud upload failed! Please check Supabase Storage policies.");
-        return; // Stop the submission
-      }
-    } else if (type === 'journal') {
-      textContent = content;
+      localPreview = URL.createObjectURL(content);
     }
 
+    // 2. Create the Optimistic Submission Object
     const newSubmission = {
-      id: Date.now(),
+      id: Date.now(), // Temporary local ID
       questId,
       studentId: currentUser.id,
       studentName: currentUser.heroName,
       status: 'pending',
       timestamp: new Date().toLocaleDateString('en-CA'),
       type,
-      proofContent: cloudUrl || textContent, // The permanent link
-      proofImage: localPreview || cloudUrl, // For immediate local UI viewing
-      journalText: textContent
+      proofContent: localPreview || (type === 'journal' ? content : null)
     };
 
+    // 3. Update UI IMMEDIATELY
     setSubmissions(prev => [...prev, newSubmission]);
-    saveSubmissionToCloud(newSubmission);
+
+    // 4. Perform the heavy Cloud Upload in the background
+    let finalContent = type === 'journal' ? content : null;
+    
+    if (isImageQuest && content instanceof File) {
+      const cloudUrl = await uploadFileToStorage(content);
+      if (!cloudUrl) {
+        // Revert the optimistic update on failure
+        setSubmissions(prev => prev.filter(s => s.id !== newSubmission.id));
+        alert("Cloud upload failed! Please check Supabase Storage policies.");
+        return;
+      }
+      finalContent = cloudUrl;
+    }
+
+    // 5. Save the real cloud URL to the database
+    const dbSub = {
+      quest_id: questId,
+      student_id: currentUser.id,
+      student_name: currentUser.heroName,
+      status: 'pending',
+      type: type,
+      proof_content: finalContent
+    };
+    
+    const { data: savedData, error } = await supabase.from('submissions').insert([dbSub]).select();
+    
+    if (!error && savedData) {
+       // Swap the temporary local submission with the authoritative database record
+       setSubmissions(prev => prev.map(s => s.id === newSubmission.id ? {
+           ...savedData[0],
+           questId: savedData[0].quest_id,
+           studentId: savedData[0].student_id,
+           studentName: savedData[0].student_name,
+           proofContent: savedData[0].proof_content,
+           timestamp: new Date(savedData[0].created_at).toLocaleDateString('en-CA')
+       } : s));
+    } else if (error) {
+       console.error("Error saving submission:", error);
+    }
   };
 
   const submitBossStrike = async (bossId, content) => {
-    let cloudUrl = null;
     let localPreview = null;
-    let textContent = null;
     let submissionType = 'journal';
 
     if (content instanceof File) {
       submissionType = 'upload';
       localPreview = URL.createObjectURL(content);
-      cloudUrl = await uploadFileToStorage(content);
-      if (!cloudUrl) {
-        alert("Cloud upload failed! Please check Supabase Storage policies.");
-        return;
-      }
     } else if (typeof content === 'string') {
       submissionType = 'journal';
-      textContent = content;
     }
 
     const newSubmission = {
@@ -888,13 +911,48 @@ export function GameProvider({ children }) {
       isBossStrike: true,
       timestamp: new Date().toLocaleDateString('en-CA'),
       type: submissionType,
-      proofContent: cloudUrl || textContent,
-      proofImage: localPreview || cloudUrl,
-      journalText: textContent
+      proofContent: localPreview || (submissionType === 'journal' ? content : null)
     };
 
     setSubmissions(prev => [...prev, newSubmission]);
-    saveSubmissionToCloud(newSubmission);
+
+    let finalContent = submissionType === 'journal' ? content : null;
+
+    if (submissionType === 'upload') {
+      const cloudUrl = await uploadFileToStorage(content);
+      if (!cloudUrl) {
+        setSubmissions(prev => prev.filter(s => s.id !== newSubmission.id));
+        alert("Cloud upload failed! Please check Supabase Storage policies.");
+        return;
+      }
+      finalContent = cloudUrl;
+    }
+
+    const dbSub = {
+      quest_id: bossId,
+      student_id: currentUser.id,
+      student_name: currentUser.heroName,
+      status: 'pending',
+      type: submissionType,
+      is_boss_strike: true,
+      proof_content: finalContent
+    };
+
+    const { data: savedData, error } = await supabase.from('submissions').insert([dbSub]).select();
+
+    if (!error && savedData) {
+       setSubmissions(prev => prev.map(s => s.id === newSubmission.id ? {
+           ...savedData[0],
+           questId: savedData[0].quest_id,
+           studentId: savedData[0].student_id,
+           studentName: savedData[0].student_name,
+           isBossStrike: savedData[0].is_boss_strike,
+           proofContent: savedData[0].proof_content,
+           timestamp: new Date(savedData[0].created_at).toLocaleDateString('en-CA')
+       } : s));
+    } else if (error) {
+       console.error("Error saving boss strike submission:", error);
+    }
   };
 
   const submitWellnessCheck = (questId, feeling) => {
