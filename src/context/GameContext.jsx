@@ -352,6 +352,7 @@ export function GameProvider({ children }) {
   const [currentRafflePrize, setCurrentRafflePrize] = useState('Mystery Prize');
   const [session, setSession] = useState(null);
   const [globalEffects, setGlobalEffects] = useState([]);
+  const [highScores, setHighScores] = useState({});
   const [blitzHighScores, setBlitzHighScores] = useState({});
 
   useEffect(() => {
@@ -467,6 +468,17 @@ export function GameProvider({ children }) {
           // Fetch Global Effects
           const { data: effectsData } = await supabase.from('global_effects').select('*');
           if (effectsData) setGlobalEffects(effectsData);
+
+          const { data: hsData } = await supabase.from('high_scores').select('*');
+          if (hsData) {
+            const hsMap = {};
+            hsData.forEach(hs => {
+              hsMap[hs.quest_id] = { score: hs.score, player: hs.player_name };
+            });
+            setHighScores(hsMap);
+          } else {
+            setHighScores({});
+          }
         }
       } else {
         setCurrentUser(null);
@@ -1658,11 +1670,19 @@ export function GameProvider({ children }) {
     setSubmissions(prev => [...prev, newSubmission]);
     saveSubmissionToCloud(newSubmission);
 
+    const currentRecord = highScores[questId]?.score || 0;
+    if (score > currentRecord) {
+      // Save new record to the cloud
+      await supabase.from('high_scores').upsert([{ quest_id: questId, player_name: currentUser.heroName, score: score }]);
+      // Update everyone's local state instantly
+      setHighScores(prev => ({ ...prev, [questId]: { score: score, player: currentUser.heroName } }));
+    }
+
     return { success: true, message: `Time's up! You scored ${score}! +${xpEarned} XP, +${goldEarned} Gold` };
   };
 
   const getHighScore = (questId) => {
-    return blitzHighScores[questId] || null;
+    return highScores[questId] || null;
   };
 
   const value = {
