@@ -124,14 +124,15 @@ const TrophyRoom = () => {
             return (
               <div 
                 key={achievement.id} 
-                className={`bg-stone-900 border-2 rounded-xl p-6 flex flex-col justify-between relative ${
+                className={`rounded-xl p-[2px] ${
                   isUnlocked 
-                    ? 'border-yellow-500 shadow-2xl shadow-yellow-900/30 transition-all' 
+                    ? 'bg-gradient-to-br from-yellow-300 via-yellow-600 to-yellow-900 shadow-[0_0_15px_rgba(234,179,8,0.3)] transition-all' 
                     : isFutureGated 
-                      ? 'border-stone-700 opacity-50 grayscale pointer-events-none transition-all'
-                      : 'border-stone-700 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300'
+                      ? 'bg-stone-700 opacity-50 grayscale pointer-events-none transition-all'
+                      : 'bg-stone-700 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300'
                 }`}
               >
+                <div className="bg-stone-900 rounded-[10px] p-6 h-full flex flex-col justify-between relative">
                 {isFutureGated && (
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-bold font-mono whitespace-nowrap shadow-lg z-10">
                         ⏳ EVENT STARTS: {new Date(achievement.unlockDate).toLocaleDateString()}
@@ -161,13 +162,13 @@ const TrophyRoom = () => {
                   <div className="space-y-4 relative">
                    <div className="flex flex-wrap gap-2">
                      {achievement.rewardXp > 0 && (
-                        <div className="flex items-center gap-1 text-sm font-mono px-3 py-1 rounded bg-blue-900/30 text-blue-300 border border-blue-800">
+                        <div className="flex items-center gap-1 text-sm font-mono px-3 py-1 rounded-full bg-blue-500/10 text-blue-300">
                             <Star size={14} />
                             <span>{achievement.rewardXp} XP</span>
                         </div>
                      )}
                      {achievement.rewardTicket > 0 && (
-                        <div className="flex items-center gap-1 text-sm font-mono px-3 py-1 rounded bg-purple-900/30 text-purple-300 border border-purple-800">
+                        <div className="flex items-center gap-1 text-sm font-mono px-3 py-1 rounded-full bg-purple-500/10 text-purple-300">
                             <Ticket size={14} />
                             <span>{achievement.rewardTicket} Ticket(s)</span>
                         </div>
@@ -186,7 +187,7 @@ const TrophyRoom = () => {
                   )}
 
                   {achievement.realWorldPrize && (
-                    <div className={`mt-4 p-4 rounded border ${isUnlocked ? 'bg-stone-800 border-yellow-700/50' : 'bg-stone-800/50 border-stone-700'}`}>
+                    <div className={`mt-4 p-4 rounded bg-stone-950/80 border-l-4 ${isUnlocked ? 'border-l-yellow-500' : 'border-l-stone-600'}`}>
                       <div className={`flex items-center gap-2 mb-2 ${isUnlocked ? 'text-yellow-500' : 'text-stone-500'}`}>
                         <Gift size={18} />
                         <span className="font-bold font-mono text-sm uppercase tracking-wider">Real-World Prize</span>
@@ -194,12 +195,13 @@ const TrophyRoom = () => {
                       <p className="text-stone-200 text-lg font-['VT323']">{achievement.realWorldPrize}</p>
                       
                       {isUnlocked && (
-                        <div className="mt-3 text-green-400 text-sm font-bold bg-green-900/30 p-2 rounded border border-green-800/50 animate-pulse">
+                        <div className="mt-3 text-emerald-400 text-sm font-bold bg-emerald-500/10 p-2 rounded-lg hover:bg-emerald-500/20 transition-colors flex items-center justify-center">
                           Prize Status: Check with Game Master!
                         </div>
                       )}
                     </div>
                   )}
+                </div>
                 </div>
               </div>
             );
