@@ -138,21 +138,23 @@ const TeacherDashboard = () => {
     }));
   };
 
-  const handleSaveGrades = (studentId) => {
+  const handleSaveGrades = async (studentId) => {
     const inputs = gradeInputs[studentId];
     if (!inputs) return;
 
-    if (inputs.midterm && inputs.midterm !== '') {
-      updateStudentStats(studentId, 'midterm', Number(inputs.midterm));
+    if (inputs.midterm !== '' && inputs.midterm !== undefined) {
+      await updateStudentStats(studentId, 'midterm', Number(inputs.midterm));
     }
-    if (inputs.final && inputs.final !== '') {
-      updateStudentStats(studentId, 'final', Number(inputs.final));
+    if (inputs.final !== '' && inputs.final !== undefined) {
+      await updateStudentStats(studentId, 'final', Number(inputs.final));
     }
 
+    // Clear inputs after save
     setGradeInputs(prev => ({
       ...prev,
       [studentId]: { midterm: '', final: '' },
     }));
+    alert("Grades updated!");
   };
 
   const pendingSubmissions = submissions.filter(s => s.status === 'pending');

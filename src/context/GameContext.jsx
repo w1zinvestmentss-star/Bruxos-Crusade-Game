@@ -247,6 +247,8 @@ const saveProfileToCloud = async (userId, updates) => {
   if (updates.wellnessQuestsCompleted !== undefined) dbUpdates.wellness_quests_completed = updates.wellnessQuestsCompleted;
   if (updates.journalQuestsCompleted !== undefined) dbUpdates.journal_quests_completed = updates.journalQuestsCompleted;
   if (updates.gauntletQuestsCompleted !== undefined) dbUpdates.gauntlet_quests_completed = updates.gauntletQuestsCompleted;
+  if (updates.midtermGPA !== undefined) dbUpdates.midterm_gpa = updates.midtermGPA;
+  if (updates.finalGPA !== undefined) dbUpdates.final_gpa = updates.finalGPA;
 
   const { error } = await supabase.from('profiles').update(dbUpdates).eq('id', userId);
   if (error) console.error("Error saving to cloud:", error);
@@ -1512,17 +1514,20 @@ export function GameProvider({ children }) {
     return (slayerPoints * 1000000) + student.xp;
   };
 
-  const updateStudentStats = (studentId, type, rawValue) => {
+  const updateStudentStats = async (studentId, type, rawValue) => {
     const scaledValue = rawValue * 10;
+    const fieldToUpdate = type === 'midterm' ? 'midtermGPA' : 'finalGPA';
+    
+    // 1. Update the local students array
     setStudents(prev => prev.map(student => {
       if (student.id === studentId) {
-        return {
-          ...student,
-          [type === 'midterm' ? 'midtermGPA' : 'finalGPA']: scaledValue
-        };
+        return { ...student, [fieldToUpdate]: scaledValue };
       }
       return student;
     }));
+
+    // 2. Persist to cloud
+    await saveProfileToCloud(studentId, { [fieldToUpdate]: scaledValue });
   };
 
   const fulfillPrize = (studentId, prizeIndex) => {
