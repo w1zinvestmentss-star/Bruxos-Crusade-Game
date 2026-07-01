@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
-import { ArrowLeft, Trophy, Lock, Coins, Star, Gift, Ticket } from 'lucide-react';
+import { ArrowLeft, Trophy, Lock, Coins, Star, Gift, Ticket, Zap } from 'lucide-react';
 
 const TrophyRoom = () => {
   const navigate = useNavigate();
@@ -34,36 +34,54 @@ const TrophyRoom = () => {
         </button>
 
         <header className="text-center mb-16">
-          <h1 className="text-4xl sm:text-5xl text-yellow-500 font-['Press_Start_2P'] drop-shadow-lg shadow-yellow-500/50">HALL OF TRIUMPHS</h1>
+          <h1 className="text-4xl sm:text-5xl text-yellow-500 font-['Press_Start_2P'] [text-shadow:_0_0_20px_rgb(234_179_8_/_60%)]">HALL OF TRIUMPHS</h1>
           <p className="text-stone-400 text-center max-w-2xl mx-auto mt-6 italic">
             Behold the greatest feats of the realm. Unlock real-world prizes and eternal glory.
           </p>
         </header>
 
-        <div className="bg-indigo-900/80 backdrop-blur-md border border-indigo-400 px-6 py-6 rounded-xl shadow-[0_0_20px_rgba(99,102,241,0.3)] mb-6 mx-auto max-w-5xl flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex flex-col">
-            <div className="text-indigo-300 font-bold tracking-widest text-sm uppercase mb-1">📅 MONTHLY GRAND RAFFLE</div>
-            <div className="text-3xl md:text-4xl text-yellow-400 font-['Press_Start_2P'] drop-shadow-md mb-2">{currentRafflePrize}</div>
+        <div className="bg-black/60 backdrop-blur-md border border-stone-600/50 px-6 py-6 rounded-xl shadow-[0_0_30px_rgba(139,92,246,0.15)] mb-6 mx-auto max-w-5xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+          <div className="flex flex-col z-10">
+            <div className="text-purple-300 font-bold tracking-widest text-sm uppercase mb-1 flex items-center gap-2"><Ticket size={16} /> MONTHLY GRAND RAFFLE</div>
+            <div className="text-3xl md:text-4xl text-yellow-400 font-['Press_Start_2P'] drop-shadow-md mb-2 relative inline-block">
+              <span className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-black/60 via-transparent to-transparent -z-10 blur-xl"></span>
+              {currentRafflePrize}
+            </div>
             <div className="text-stone-300 font-['VT323'] text-xl">Earn Raffle Tickets from Bounties and Achievements to increase your odds! Draw is at the end of the month.</div>
           </div>
-          <div className="flex flex-col items-center justify-center bg-yellow-600/20 border-2 border-dashed border-yellow-500 rounded-lg p-4 min-w-[160px]">
+          <div className="flex flex-col items-center justify-center bg-gradient-to-b from-yellow-700/20 to-yellow-900/40 border-2 border-yellow-600/80 shadow-[0_0_15px_rgba(202,138,4,0.3)] rounded-lg p-4 min-w-[160px] z-10">
             <Ticket size={32} className="text-yellow-400 mb-2" />
             <span className="text-white font-['VT323'] text-2xl">YOUR TICKETS</span>
-            <span className="text-4xl font-bold text-yellow-400 font-mono">{currentUser?.raffleTickets || 0}</span>
+            <span className="text-6xl font-bold text-yellow-400 font-mono drop-shadow-lg relative z-10">
+              <span className="absolute inset-0 bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-yellow-500/40 to-transparent blur-md -z-10"></span>
+              {currentUser?.raffleTickets || 0}
+            </span>
           </div>
         </div>
 
         <section className="max-w-5xl mx-auto mb-10">
           <h2 className="text-2xl text-yellow-500 font-['Press_Start_2P'] mb-4">HOW TO WIN</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-indigo-900/30 border border-indigo-500/50 p-4 rounded-lg">
-              🎟️ RAFFLE TICKETS: Earn these to enter the Grand Monthly Draw. More tickets = better odds!
+            <div className="bg-blue-500/10 border border-stone-500/40 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] p-5 rounded-lg flex flex-col">
+              <div className="flex items-center gap-2 mb-2">
+                <Ticket className="text-blue-400" size={24} />
+                <span className="font-bold text-stone-200 uppercase tracking-wider font-mono">Raffle Tickets</span>
+              </div>
+              <p className="text-stone-400 text-sm leading-relaxed">Earn these to enter the Grand Monthly Draw. More tickets = better odds!</p>
             </div>
-            <div className="bg-green-900/30 border border-green-500/50 p-4 rounded-lg">
-              🎁 GUARANTEED: Complete the goal, get the prize. No luck required. Includes the Pity Timer safety net!
+            <div className="bg-green-500/10 border border-stone-500/40 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] p-5 rounded-lg flex flex-col">
+              <div className="flex items-center gap-2 mb-2">
+                <Gift className="text-green-400" size={24} />
+                <span className="font-bold text-stone-200 uppercase tracking-wider font-mono">Guaranteed</span>
+              </div>
+              <p className="text-stone-400 text-sm leading-relaxed">Complete the goal, get the prize. No luck required. Includes the Pity Timer safety net!</p>
             </div>
-            <div className="bg-red-900/30 border border-red-500/50 p-4 rounded-lg">
-              ⚡ SPEED RACE: Limited quantities! Be the first to claim. Latecomers get a massive Gold fallback reward.
+            <div className="bg-red-500/10 border border-stone-500/40 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] p-5 rounded-lg flex flex-col">
+              <div className="flex items-center gap-2 mb-2">
+                <Zap className="text-red-400" size={24} />
+                <span className="font-bold text-stone-200 uppercase tracking-wider font-mono">Speed Race</span>
+              </div>
+              <p className="text-stone-400 text-sm leading-relaxed">Limited quantities! Be the first to claim. Latecomers get a massive Gold fallback reward.</p>
             </div>
           </div>
         </section>
@@ -80,8 +98,8 @@ const TrophyRoom = () => {
               onClick={() => setActiveFilter(filter.id)}
               className={
                 activeFilter === filter.id
-                  ? "bg-yellow-600 text-white border-2 border-yellow-400 px-4 py-2 rounded-lg font-bold font-mono shadow-[0_0_10px_rgba(202,138,4,0.5)]"
-                  : "bg-stone-800 text-stone-400 border border-stone-600 px-4 py-2 rounded-lg font-mono hover:bg-stone-700 transition-colors"
+                  ? "bg-yellow-600 text-white border-2 border-yellow-400 px-4 py-2 rounded-lg font-bold font-mono shadow-[0_0_10px_rgba(202,138,4,0.5)] transition-all"
+                  : "bg-stone-800/80 text-stone-300 border border-stone-600 px-4 py-2 rounded-lg font-mono hover:bg-stone-700 hover:text-white hover:border-stone-500 cursor-pointer transition-all"
               }
             >
               {filter.label}
