@@ -18,7 +18,10 @@ const TeacherDashboard = () => {
     fulfillPrize,
     currentRafflePrize,
     setCurrentRafflePrize,
-    runMonthlyRaffle
+    runMonthlyRaffle,
+    prizeClaims,
+    fulfillAchievementClaim,
+    ACHIEVEMENTS,
   } = useGame();
 
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -547,6 +550,62 @@ const TeacherDashboard = () => {
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* Achievement Prize Claims */}
+        <div className="bg-black/60 backdrop-blur-md border border-white/10 rounded-xl p-6 mt-8">
+          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-stone-200">
+            <Star className="text-yellow-400" /> Achievement Prize Claims
+          </h2>
+          {(() => {
+            const pendingClaims = (prizeClaims || []).filter(c => c.status === 'pending');
+            if (pendingClaims.length === 0) {
+              return (
+                <div className="p-8 bg-black/20 rounded-xl border border-white/10 text-center text-stone-400 italic">
+                  No pending achievement prize claims.
+                </div>
+              );
+            }
+            return (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-stone-300">
+                  <thead>
+                    <tr className="text-left text-stone-400 border-b border-stone-700 text-xs font-bold uppercase tracking-wider">
+                      <th className="pb-3 pr-4">Student</th>
+                      <th className="pb-3 pr-4">Achievement</th>
+                      <th className="pb-3 pr-4">Prize</th>
+                      <th className="pb-3 pr-4">Requested</th>
+                      <th className="pb-3">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pendingClaims.map(claim => {
+                      const student = students.find(s => s.id === claim.student_id);
+                      const achievement = (ACHIEVEMENTS || []).find(a => a.id === claim.achievement_id);
+                      return (
+                        <tr key={claim.id} className="border-b border-stone-800/60 hover:bg-stone-800/30 transition-colors">
+                          <td className="py-3 pr-4 font-semibold text-white">{student?.heroName || student?.name || claim.student_id.slice(0, 8)}</td>
+                          <td className="py-3 pr-4 font-mono text-yellow-400 text-xs">{achievement?.title || claim.achievement_id}</td>
+                          <td className="py-3 pr-4 text-stone-300">{achievement?.realWorldPrize || '—'}</td>
+                          <td className="py-3 pr-4 text-stone-500">{new Date(claim.requested_at).toLocaleDateString()}</td>
+                          <td className="py-3">
+                            <button
+                              onClick={async () => {
+                                await fulfillAchievementClaim(claim.id);
+                              }}
+                              className="flex items-center gap-1 bg-green-700 hover:bg-green-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs transition-colors"
+                            >
+                              <Check size={14} /> Approve &amp; Fulfill
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Prize Fulfillment Center */}

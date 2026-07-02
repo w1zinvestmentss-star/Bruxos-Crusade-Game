@@ -356,6 +356,7 @@ export function GameProvider({ children }) {
   const [globalEffects, setGlobalEffects] = useState([]);
   const [highScores, setHighScores] = useState({});
   const [blitzHighScores, setBlitzHighScores] = useState({});
+  const [prizeClaims, setPrizeClaims] = useState([]);
 
   useEffect(() => {
     const handleAuthChange = async (session) => {
@@ -481,11 +482,21 @@ export function GameProvider({ children }) {
           } else {
             setHighScores({});
           }
+
+          // Fetch Prize Claims — all claims if teacher, own claims if student
+          const isTeacherForClaims = session.user.email === 'admin@bruxos.com';
+          let claimsQuery = supabase.from('prize_claims').select('*').order('requested_at', { ascending: false });
+          if (!isTeacherForClaims) {
+            claimsQuery = claimsQuery.eq('student_id', session.user.id);
+          }
+          const { data: claimsData } = await claimsQuery;
+          if (claimsData) setPrizeClaims(claimsData);
         }
       } else {
         setCurrentUser(null);
         setSubmissions([]);
         setGlobalEffects([]);
+        setPrizeClaims([]);
       }
     };
 
@@ -514,7 +525,76 @@ export function GameProvider({ children }) {
     await supabase.auth.signOut();
     setCurrentUser(null);
     setUserRole(null);
+    setPrizeClaims([]);
   };
+
+  // ── PRIZE CLAIMS ──────────────────────────────────────────────────────────
+  const claimAchievementPrize = async (studentId, achievementId) => {
+    // Optimistically add a pending claim to local state
+    const optimisticClaim = {
+      id: `optimistic-${achievementId}`,
+      student_id: studentId,
+      achievement_id: achievementId,
+      status: 'pending',
+      requested_at: new Date().toISOString(),
+      fulfilled_at: null,
+    };
+    setPrizeClaims(prev => [...prev.filter(c => c.achievement_id !== achievementId), optimisticClaim]);
+
+    const { data, error } = await supabase
+      .from('prize_claims')
+      .insert([{ student_id: studentId, achievement_id: achievementId, status: 'pending' }])
+      .select()
+      .single();
+
+    if (error) {
+      // If duplicate (already claimed), just refresh from DB
+      if (error.code === '23505') {
+        const { data: existing } = await supabase
+          .from('prize_claims')
+          .select('*')
+          .eq('student_id', studentId)
+          .eq('achievement_id', achievementId)
+          .single();
+        if (existing) {
+          setPrizeClaims(prev => [...prev.filter(c => c.achievement_id !== achievementId), existing]);
+        }
+        return { success: false, message: 'You have already claimed this prize.' };
+      }
+      // Roll back optimistic update on other errors
+      setPrizeClaims(prev => prev.filter(c => c.id !== optimisticClaim.id));
+      console.error('Error claiming prize:', error);
+      return { success: false, message: error.message };
+    }
+
+    // Replace optimistic row with real DB row
+    setPrizeClaims(prev => [...prev.filter(c => c.id !== optimisticClaim.id), data]);
+    return { success: true };
+  };
+
+  const fulfillAchievementClaim = async (claimId) => {
+    const now = new Date().toISOString();
+    // Optimistic update
+    setPrizeClaims(prev => prev.map(c =>
+      c.id === claimId ? { ...c, status: 'fulfilled', fulfilled_at: now } : c
+    ));
+
+    const { error } = await supabase
+      .from('prize_claims')
+      .update({ status: 'fulfilled', fulfilled_at: now })
+      .eq('id', claimId);
+
+    if (error) {
+      console.error('Error fulfilling claim:', error);
+      // Roll back
+      setPrizeClaims(prev => prev.map(c =>
+        c.id === claimId ? { ...c, status: 'pending', fulfilled_at: null } : c
+      ));
+      return { success: false };
+    }
+    return { success: true };
+  };
+  // ─────────────────────────────────────────────────────────────────────────
 
   const uploadFileToStorage = async (file) => {
     if (!file) return null;
@@ -1726,7 +1806,10 @@ export function GameProvider({ children }) {
     applyVoidGrasp,
     resolveVoidGrasp,
     attemptBlitz,
-    getHighScore
+    getHighScore,
+    prizeClaims,
+    claimAchievementPrize,
+    fulfillAchievementClaim,
   };
 
   return (

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
-import { ArrowLeft, Trophy, Lock, Coins, Star, Gift, Ticket, Zap } from 'lucide-react';
+import { ArrowLeft, Trophy, Lock, Coins, Star, Gift, Ticket, Zap, Loader2 } from 'lucide-react';
 
 const TrophyRoom = () => {
   const navigate = useNavigate();
-  const { currentUser, ACHIEVEMENTS, students, currentRafflePrize = "Mystery Box" } = useGame();
+  const { currentUser, ACHIEVEMENTS, students, currentRafflePrize = "Mystery Box", prizeClaims, claimAchievementPrize } = useGame();
   const [activeFilter, setActiveFilter] = useState('all');
+  const [claimingId, setClaimingId] = useState(null);
 
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
 
@@ -186,21 +187,49 @@ const TrophyRoom = () => {
                       </div>
                   )}
 
-                  {achievement.realWorldPrize && (
-                    <div className={`mt-4 p-4 rounded bg-stone-950/80 border-l-4 ${isUnlocked ? 'border-l-yellow-500' : 'border-l-stone-600'}`}>
-                      <div className={`flex items-center gap-2 mb-2 ${isUnlocked ? 'text-yellow-500' : 'text-stone-500'}`}>
-                        <Gift size={18} />
-                        <span className="font-bold font-mono text-sm uppercase tracking-wider">Real-World Prize</span>
-                      </div>
-                      <p className="text-stone-200 text-lg font-['VT323']">{achievement.realWorldPrize}</p>
-                      
-                      {isUnlocked && (
-                        <div className="mt-3 text-emerald-400 text-sm font-bold bg-emerald-500/10 p-2 rounded-lg hover:bg-emerald-500/20 transition-colors flex items-center justify-center">
-                          Prize Status: Check with Game Master!
+                  {achievement.realWorldPrize && (() => {
+                    const claim = prizeClaims?.find(c => c.achievement_id === achievement.id);
+                    const claimStatus = claim?.status || null;
+
+                    const handleClaim = async () => {
+                      if (claimingId === achievement.id) return;
+                      setClaimingId(achievement.id);
+                      await claimAchievementPrize(currentUser.id, achievement.id);
+                      setClaimingId(null);
+                    };
+
+                    return (
+                      <div className={`mt-4 p-4 rounded bg-stone-950/80 border-l-4 ${isUnlocked ? 'border-l-yellow-500' : 'border-l-stone-600'}`}>
+                        <div className={`flex items-center gap-2 mb-2 ${isUnlocked ? 'text-yellow-500' : 'text-stone-500'}`}>
+                          <Gift size={18} />
+                          <span className="font-bold font-mono text-sm uppercase tracking-wider">Real-World Prize</span>
                         </div>
-                      )}
-                    </div>
-                  )}
+                        <p className="text-stone-200 text-lg font-['VT323'] mb-3">{achievement.realWorldPrize}</p>
+
+                        {isUnlocked && (
+                          claimStatus === 'fulfilled' ? (
+                            <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/10 text-emerald-400 font-bold text-sm cursor-default select-none">
+                              ✅ Fulfilled!
+                            </div>
+                          ) : claimStatus === 'pending' ? (
+                            <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-amber-500/10 text-amber-400 font-bold text-sm cursor-default select-none">
+                              ⏳ Awaiting Teacher Approval
+                            </div>
+                          ) : (
+                            <button
+                              onClick={handleClaim}
+                              disabled={claimingId === achievement.id}
+                              className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-yellow-600 hover:bg-yellow-500 disabled:bg-yellow-800/40 disabled:cursor-not-allowed text-white font-bold text-sm transition-all"
+                            >
+                              {claimingId === achievement.id
+                                ? <><Loader2 size={14} className="animate-spin" /> Claiming...</>
+                                : <><Gift size={14} /> Claim Prize</>}
+                            </button>
+                          )
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
                 </div>
               </div>
