@@ -5,7 +5,7 @@ import { ArrowLeft, Trophy, Lock, Coins, Star, Gift, Ticket, Zap, Loader2 } from
 
 const TrophyRoom = () => {
   const navigate = useNavigate();
-  const { currentUser, ACHIEVEMENTS, students, currentRafflePrize = "Mystery Box", prizeClaims, claimAchievementPrize } = useGame();
+  const { currentUser, ACHIEVEMENTS, students, currentRafflePrize = "Mystery Box", prizeClaims, claimAchievementPrize, pendingPrizesList } = useGame();
   const [activeFilter, setActiveFilter] = useState('all');
   const [claimingId, setClaimingId] = useState(null);
 
@@ -236,6 +236,31 @@ const TrophyRoom = () => {
             );
           })}
         </div>
+
+        {(() => {
+          const userPrizes = (pendingPrizesList || []).filter(p => p.student_id === currentUser?.id);
+          if (userPrizes.length === 0) {
+            return (
+              <div className="bg-black/60 border border-yellow-500/30 rounded-xl p-6 mt-8 max-w-5xl mx-auto">
+                <h2 className="text-2xl font-bold mb-4 text-yellow-400 font-['Press_Start_2P']">🎁 MY PRIZES</h2>
+                <p className="text-stone-500 italic">No prizes yet. Keep earning tickets!</p>
+              </div>
+            );
+          }
+          return (
+            <div className="bg-black/60 border border-yellow-500/30 rounded-xl p-6 mt-8 max-w-5xl mx-auto">
+              <h2 className="text-2xl font-bold mb-4 text-yellow-400 font-['Press_Start_2P']">🎁 MY PRIZES</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {userPrizes.map((prize, idx) => (
+                  <div key={prize.id || idx} className="bg-stone-800 p-4 rounded-lg border border-yellow-500/20">
+                    <p className="text-xl text-white font-['VT323']">{prize.prize}</p>
+                    <p className="text-sm text-stone-400">Status: {prize.status}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );

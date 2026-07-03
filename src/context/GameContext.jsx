@@ -357,6 +357,7 @@ export function GameProvider({ children }) {
   const [highScores, setHighScores] = useState({});
   const [blitzHighScores, setBlitzHighScores] = useState({});
   const [prizeClaims, setPrizeClaims] = useState([]);
+  const [pendingPrizesList, setPendingPrizesList] = useState([]);
 
   useEffect(() => {
     const handleAuthChange = async (session) => {
@@ -491,12 +492,22 @@ export function GameProvider({ children }) {
           }
           const { data: claimsData } = await claimsQuery;
           if (claimsData) setPrizeClaims(claimsData);
+
+          // Fetch pending_prizes — all for teacher, own for student
+          const isTeacherForPrizes = session.user.email === 'admin@bruxos.com';
+          let prizesQuery = supabase.from('pending_prizes').select('*').order('created_at', { ascending: false });
+          if (!isTeacherForPrizes) {
+            prizesQuery = prizesQuery.eq('student_id', session.user.id);
+          }
+          const { data: prizesData } = await prizesQuery;
+          if (prizesData) setPendingPrizesList(prizesData);
         }
       } else {
         setCurrentUser(null);
         setSubmissions([]);
         setGlobalEffects([]);
         setPrizeClaims([]);
+        setPendingPrizesList([]);
       }
     };
 
@@ -593,6 +604,21 @@ export function GameProvider({ children }) {
       return { success: false };
     }
     return { success: true };
+  };
+
+  const fulfillPendingPrize = async (prizeId) => {
+    const { error } = await supabase
+      .from('pending_prizes')
+      .update({ status: 'delivered' })
+      .eq('id', prizeId);
+
+    if (!error) {
+      setPendingPrizesList(prev => prev.map(p =>
+        p.id === prizeId ? { ...p, status: 'delivered' } : p
+      ));
+      return { success: true };
+    }
+    return { success: false, error };
   };
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -1625,7 +1651,7 @@ export function GameProvider({ children }) {
     }));
   };
 
-  const runMonthlyRaffle = (prizeName) => {
+  const runMonthlyRaffle = async (prizeName) => {
     let pool = [];
     students.forEach(student => {
       const tickets = student.raffleTickets || 0;
@@ -1634,35 +1660,54 @@ export function GameProvider({ children }) {
       }
     });
 
-    if (pool.length === 0) {
-      return { success: false, message: 'No tickets in the pool.' };
-    }
+    if (pool.length === 0) return { success: false, message: 'No tickets in the pool.' };
 
     const winnerId = pool[Math.floor(Math.random() * pool.length)];
     const winner = students.find(s => s.id === winnerId);
 
-    setStudents(prev => prev.map(student => {
-      let updated = { ...student };
-      updated.raffleTickets = 0;
+    // 1. Add to pending_prizes in Supabase
+    const { error: prizeError } = await supabase.from('pending_prizes').insert([{
+      student_id: winnerId,
+      student_name: winner.heroName || winner.name,
+      prize: prizeName,
+      reason: 'Grand Monthly Raffle',
+      status: 'pending'
+    }]);
 
-      if (student.id === winnerId) {
-        updated.pendingPrizes = [...(updated.pendingPrizes || []), { name: prizeName, achievement: 'Grand Monthly Raffle', status: 'pending' }];
-        updated.notifications = [...(updated.notifications || []), {
-          id: Date.now() + Math.random(),
-          title: "🎉 YOU WON THE GRAND RAFFLE! 🎉",
-          quote: `Your incredible dedication has earned you the ${prizeName}!`,
-          xp: 0,
-          gold: 0
-        }];
+    // 2. Save winner notification to cloud (mentions the specific prize)
+    const newNotification = {
+      id: Date.now(),
+      title: "🎉 GRAND RAFFLE WINNER! 🎉",
+      quote: `Your tickets were drawn! You won: ${prizeName}. Check your Trophy Room to track your prize!`,
+      xp: 0,
+      gold: 0
+    };
+    await saveProfileToCloud(winnerId, {
+      notifications: [...(winner.notifications || []), newNotification]
+    });
+
+    // 3. Reset all raffle tickets in the database
+    const { error: resetError } = await supabase
+      .from('profiles')
+      .update({ raffle_tickets: 0 })
+      .neq('id', '00000000-0000-0000-0000-000000000000');
+
+    if (!prizeError && !resetError) {
+      // 4. Reflect ticket reset and winner notification in local state
+      setStudents(prev => prev.map(student => {
+        let updated = { ...student, raffleTickets: 0 };
+        if (student.id === winnerId) {
+          updated.notifications = [...(student.notifications || []), newNotification];
+        }
+        return updated;
+      }));
+      if (currentUser) {
+        setCurrentUser(prev => ({ ...prev, raffleTickets: 0 }));
       }
-      return updated;
-    }));
-
-    if (currentUser) {
-      setCurrentUser(prev => ({ ...prev, raffleTickets: 0 }));
+      return { success: true, winnerName: winner.heroName || winner.name };
     }
 
-    return { success: true, winnerName: winner.heroName || winner.name };
+    return { success: false, message: 'Raffle failed. Check Supabase errors.' };
   };
 
   const clearNotifications = () => {
@@ -1810,6 +1855,8 @@ export function GameProvider({ children }) {
     prizeClaims,
     claimAchievementPrize,
     fulfillAchievementClaim,
+    pendingPrizesList,
+    fulfillPendingPrize,
   };
 
   return (
