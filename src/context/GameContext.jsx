@@ -1697,6 +1697,9 @@ export function GameProvider({ children }) {
       if (currentUser) {
         setCurrentUser(prev => ({ ...prev, raffleTickets: 0 }));
       }
+      // 5. Refresh pending prizes list so new winner entry displays instantly
+      const { data: newPrizes } = await supabase.from('pending_prizes').select('*');
+      if (newPrizes) setPendingPrizesList(newPrizes);
       return { success: true, winnerName: winner.heroName || winner.name };
     }
 
@@ -1812,6 +1815,7 @@ export function GameProvider({ children }) {
   };
 
   // Live Realtime listener for global pvp effects (Snares & Grasps)
+  // Also listens to prize_claims and pending_prizes for instant UI sync
   useEffect(() => {
     if (!session) return;
 
@@ -1835,8 +1839,42 @@ export function GameProvider({ children }) {
       )
       .subscribe();
 
+    const prizeClaimsChannel = supabase
+      .channel('realtime_prize_claims')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'prize_claims' }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          setPrizeClaims(prev => {
+            if (prev.some(c => c.id === payload.new.id)) return prev;
+            return [...prev, payload.new];
+          });
+        } else if (payload.eventType === 'UPDATE') {
+          setPrizeClaims(prev => prev.map(c => c.id === payload.new.id ? payload.new : c));
+        } else if (payload.eventType === 'DELETE') {
+          setPrizeClaims(prev => prev.filter(c => c.id !== payload.old.id));
+        }
+      })
+      .subscribe();
+
+    const pendingPrizesChannel = supabase
+      .channel('realtime_pending_prizes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'pending_prizes' }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          setPendingPrizesList(prev => {
+            if (prev.some(p => p.id === payload.new.id)) return prev;
+            return [...prev, payload.new];
+          });
+        } else if (payload.eventType === 'UPDATE') {
+          setPendingPrizesList(prev => prev.map(p => p.id === payload.new.id ? payload.new : p));
+        } else if (payload.eventType === 'DELETE') {
+          setPendingPrizesList(prev => prev.filter(p => p.id !== payload.old.id));
+        }
+      })
+      .subscribe();
+
     return () => {
       supabase.removeChannel(channel);
+      supabase.removeChannel(prizeClaimsChannel);
+      supabase.removeChannel(pendingPrizesChannel);
     };
   }, [session]);
 
