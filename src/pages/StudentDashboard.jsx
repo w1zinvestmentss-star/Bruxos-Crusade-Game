@@ -66,7 +66,7 @@ const Awakening = () => {
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
-  const { currentUser, setUserRole, clearNotifications, quests, isProfileLoaded } = useGame();
+  const { currentUser, setUserRole, clearNotifications, quests, isProfileLoaded, session } = useGame();
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   useEffect(() => {
@@ -124,7 +124,8 @@ const StudentDashboard = () => {
     );
   };
 
-  if (!isProfileLoaded || !currentUser) {
+  // If logged in but the database is still loading, stay on the loading screen
+  if (session && !isProfileLoaded) {
     return (
       <div className="min-h-screen bg-stone-950 flex flex-col items-center justify-center z-[200]">
         <div className="text-yellow-500 font-['Press_Start_2P'] text-lg md:text-xl animate-pulse drop-shadow-[0_0_15px_rgba(234,179,8,0.8)]">

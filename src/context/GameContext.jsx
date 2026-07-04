@@ -362,6 +362,9 @@ export function GameProvider({ children }) {
     const handleAuthChange = async (session) => {
       setSession(session);
       if (session) {
+        // Reset loading states for a fresh login
+        setIsProfileLoaded(false);
+        
         // 1. Fetch Profile First (required to get ID for subsequent filters)
         let { data, error } = await supabase
           .from('profiles')
@@ -497,10 +500,8 @@ export function GameProvider({ children }) {
       }
     };
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      handleAuthChange(session);
-    });
-
+    // SINGLE SOURCE OF TRUTH: Let onAuthStateChange handle the initial session fetch
+    // as well as all subsequent auth state changes. Delete the redundant getSession()!
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
