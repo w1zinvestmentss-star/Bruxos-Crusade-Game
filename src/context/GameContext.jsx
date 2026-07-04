@@ -1,16 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { HISTORY_BANK, MATH_BLITZ_BANK, SCIENCE_BLITZ_BANK, GAUNTLET_BANK, INCANTATION_BANK, MULTISTEP_BANK } from '../data/questionBanks';
 
 const GameContext = createContext();
-
-const INITIAL_STUDENTS = [
-  { id: 1, name: "John Doe", heroName: "Sir Lancelot", level: 5, xp: 1250, gold: 400, inventory: [], midtermGPA: 750, finalGPA: 850, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.knight2.png', notifications: [], activeBuffs: {}, loginStreak: 150, defeatedBosses: [], uploadQuestsCompleted: 150, quizQuestsCompleted: 150, multiStepQuestsCompleted: 150, scenarioQuestsCompleted: 150, incantationQuestsCompleted: 150, sportsQuestsCompleted: 150, artsQuestsCompleted: 150, wellnessQuestsCompleted: 150, journalQuestsCompleted: 150, cipherQuestsCompleted: 150, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
-  { id: 2, name: "Jane Smith", heroName: "Lady Arwen", level: 6, xp: 1450, gold: 120, inventory: [], midtermGPA: 880, finalGPA: 900, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Vamphunter1.png', notifications: [], activeBuffs: {}, loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
-  { id: 3, name: "Mike Ross", heroName: "Ranger Rick", level: 3, xp: 800, gold: 550, inventory: [], midtermGPA: 600, finalGPA: 700, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Baller.outfit2.png', notifications: [], activeBuffs: {}, loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
-  { id: 4, name: "Sarah Connor", heroName: "The Terminator", level: 4, xp: 1100, gold: 50, inventory: [], midtermGPA: 920, finalGPA: null, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Powerful.golden.armour.png', notifications: [], activeBuffs: {}, loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
-  { id: 5, name: "Bruce Wayne", heroName: "Dark Knight", level: 7, xp: 2000, gold: 900, inventory: [], midtermGPA: 850, finalGPA: 950, currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dark.souls1.png', notifications: [], activeBuffs: {}, loginStreak: 4, defeatedBosses: [], uploadQuestsCompleted: 5, quizQuestsCompleted: 3, multiStepQuestsCompleted: 1, scenarioQuestsCompleted: 0, incantationQuestsCompleted: 0, sportsQuestsCompleted: 0, artsQuestsCompleted: 0, wellnessQuestsCompleted: 0, journalQuestsCompleted: 0, cipherQuestsCompleted: 0, unlockedAchievements: [], pendingPrizes: [], raffleTickets: 0, totalTicketsEarned: 0 },
-];
 
 const ACHIEVEMENTS = [
   // --- THE LEVEL PROGRESSION TRACK (Guaranteed Real-World Prizes) ---
@@ -346,11 +338,18 @@ export function GameProvider({ children }) {
     { id: 999, title: "The Gauntlet", description: "5 Questions. 7 Seconds each. No mistakes allowed. One attempt per day.", type: 'gauntlet', xp: 100, gold: 40, frequency: 'daily', totalSteps: 5, timePerStep: 7, questionBank: GAUNTLET_BANK }
   ];
 
-  const [students, setStudents] = useState(INITIAL_STUDENTS);
+  const [students, setStudents] = useState([]);
   const [quests, setQuests] = useState(INITIAL_QUESTS);
   const [submissions, setSubmissions] = useState([]);
   const [userRole, setUserRole] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  
+  const currentUserRef = useRef(null);
+  useEffect(() => {
+    currentUserRef.current = currentUser;
+  }, [currentUser]);
+
+  const [isProfileLoaded, setIsProfileLoaded] = useState(false);
   const [currentRafflePrize, setCurrentRafflePrize] = useState('Mystery Prize');
   const [session, setSession] = useState(null);
   const [globalEffects, setGlobalEffects] = useState([]);
@@ -485,9 +484,12 @@ export function GameProvider({ children }) {
             });
             setTimeout(() => checkAchievements(formattedProfile), 500);
           }
+          
+          setIsProfileLoaded(true);
         }
       } else {
         setCurrentUser(null);
+        setIsProfileLoaded(false);
         setSubmissions([]);
         setGlobalEffects([]);
         setPrizeClaims([]);
@@ -810,7 +812,9 @@ export function GameProvider({ children }) {
 
       // Update students array and — only if this IS the current user — currentUser
       setStudents(prev => prev.map(s => s.id === studentId ? updatedStudent : s));
-      if (currentUser && currentUser.id === studentId) {
+      
+      // Safely update the current user using the fresh ref
+      if (currentUserRef.current && currentUserRef.current.id === studentId) {
         setCurrentUser(updatedStudent);
       }
 
@@ -1854,6 +1858,7 @@ export function GameProvider({ children }) {
   }, [session]);
 
   const value = {
+    isProfileLoaded,
     students, quests, submissions, BOSSES, ACHIEVEMENTS,
     createQuest, importQuestions, submitQuest, approveSubmission, rejectSubmission, getQuestStatus, submitWellnessCheck, submitBossStrike,
     userRole, setUserRole, currentUser, setCurrentUser,

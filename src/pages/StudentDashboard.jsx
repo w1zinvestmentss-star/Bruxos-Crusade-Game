@@ -66,21 +66,14 @@ const Awakening = () => {
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
-  const { currentUser, setUserRole, clearNotifications, quests } = useGame();
+  const { currentUser, setUserRole, clearNotifications, quests, isProfileLoaded } = useGame();
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
-  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     if (currentUser) {
-      const timer = setTimeout(() => {
-        if (currentUser.notifications && currentUser.notifications.length > 0) {
-          setShowWelcomeModal(true);
-        }
-        setIsReady(true);
-      }, 150); // 150ms stabilization delay
-      return () => clearTimeout(timer);
-    } else {
-      setIsReady(false);
+      if (currentUser.notifications && currentUser.notifications.length > 0) {
+        setShowWelcomeModal(true);
+      }
     }
   }, [currentUser]);
 
@@ -131,10 +124,10 @@ const StudentDashboard = () => {
     );
   };
 
-  if (!currentUser || !isReady) {
+  if (!isProfileLoaded || !currentUser) {
     return (
       <div className="min-h-screen bg-stone-950 flex flex-col items-center justify-center z-[200]">
-        <div className="text-yellow-500 font-['Press_Start_2P'] text-xl md:text-2xl animate-pulse drop-shadow-[0_0_15px_rgba(234,179,8,0.8)]">
+        <div className="text-yellow-500 font-['Press_Start_2P'] text-lg md:text-xl animate-pulse drop-shadow-[0_0_15px_rgba(234,179,8,0.8)]">
           LOADING REALM...
         </div>
       </div>
