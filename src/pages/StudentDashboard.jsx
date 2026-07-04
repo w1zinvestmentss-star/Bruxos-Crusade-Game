@@ -72,13 +72,12 @@ const StudentDashboard = () => {
 
   useEffect(() => {
     if (currentUser) {
-      // 100ms delay ensures state settles before making rendering decisions
       const timer = setTimeout(() => {
         if (currentUser.notifications && currentUser.notifications.length > 0) {
           setShowWelcomeModal(true);
         }
         setIsReady(true);
-      }, 100);
+      }, 150); // 150ms stabilization delay
       return () => clearTimeout(timer);
     } else {
       setIsReady(false);
