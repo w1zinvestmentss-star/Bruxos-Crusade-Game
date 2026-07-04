@@ -363,7 +363,7 @@ export function GameProvider({ children }) {
     const handleAuthChange = async (session) => {
       setSession(session);
       if (session) {
-        // Fetch Profile
+        // 1. Fetch Profile First (required to get ID for subsequent filters)
         let { data, error } = await supabase
           .from('profiles')
           .select('*')
@@ -387,75 +387,48 @@ export function GameProvider({ children }) {
         if (profileToSet) {
           const formattedProfile = formatProfile(profileToSet);
 
-          // Preserve some critical base defaults not covered by the user adapter
-          formattedProfile.inventory = formattedProfile.inventory || [];
-          formattedProfile.notifications = formattedProfile.notifications || [];
-          formattedProfile.pendingPrizes = formattedProfile.pendingPrizes || [];
-          formattedProfile.defeatedBosses = formattedProfile.defeatedBosses || [];
-          formattedProfile.xp = formattedProfile.xp || 0;
-          formattedProfile.gold = formattedProfile.gold || 0;
-          formattedProfile.level = formattedProfile.level || 1;
-          formattedProfile.activeBuffs = formattedProfile.activeBuffs || {};
-
-          // Fetch Inventory
-          const { data: inv } = await supabase
-            .from('inventory')
-            .select('*')
-            .eq('student_id', session.user.id);
-
-          formattedProfile.inventory = inv || [];
-
-          // --- LOGIN STREAK LOGIC ---
-          const todayStr = new Date().toISOString().split('T')[0];
-          const yest = new Date();
-          yest.setDate(yest.getDate() - 1);
-          const yesterdayStr = yest.toISOString().split('T')[0];
-
-          let streakUpdated = false;
-
-          if (formattedProfile.lastLoginDate !== todayStr) {
-            if (formattedProfile.lastLoginDate === yesterdayStr) {
-              formattedProfile.loginStreak = (formattedProfile.loginStreak || 0) + 1;
-            } else {
-              formattedProfile.loginStreak = 1; // Streak broken or first login
-            }
-            formattedProfile.lastLoginDate = todayStr;
-            streakUpdated = true;
-          }
-          // --------------------------
-
-          setCurrentUser(formattedProfile);
-
-          if (streakUpdated) {
-            saveProfileToCloud(session.user.id, {
-              loginStreak: formattedProfile.loginStreak,
-              lastLoginDate: formattedProfile.lastLoginDate
-            });
-            // Delay achievement check slightly to ensure students array is ready
-            setTimeout(() => checkAchievements(formattedProfile), 500);
-          }
-
-          // Fetch all profiles for leaderboard
-          const { data: allProfiles } = await supabase.from('profiles').select('*');
-          if (allProfiles) {
-            setStudents(allProfiles.map(p => formatProfile(p)));
-          }
-
-          // Fetch Submissions
+          // 2. Prepare parallel queries
           const isTeacher = session.user.email === 'admin@bruxos.com';
+          
           let subsQuery = supabase.from('submissions').select('*');
+          if (!isTeacher) subsQuery = subsQuery.eq('student_id', session.user.id);
 
-          // If they are a student, only let them see their own submissions. 
-          // If they are the teacher, let them see everything!
-          if (!isTeacher) {
-            subsQuery = subsQuery.eq('student_id', session.user.id);
+          let claimsQuery = supabase.from('prize_claims').select('*').order('requested_at', { ascending: false });
+          if (!isTeacher) claimsQuery = claimsQuery.eq('student_id', session.user.id);
+
+          let prizesQuery = supabase.from('pending_prizes').select('*').order('created_at', { ascending: false });
+          if (!isTeacher) prizesQuery = prizesQuery.eq('student_id', session.user.id);
+
+          // 3. Execute all secondary fetches IN PARALLEL (Speed boost & prevents race conditions)
+          const [
+            invResult,
+            profilesResult,
+            subsResult,
+            effectsResult,
+            settingsResult,
+            hsResult,
+            claimsResult,
+            prizesResult
+          ] = await Promise.all([
+            supabase.from('inventory').select('*').eq('student_id', session.user.id),
+            supabase.from('profiles').select('*'),
+            subsQuery,
+            supabase.from('global_effects').select('*'),
+            supabase.from('game_settings').select('value').eq('key', 'current_raffle_prize').single(),
+            supabase.from('high_scores').select('*'),
+            claimsQuery,
+            prizesQuery
+          ]);
+
+          // 4. Map results safely to state
+          formattedProfile.inventory = invResult.data || [];
+
+          if (profilesResult.data) {
+            setStudents(profilesResult.data.map(p => formatProfile(p)));
           }
 
-          const { data: subs, error: subsError } = await subsQuery;
-          if (subsError) {
-            console.error("Error fetching submissions:", subsError);
-          } else if (subs) {
-            const mappedSubs = subs.map(s => ({
+          if (subsResult.data) {
+            const mappedSubs = subsResult.data.map(s => ({
               ...s,
               questId: s.quest_id,
               studentId: s.student_id,
@@ -469,23 +442,12 @@ export function GameProvider({ children }) {
             setSubmissions(mappedSubs);
           }
 
-          // Fetch Global Effects
-          const { data: effectsData } = await supabase.from('global_effects').select('*');
-          if (effectsData) setGlobalEffects(effectsData);
-
-          const { data: settingsData } = await supabase
-            .from('game_settings')
-            .select('value')
-            .eq('key', 'current_raffle_prize')
-            .single();
-          if (settingsData) {
-            setCurrentRafflePrize(settingsData.value);
-          }
-
-          const { data: hsData } = await supabase.from('high_scores').select('*');
-          if (hsData) {
+          if (effectsResult.data) setGlobalEffects(effectsResult.data);
+          if (settingsResult.data) setCurrentRafflePrize(settingsResult.data.value);
+          
+          if (hsResult.data) {
             const hsMap = {};
-            hsData.forEach(hs => {
+            hsResult.data.forEach(hs => {
               hsMap[hs.quest_id] = { score: hs.score, player: hs.player_name };
             });
             setHighScores(hsMap);
@@ -493,23 +455,36 @@ export function GameProvider({ children }) {
             setHighScores({});
           }
 
-          // Fetch Prize Claims — all claims if teacher, own claims if student
-          const isTeacherForClaims = session.user.email === 'admin@bruxos.com';
-          let claimsQuery = supabase.from('prize_claims').select('*').order('requested_at', { ascending: false });
-          if (!isTeacherForClaims) {
-            claimsQuery = claimsQuery.eq('student_id', session.user.id);
-          }
-          const { data: claimsData } = await claimsQuery;
-          if (claimsData) setPrizeClaims(claimsData);
+          if (claimsResult.data) setPrizeClaims(claimsResult.data);
+          if (prizesResult.data) setPendingPrizesList(prizesResult.data);
 
-          // Fetch pending_prizes — all for teacher, own for student
-          const isTeacherForPrizes = session.user.email === 'admin@bruxos.com';
-          let prizesQuery = supabase.from('pending_prizes').select('*').order('created_at', { ascending: false });
-          if (!isTeacherForPrizes) {
-            prizesQuery = prizesQuery.eq('student_id', session.user.id);
+          // --- LOGIN STREAK LOGIC ---
+          const todayStr = new Date().toISOString().split('T')[0];
+          const yest = new Date();
+          yest.setDate(yest.getDate() - 1);
+          const yesterdayStr = yest.toISOString().split('T')[0];
+
+          let streakUpdated = false;
+
+          if (formattedProfile.lastLoginDate !== todayStr) {
+            if (formattedProfile.lastLoginDate === yesterdayStr) {
+              formattedProfile.loginStreak = (formattedProfile.loginStreak || 0) + 1;
+            } else {
+              formattedProfile.loginStreak = 1;
+            }
+            formattedProfile.lastLoginDate = todayStr;
+            streakUpdated = true;
           }
-          const { data: prizesData } = await prizesQuery;
-          if (prizesData) setPendingPrizesList(prizesData);
+
+          setCurrentUser(formattedProfile);
+
+          if (streakUpdated) {
+            saveProfileToCloud(session.user.id, {
+              loginStreak: formattedProfile.loginStreak,
+              lastLoginDate: formattedProfile.lastLoginDate
+            });
+            setTimeout(() => checkAchievements(formattedProfile), 500);
+          }
         }
       } else {
         setCurrentUser(null);
