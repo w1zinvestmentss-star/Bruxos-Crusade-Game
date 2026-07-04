@@ -473,6 +473,15 @@ export function GameProvider({ children }) {
           const { data: effectsData } = await supabase.from('global_effects').select('*');
           if (effectsData) setGlobalEffects(effectsData);
 
+          const { data: settingsData } = await supabase
+            .from('game_settings')
+            .select('value')
+            .eq('key', 'current_raffle_prize')
+            .single();
+          if (settingsData) {
+            setCurrentRafflePrize(settingsData.value);
+          }
+
           const { data: hsData } = await supabase.from('high_scores').select('*');
           if (hsData) {
             const hsMap = {};
@@ -1694,6 +1703,18 @@ export function GameProvider({ children }) {
     return { success: false, message: 'Raffle failed. Check Supabase errors.' };
   };
 
+  const updateRafflePrize = async (newPrize) => {
+    const { error } = await supabase
+      .from('game_settings')
+      .upsert([{ key: 'current_raffle_prize', value: newPrize }]);
+    if (!error) {
+      setCurrentRafflePrize(newPrize);
+      return { success: true };
+    }
+    console.error("Error saving raffle prize:", error);
+    return { success: false };
+  };
+
   const clearNotifications = () => {
     if (!currentUser) return;
     const updatedUser = { ...currentUser, notifications: [] };
@@ -1841,6 +1862,7 @@ export function GameProvider({ children }) {
     currentRafflePrize,
     setCurrentRafflePrize,
     runMonthlyRaffle,
+    updateRafflePrize,
     session,
     login,
     logout,

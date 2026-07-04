@@ -18,6 +18,7 @@ const TeacherDashboard = () => {
     currentRafflePrize,
     setCurrentRafflePrize,
     runMonthlyRaffle,
+    updateRafflePrize,
     prizeClaims,
     fulfillAchievementClaim,
     pendingPrizesList,
@@ -211,12 +212,24 @@ const TeacherDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-bold text-stone-300 mb-2">Current Billboard Prize (Visible to Students):</label>
-              <input
-                type="text"
-                value={currentRafflePrize}
-                onChange={(e) => setCurrentRafflePrize(e.target.value)}
-                className="bg-black text-white p-2 rounded w-full border border-indigo-400"
-              />
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={currentRafflePrize}
+                  onChange={(e) => setCurrentRafflePrize(e.target.value)}
+                  className="bg-black text-white p-2 rounded flex-grow border border-indigo-400"
+                />
+                <button 
+                  onClick={async () => {
+                    const res = await updateRafflePrize(currentRafflePrize);
+                    if (res.success) alert("Billboard updated permanently!");
+                    else alert("Failed to save billboard.");
+                  }}
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded text-xs"
+                >
+                  SAVE
+                </button>
+              </div>
             </div>
             <div className="flex items-end">
               <button
