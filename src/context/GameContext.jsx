@@ -1740,17 +1740,18 @@ export function GameProvider({ children }) {
     let goldEarned = applyClassBonus(quest.type, baseGold, currentUser.heroClass);
     goldEarned = applyPetBonus(quest.type, goldEarned, true, currentUser.equippedPet);
 
-    // Track as a quiz so Order of the Owl bosses and achievements still unlock!
     const updates = {
       xp: (currentUser.xp || 0) + xpEarned,
       gold: (currentUser.gold || 0) + goldEarned,
     };
 
-    // Route to separate boss tracks based on quest ID
+    // Single Source of Truth: Route Blitz quests to unique boss tracks
     if (questId === 103) {
-      updates.quizQuestsCompleted = (currentUser.quizQuestsCompleted || 0) + 1; // Feeds Owls
+      updates.quizQuestsCompleted = (currentUser.quizQuestsCompleted || 0) + 1; // Feeds Owls (Track 2)
     } else if (questId === 112) {
-      updates.scenarioQuestsCompleted = (currentUser.scenarioQuestsCompleted || 0) + 1; // Feeds Volcanic Dragons
+      updates.scenarioQuestsCompleted = (currentUser.scenarioQuestsCompleted || 0) + 1; // Feeds Volcanic Dragons (Track 5)
+    } else if (questId === 104) {
+      updates.cipherQuestsCompleted = (currentUser.cipherQuestsCompleted || 0) + 1; // Feeds Shapeshifters (Track 6)
     }
 
     syncUserUpdate(updates);
