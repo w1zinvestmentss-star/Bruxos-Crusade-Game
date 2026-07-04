@@ -69,7 +69,7 @@ const THEMES = {
 const BriefingRoom = () => {
   const navigate = useNavigate();
   const { questId } = useParams();
-  const { quests, submitQuest, attemptQuiz, recordGauntletFailure, attemptBlitz, getHighScore } = useGame();
+  const { quests, submitQuest, attemptQuiz, recordGauntletFailure, attemptBlitz, getHighScore, currentUser } = useGame();
   const quest = quests.find(q => String(q.id) === String(questId));
   const currentTheme = quest ? (THEMES[quest.id] || THEMES[quest.type] || THEMES.journal) : THEMES.journal;
   const theme = currentTheme;
@@ -88,6 +88,7 @@ const BriefingRoom = () => {
   const [modalQuote, setModalQuote] = useState('');
   const [isGauntletFinished, setIsGauntletFinished] = useState(false);
 
+  const [assetsLoaded, setAssetsLoaded] = useState(false);
   const [gauntletStep, setGauntletStep] = useState(0);
   const [gauntletTimer, setGauntletTimer] = useState(70);
   const [gauntletQuestion, setGauntletQuestion] = useState(null);
@@ -179,6 +180,31 @@ const BriefingRoom = () => {
     event.preventDefault();
   };
 
+  // Asynchronously preload background and NPC images to prevent visual flickers
+  useEffect(() => {
+    if (!theme) return;
+    setAssetsLoaded(false);
+
+    const bgImg = new Image();
+    const npcImg = new Image();
+    let loadedCount = 0;
+
+    const handleAssetLoad = () => {
+      loadedCount++;
+      if (loadedCount === 2) {
+        setAssetsLoaded(true);
+      }
+    };
+
+    bgImg.onload = handleAssetLoad;
+    npcImg.onload = handleAssetLoad;
+    bgImg.onerror = handleAssetLoad; // Fallback in case of network error
+    npcImg.onerror = handleAssetLoad;
+
+    bgImg.src = theme.bg;
+    npcImg.src = theme.npc;
+  }, [theme]);
+
   const handleSubmit = async () => {
     if (!quest) return;
     if (journalText.trim() === '') {
@@ -268,19 +294,11 @@ const BriefingRoom = () => {
     setBlitzInput('');
   };
 
-  if (!quest) {
+  if (!quest || !currentUser || !assetsLoaded) {
     return (
-      <div className="relative min-h-screen overflow-hidden bg-black text-stone-100">
-        <img src={theme.bg} alt="Briefing background" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-black/80" />
-        <div className="relative z-10 min-h-screen flex items-center justify-center p-6">
-          <div className="bg-black/75 backdrop-blur-md p-8 rounded-2xl border-2 border-yellow-500/30 max-w-2xl w-full text-center">
-            <h1 className="text-yellow-400 font-['Press_Start_2P'] text-2xl mb-4">MISSION NOT FOUND</h1>
-            <p className="text-stone-300 font-['VT323'] text-xl mb-6">This journal quest could not be found.</p>
-            <button onClick={() => navigate('/quests')} className="w-full bg-yellow-500 text-stone-950 font-['Press_Start_2P'] py-3 rounded hover:bg-yellow-400">
-              RETURN TO KINGDOM
-            </button>
-          </div>
+      <div className="min-h-screen bg-stone-950 flex flex-col items-center justify-center z-[200]">
+        <div className="text-yellow-500 font-['Press_Start_2P'] text-lg md:text-xl animate-pulse drop-shadow-[0_0_15px_rgba(234,179,8,0.8)]">
+          LOADING REALM...
         </div>
       </div>
     );
