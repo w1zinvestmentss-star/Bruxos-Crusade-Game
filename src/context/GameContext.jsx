@@ -1250,8 +1250,6 @@ export function GameProvider({ children }) {
 
     let currentBuffs = { ...(currentUser.activeBuffs || {}) };
 
-    const mimicSnare = globalEffects.find(e => e.type === 'mimic_snare' && e.quest_id === questId);
-
     if (isCorrect) {
       if (!isFinalStep) {
         return { success: true, message: "Step Complete!" };
@@ -1267,13 +1265,6 @@ export function GameProvider({ children }) {
       }
       if (currentBuffs.ember && Date.now() < currentBuffs.ember) {
         finalXp *= 2;
-      }
-
-      if (mimicSnare) {
-        finalXp *= 2;
-        finalGold *= 2;
-        supabase.from('global_effects').delete().eq('id', mimicSnare.id).then();
-        setGlobalEffects(prev => prev.filter(e => e.id !== mimicSnare.id));
       }
 
       let xpEarned = applyClassBonus(quest.type, finalXp, currentUser.heroClass);
@@ -1310,13 +1301,6 @@ export function GameProvider({ children }) {
 
       return { success: true, message: `+${xpEarned} XP, +${goldEarned} Gold` };
     } else {
-      if (mimicSnare) {
-        awardRewards(mimicSnare.creator_id, 300, 150);
-        supabase.from('global_effects').delete().eq('id', mimicSnare.id).then();
-        setGlobalEffects(prev => prev.filter(e => e.id !== mimicSnare.id));
-        return { success: false, message: "A Mimic's Snare was triggered! You were ambushed!" };
-      }
-
       if (currentBuffs.oath) {
         const updatedBuffs = { ...currentBuffs };
         delete updatedBuffs.oath;
@@ -1718,16 +1702,6 @@ export function GameProvider({ children }) {
     saveProfileToCloud(currentUser.id, { notifications: [] });
   };
 
-  const placeMimicSnare = async (questId) => {
-    if (!currentUser || currentUser.gold < 150) return { success: false, message: 'Not enough gold.' };
-    const newGold = currentUser.gold - 150;
-    syncUserUpdate({ gold: newGold });
-    const newEffect = { type: 'mimic_snare', quest_id: questId, creator_id: currentUser.id };
-    const { data, error } = await supabase.from('global_effects').insert([newEffect]).select();
-    if (!error && data) setGlobalEffects(prev => [...prev, ...data]);
-    return { success: true, message: "Mimic's Snare placed!" };
-  };
-
   const applyVoidGrasp = async (targetStudentId) => {
     if (!currentUser || currentUser.gold < 500) return { success: false, message: 'Not enough gold.' };
     const newGold = currentUser.gold - 500;
@@ -1815,6 +1789,35 @@ export function GameProvider({ children }) {
     return highScores[questId] || null;
   };
 
+  // Live Realtime listener for global pvp effects (Snares & Grasps)
+  useEffect(() => {
+    if (!session) return;
+
+    const channel = supabase
+      .channel('realtime_global_effects')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'global_effects' },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            setGlobalEffects(prev => {
+              if (prev.some(e => e.id === payload.new.id)) return prev;
+              return [...prev, payload.new];
+            });
+          } else if (payload.eventType === 'DELETE') {
+            setGlobalEffects(prev => prev.filter(e => e.id !== payload.old.id));
+          } else if (payload.eventType === 'UPDATE') {
+            setGlobalEffects(prev => prev.map(e => e.id === payload.new.id ? payload.new : e));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [session]);
+
   const value = {
     students, quests, submissions, BOSSES, ACHIEVEMENTS,
     createQuest, importQuestions, submitQuest, approveSubmission, rejectSubmission, getQuestStatus, submitWellnessCheck, submitBossStrike,
@@ -1847,7 +1850,6 @@ export function GameProvider({ children }) {
     unequipPet,
     applyPetBonus,
     globalEffects,
-    placeMimicSnare,
     applyVoidGrasp,
     resolveVoidGrasp,
     attemptBlitz,
