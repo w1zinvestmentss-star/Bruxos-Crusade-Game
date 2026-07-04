@@ -17,16 +17,16 @@ const Dungeon = () => {
 
   useEffect(() => {
     let timer;
-    if (activeBossBattle && activeBossBattle.finishingBlow?.type === 'auto' && battleTimeLeft > 0) {
+    if (activeBossBattle && activeBossBattle.finishingBlow?.type === 'auto' && battleTimeLeft > 0 && !cinematic) {
       timer = setInterval(() => {
         setBattleTimeLeft((prev) => prev - 1);
       }, 1000);
-    } else if (battleTimeLeft === 0 && activeBossBattle?.finishingBlow?.type === 'auto') {
+    } else if (battleTimeLeft === 0 && activeBossBattle?.finishingBlow?.type === 'auto' && !cinematic) {
       alert('The boss evaded your strike!');
       setActiveBossBattle(null);
     }
     return () => clearInterval(timer);
-  }, [activeBossBattle, battleTimeLeft]);
+  }, [activeBossBattle, battleTimeLeft, cinematic]);
 
   if (!currentUser) {
     return (
@@ -75,28 +75,26 @@ const Dungeon = () => {
   const getRequirementLabel = (requirement) => {
     switch (requirement) {
       case 'uploads': return "Homework Uploads";
-      case 'quizzes': return "Quizzes Aced";
+      case 'quizzes': return "Math Quizzes";
       case 'multistep': return "Complex Problems";
-      case 'scenarios': return "Scenarios Cleared";
+      case 'scenarios': return "Science Speed Runs";
       case 'incantations': return "Incantations Recited";
       case 'sports': return "Athletics Missions";
       case 'arts': return "Creative Missions";
       case 'wellness': return "Tavern Rests";
       case 'streak': return "Days in a Row";
       case 'journal': return "Reflections Written";
-      case 'ciphers': return "Riddles Solved";
+      case 'ciphers': return "History Speed Runs";
       case 'gauntlet': return "Gauntlet Victories";
       default: return "Requirement";
     }
   };
 
-  const CATEGORIES = {
+const CATEGORIES = {
     uploads: { title: 'The Paper Constructs', desc: 'Submit physical homework (Upload Quests) to summon these golems.' },
-    quizzes: { title: 'Order of the Owl', desc: 'Ace Math and History Quizzes to attract these wise entities.' },
-    multistep: { title: 'The Ancient Colossi', desc: 'Conquer complex, Multi-Step math problems to awaken the titans.' },
-    streak: { title: 'The Chronos Entities', desc: 'Maintain your Daily Login Streak to challenge the masters of time.' },
-    scenarios: { title: 'The Volcanic Lineage', desc: 'Make the right choices in Scenario Quests to face these dragons.' },
-    ciphers: { title: 'The Shapeshifters', desc: 'Solve Riddles and Ciphers to unmask these illusions.' },
+    quizzes: { title: 'Order of the Owl', desc: 'Ace Math Speed Runs and Quizzes to attract these wise entities.' },
+    scenarios: { title: 'The Volcanic Lineage', desc: 'Conduct rapid experiments (Science Speed Runs) to face these lava dragons.' },
+    ciphers: { title: 'The Shapeshifters', desc: 'Seek historical insight (History Speed Runs) to unmask these deceptive illusions.' },
     incantations: { title: 'The Spectral Scribes', desc: 'Type Incantations perfectly and quickly to summon these ghosts.' },
     sports: { title: 'The Earth Titans', desc: 'Complete physical education Scout Reports to challenge the earth.' },
     arts: { title: 'The Prismatic Muses', desc: 'Submit creative art Scout Reports to face the glass entities.' },
