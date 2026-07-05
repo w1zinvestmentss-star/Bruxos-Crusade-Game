@@ -385,15 +385,32 @@ const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equi
                         )}
                         <div className="text-yellow-400 font-['VT323'] text-xl">{item.cost} G</div>
                       </div>
-                      <button
-                        onClick={() => handleBuyItem(item)}
-                        disabled={currentUser.gold < item.cost}
-                        className={`w-full py-2 px-4 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
-                          currentUser.gold < item.cost ? 'bg-stone-800 text-stone-500 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-500 text-white'
-                        }`}
-                      >
-                        CAST SPELL ({item.cost} G)
-</button>
+                      {(() => {
+                        const limitKey = item.buffType === 'oath' ? 'spellOathCount' : 'spellEmberCount';
+                        const remainingCasts = 10 - (currentUser[limitKey] || 0);
+                        const isLimitReached = remainingCasts <= 0;
+                        const isButtonDisabled = currentUser.gold < item.cost || isLimitReached;
+
+                        return (
+                          <button
+                            onClick={() => {
+                              if (isLimitReached) return alert(`You have exhausted all 10 ${item.name} charges!`);
+                              handleBuyItem(item);
+                            }}
+                            disabled={isButtonDisabled}
+                            className={`w-full py-2 px-4 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
+                              isButtonDisabled 
+                                ? 'bg-stone-800 text-stone-500 cursor-not-allowed' 
+                                : 'bg-purple-600 hover:bg-purple-500 text-white'
+                            }`}
+                          >
+                            {isLimitReached 
+                              ? 'DEPLETED (0/10 Left)' 
+                              : `CAST SPELL (${item.cost} G) [${remainingCasts}/10 Left]`
+                            }
+                          </button>
+                        );
+                      })()}
                       </div>
                     );
                   })}

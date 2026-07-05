@@ -205,6 +205,8 @@ const formatProfile = (dbProfile = {}) => {
     gauntletQuestsCompleted: profile.gauntlet_quests_completed || 0,
     equippedPet: profile.equipped_pet || null,
     voidGraspCount: profile.void_grasp_count || 0,
+    spellOathCount: profile.spell_oath_count || 0,
+    spellEmberCount: profile.spell_ember_count || 0,
     lastLoginDate: profile.last_login_date || null,
   };
 };
@@ -228,6 +230,8 @@ const saveProfileToCloud = async (userId, updates) => {
   if (updates.equippedPet !== undefined) dbUpdates.equipped_pet = updates.equippedPet;
   if (updates.lastLoginDate !== undefined) dbUpdates.last_login_date = updates.lastLoginDate;
   if (updates.voidGraspCount !== undefined) dbUpdates.void_grasp_count = updates.voidGraspCount;
+  if (updates.spellOathCount !== undefined) dbUpdates.spell_oath_count = updates.spellOathCount;
+  if (updates.spellEmberCount !== undefined) dbUpdates.spell_ember_count = updates.spellEmberCount;
 
   // Map all quest counters:
   if (updates.uploadQuestsCompleted !== undefined) dbUpdates.upload_quests_completed = updates.uploadQuestsCompleted;
@@ -1415,15 +1419,30 @@ export function GameProvider({ children }) {
       const itemToSave = { ...item };
 
       if (item.type === 'consumable') {
+        const isOath = item.buffType === 'oath';
+        const limitKey = isOath ? 'spellOathCount' : 'spellEmberCount';
+        const currentCasts = currentUser[limitKey] || 0;
+        
+        if (currentCasts >= 10) {
+          return { success: false, message: `Spell failed! You have reached your limit of 10 ${item.name}s!` };
+        }
+
         const newBuffs = { ...(currentUser.activeBuffs || {}) };
+        const newCasts = currentCasts + 1;
+
         if (item.buffType === 'ember') {
           newBuffs.ember = Date.now() + 86400000;
         } else if (item.buffType === 'oath') {
           newBuffs.oath = true;
         }
 
-        syncUserUpdate({ gold: newGold, activeBuffs: newBuffs });
-        return { success: true, message: "Dark magic acquired!" };
+        syncUserUpdate({ 
+          gold: newGold, 
+          activeBuffs: newBuffs, 
+          [limitKey]: newCasts 
+        });
+        
+        return { success: true, message: `${item.name} acquired! (${10 - newCasts} charges remaining).` };
       }
 
       const updatedStudents = students.map(student => {
