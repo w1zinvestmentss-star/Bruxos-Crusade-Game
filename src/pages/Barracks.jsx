@@ -419,35 +419,49 @@ const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equi
                          <div className="text-yellow-400 font-['VT323'] text-xl mb-4">{item.cost} G</div>
                        </div>
 
-                       <div className="flex flex-col gap-2">
-                         <select
-                           value={selectedGraspTarget}
-                           onChange={(e) => setSelectedGraspTarget(e.target.value)}
-                           className="bg-black/80 text-stone-300 border border-stone-600 rounded p-2 font-['VT323'] text-lg w-full"
-                         >
-                           <option value="">Select a Target...</option>
-                           {[...students]
-                             .sort((a, b) => b.xp - a.xp)
-                             .slice(0, 3)
-                             .filter(s => s.id !== currentUser.id)
-                             .map(s => (
-                               <option key={s.id} value={s.id}>{s.heroName || s.name}</option>
-                             ))}
-                         </select>
-                         <button
-                           onClick={async () => {
-                             if (!selectedGraspTarget) return alert('Select a target first!');
-                             const res = await applyVoidGrasp(selectedGraspTarget);
-                             alert(res.message);
-                           }}
-                           disabled={currentUser.gold < item.cost || !selectedGraspTarget}
-                           className={`w-full py-2 px-4 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
-                             currentUser.gold < item.cost || !selectedGraspTarget ? 'bg-stone-800 text-stone-500 cursor-not-allowed' : 'bg-red-700 hover:bg-red-600 text-white'
-                           }`}
-                         >
-                           CAST ({item.cost} G)
-                         </button>
-                       </div>
+                        <div className="flex flex-col gap-2">
+                          <select
+                            value={selectedGraspTarget}
+                            onChange={(e) => setSelectedGraspTarget(e.target.value)}
+                            className="bg-black/80 text-stone-300 border border-stone-600 rounded p-2 font-['VT323'] text-lg w-full"
+                          >
+                            <option value="">Select a Target...</option>
+                            {[...students]
+                              .sort((a, b) => b.xp - a.xp)
+                              .slice(0, 3)
+                              .filter(s => s.id !== currentUser.id)
+                              .map(s => (
+                                <option key={s.id} value={s.id}>{s.heroName || s.name}</option>
+                              ))}
+                          </select>
+                          {(() => {
+                            const remainingCasts = 10 - (currentUser.voidGraspCount || 0);
+                            const isLimitReached = remainingCasts <= 0;
+                            const isButtonDisabled = currentUser.gold < item.cost || !selectedGraspTarget || isLimitReached;
+
+                            return (
+                              <button
+                                onClick={async () => {
+                                  if (isLimitReached) return alert("You have exhausted all 10 Voidwalker's Grasp charges!");
+                                  if (!selectedGraspTarget) return alert('Select a target first!');
+                                  const res = await applyVoidGrasp(selectedGraspTarget);
+                                  alert(res.message);
+                                }}
+                                disabled={isButtonDisabled}
+                                className={`w-full py-2 px-4 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
+                                  isButtonDisabled
+                                    ? 'bg-stone-800 text-stone-500 cursor-not-allowed'
+                                    : 'bg-red-700 hover:bg-red-600 text-white'
+                                }`}
+                              >
+                                {isLimitReached
+                                  ? 'DEPLETED (0/10 Left)'
+                                  : `CAST (${item.cost} G) [${remainingCasts}/10 Left]`
+                                }
+                              </button>
+                            );
+                          })()}
+                        </div>
                      </div>
                    );
                  })}

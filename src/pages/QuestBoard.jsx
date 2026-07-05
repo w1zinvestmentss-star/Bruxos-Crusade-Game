@@ -32,6 +32,19 @@ const QuestBoard = () => {
   const graspLock = globalEffects?.find(e => e.type === 'void_grasp' && e.target_id === currentUser?.id);
   const isLocked = !!graspLock;
 
+  const getVoidGraspTimeLeft = () => {
+    if (!graspLock || !graspLock.created_at) return "24 hours remaining";
+    const createdTime = new Date(graspLock.created_at).getTime();
+    const expirationTime = createdTime + 86400000; // 24 hours
+    const msLeft = expirationTime - Date.now();
+
+    if (msLeft <= 0) return "Dissolving...";
+
+    const hours = Math.floor(msLeft / 3600000);
+    const minutes = Math.floor((msLeft % 3600000) / 60000);
+    return `${hours}h ${minutes}m remaining until dissolution`;
+  };
+
   const [activeSessions, setActiveSessions] = useState({});
   const [sessionAnswers, setSessionAnswers] = useState({});
   const [activeScenarios, setActiveScenarios] = useState({});
@@ -263,7 +276,12 @@ const QuestBoard = () => {
           {isLocked ? (
             <div className="bg-purple-900/80 border-4 border-purple-500 p-8 rounded-xl max-w-2xl mx-auto text-center shadow-[0_0_50px_rgba(168,85,247,0.5)]">
               <h1 className="text-4xl text-white font-['Press_Start_2P'] mb-6 animate-pulse">VOID BREACH DETECTED</h1>
-              <p className="text-xl font-['VT323'] text-purple-200 mb-6">A dark magic has sealed your board! Solve the ancient equation to break the seal.</p>
+              <p className="text-xl font-['VT323'] text-purple-200 mb-2">
+                A dark magic has sealed your board! Solve the ancient equation to break the seal.
+              </p>
+              <p className="text-sm font-['Press_Start_2P'] text-purple-400 mb-6 uppercase tracking-wider animate-pulse">
+                ⏳ {getVoidGraspTimeLeft()}
+              </p>
               <div className="text-4xl font-mono text-yellow-400 mb-8 bg-black/50 p-4 rounded-lg inline-block">144 * 12 + 8 / 2 - 50</div>
               <input 
                 type="text" 

@@ -204,6 +204,7 @@ const formatProfile = (dbProfile = {}) => {
     journalQuestsCompleted: profile.journal_quests_completed || 0,
     gauntletQuestsCompleted: profile.gauntlet_quests_completed || 0,
     equippedPet: profile.equipped_pet || null,
+    voidGraspCount: profile.void_grasp_count || 0,
     lastLoginDate: profile.last_login_date || null,
   };
 };
@@ -226,6 +227,7 @@ const saveProfileToCloud = async (userId, updates) => {
   if (updates.activeBuffs !== undefined) dbUpdates.active_buffs = updates.activeBuffs;
   if (updates.equippedPet !== undefined) dbUpdates.equipped_pet = updates.equippedPet;
   if (updates.lastLoginDate !== undefined) dbUpdates.last_login_date = updates.lastLoginDate;
+  if (updates.voidGraspCount !== undefined) dbUpdates.void_grasp_count = updates.voidGraspCount;
 
   // Map all quest counters:
   if (updates.uploadQuestsCompleted !== undefined) dbUpdates.upload_quests_completed = updates.uploadQuestsCompleted;
@@ -400,6 +402,14 @@ export function GameProvider({ children }) {
 
           let prizesQuery = supabase.from('pending_prizes').select('*').order('created_at', { ascending: false });
           if (!isTeacher) prizesQuery = prizesQuery.eq('student_id', session.user.id);
+
+          // 2.5. 24-Hour Expiration Cleanup (Silently delete old grasps before loading)
+          const twentyFourHoursAgo = new Date(Date.now() - 86400000).toISOString();
+          await supabase
+            .from('global_effects')
+            .delete()
+            .eq('type', 'void_grasp')
+            .lt('created_at', twentyFourHoursAgo);
 
           // 3. Execute all secondary fetches IN PARALLEL (Speed boost & prevents race conditions)
           const [
@@ -1707,13 +1717,32 @@ export function GameProvider({ children }) {
   };
 
   const applyVoidGrasp = async (targetStudentId) => {
-    if (!currentUser || currentUser.gold < 500) return { success: false, message: 'Not enough gold.' };
+    if (!currentUser) return { success: false, message: "Not logged in!" };
+    
+    // Enforce 10-cast limit
+    const currentCasts = currentUser.voidGraspCount || 0;
+    if (currentCasts >= 10) {
+      return { success: false, message: "Spell failed! You have reached your lifetime limit of 10 Voidwalker's Grasps!" };
+    }
+
+    if (currentUser.gold < 500) {
+      return { success: false, message: "Not enough gold!" };
+    }
+
     const newGold = currentUser.gold - 500;
-    syncUserUpdate({ gold: newGold });
+    const newCasts = currentCasts + 1;
+
+    // Deduct gold and increment cast tracker
+    syncUserUpdate({ gold: newGold, voidGraspCount: newCasts });
+
     const newEffect = { type: 'void_grasp', target_id: targetStudentId, creator_id: currentUser.id };
     const { data, error } = await supabase.from('global_effects').insert([newEffect]).select();
-    if (!error && data) setGlobalEffects(prev => [...prev, ...data]);
-    return { success: true, message: "Voidwalker's Grasp applied!" };
+    
+    if (!error && data) {
+      setGlobalEffects(prev => [...prev, ...data]);
+    }
+
+    return { success: true, message: `Voidwalker's Grasp applied! (${10 - newCasts} charges remaining for the year).` };
   };
 
   const resolveVoidGrasp = async (isSuccess) => {
