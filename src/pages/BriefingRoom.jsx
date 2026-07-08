@@ -146,7 +146,8 @@ const BriefingRoom = () => {
     }
     if (quest?.type === 'blitz') {
       const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
-      setActiveBlitz({ isActive: true, timeLeft: 60, score: 0, currentQ: randomQ });
+      setActiveBlitz({ isActive: true, timeLeft: quest.timeLimit || 60, score: 0, currentQ: randomQ });
+      setIsAccepted(true);
     }
     setIsAccepted(true);
   };

@@ -294,13 +294,13 @@ export function GameProvider({ children }) {
     {
       id: 103,
       title: "Math Speed Run",
-      description: "Answer as many questions as you can in 60 seconds! Skip if you get stuck. Max rewards at 15 correct answers.",
+      description: "Answer as many questions as you can in 120 seconds! Skip if you get stuck. Max rewards at 30 correct answers.",
       xp: 50,
       gold: 20,
       type: 'blitz',
       frequency: 'daily',
       unlockDate: null,
-      timeLimit: 60,
+      timeLimit: 120,
       questionBank: MATH_BLITZ_BANK
     },
     {
@@ -1779,12 +1779,17 @@ export function GameProvider({ children }) {
     if (!quest) return { success: false, message: 'Quest not found' };
     if (score === 0) return { success: false, message: 'No points scored. Try again!' };
 
-    // Cap score at 15
-    const cappedScore = Math.min(score, 15);
+    // Balance limits for 120s (Math) vs 60s (Science)
+    const isMathBlitz = questId === 103;
+    const scoreCap = isMathBlitz ? 30 : 15;
+    const cappedScore = Math.min(score, scoreCap);
 
-    // Calculate Base + Bonus (Base: 50xp/20g. Each extra correct answer adds +5xp / +2g)
-    let baseXp = 50 + ((cappedScore - 1) * 5);
-    let baseGold = 20 + ((cappedScore - 1) * 2);
+    const xpPerExtra = isMathBlitz ? 4 : 5;
+    const goldPerExtra = isMathBlitz ? 1 : 2;
+
+    // Calculate Base + Bonus (Base: 50xp/20g. Each extra correct answer adds to the pool)
+    let baseXp = 50 + ((cappedScore - 1) * xpPerExtra);
+    let baseGold = 20 + ((cappedScore - 1) * goldPerExtra);
 
     let xpEarned = applyClassBonus(quest.type, baseXp, currentUser.heroClass);
     xpEarned = applyPetBonus(quest.type, xpEarned, false, currentUser.equippedPet);
@@ -1811,10 +1816,10 @@ export function GameProvider({ children }) {
     // Update blitz high score if this is a new record
     setBlitzHighScores(prev => {
       const current = prev[questId];
-      if (!current || cappedScore > current.score) {
+      if (!current || score > current.score) {
         return {
           ...prev,
-          [questId]: { score: cappedScore, player: currentUser.heroName }
+          [questId]: { score: score, player: currentUser.heroName }
         };
       }
       return prev;
