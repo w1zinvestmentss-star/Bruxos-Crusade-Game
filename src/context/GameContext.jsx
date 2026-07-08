@@ -306,15 +306,16 @@ export function GameProvider({ children }) {
     {
       id: 104,
       title: "History Check",
-      description: "Test your knowledge of history and geography. A new question awaits every day!",
+      description: "Test your knowledge of history and geography. Answer as many questions as you can in 120 seconds!",
       xp: 50,
       gold: 20,
       type: 'blitz',
       frequency: 'daily',
       unlockDate: null,
+      timeLimit: 120,
       questionBank: HISTORY_BANK
     },
-    { id: 112, title: "Science Speed Run", description: "Answer as many science questions as you can in 60 seconds!", type: 'blitz', xp: 50, gold: 20, frequency: 'daily', timeLimit: 60, questionBank: SCIENCE_BLITZ_BANK },
+    { id: 112, title: "Science Speed Run", description: "Answer as many science questions as you can in 120 seconds!", type: 'blitz', xp: 50, gold: 20, frequency: 'daily', timeLimit: 120, questionBank: SCIENCE_BLITZ_BANK },
     {
       id: 107,
       title: "The Memory Spell",
@@ -1779,17 +1780,12 @@ export function GameProvider({ children }) {
     if (!quest) return { success: false, message: 'Quest not found' };
     if (score === 0) return { success: false, message: 'No points scored. Try again!' };
 
-    // Balance limits for 120s (Math) vs 60s (Science)
-    const isMathBlitz = questId === 103;
-    const scoreCap = isMathBlitz ? 30 : 15;
-    const cappedScore = Math.min(score, scoreCap);
+    // Unified balance limits for all 120-second (2 Minute) Blitzes
+    const cappedScore = Math.min(score, 30);
 
-    const xpPerExtra = isMathBlitz ? 4 : 5;
-    const goldPerExtra = isMathBlitz ? 1 : 2;
-
-    // Calculate Base + Bonus (Base: 50xp/20g. Each extra correct answer adds to the pool)
-    let baseXp = 50 + ((cappedScore - 1) * xpPerExtra);
-    let baseGold = 20 + ((cappedScore - 1) * goldPerExtra);
+    // Base 50 XP / 20 Gold. Each correct answer beyond the first adds +4 XP / +1 Gold. Max: 166 XP, 49 Gold
+    let baseXp = 50 + ((cappedScore - 1) * 4);
+    let baseGold = 20 + ((cappedScore - 1) * 1);
 
     let xpEarned = applyClassBonus(quest.type, baseXp, currentUser.heroClass);
     xpEarned = applyPetBonus(quest.type, xpEarned, false, currentUser.equippedPet);

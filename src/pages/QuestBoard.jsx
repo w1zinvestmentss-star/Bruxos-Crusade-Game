@@ -231,7 +231,7 @@ const QuestBoard = () => {
 
   const QUEST_CATEGORIES = {
     'upload': { title: 'The Paper Trail', desc: 'Submit physical homework and standard assignments for the Game Master to review.' },
-    'blitz': { title: '⚡ The 60-Second Frenzy', desc: 'Answer as many questions as you can before time runs out! Every correct answer earns extra Gold & XP.' },
+    'blitz': { title: '⚡ The 2-Minute Frenzy', desc: 'Answer as many questions as you can before time runs out! Every correct answer earns extra Gold & XP.' },
     'quiz': { title: "The Scholar's Trial", desc: 'Auto-graded tests of knowledge. Answer correctly for instant rewards.' },
     'multi-step': { title: "The Hydra's Enigma", desc: 'Complex, multi-part problems. Solve them step-by-step.' },
     'scenario': { title: 'The Crossroads', desc: 'Read the situation and make the right choice to proceed.' },
