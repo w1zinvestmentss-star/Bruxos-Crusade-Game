@@ -66,6 +66,22 @@ const THEMES = {
   }
 };
 
+const getMathTip = (questionText) => {
+  if (!questionText) return "";
+  const qLower = questionText.toLowerCase();
+  if (qLower.includes('round')) return "💡 Rounding Tip: 5 or more? Round up! 4 or less? Let it rest!";
+  if (qLower.includes('perimeter')) return "💡 Perimeter Tip: Add all the outside boundaries of the shape together!";
+  if (qLower.includes('area')) return "💡 Area Tip: For a rectangle, simply multiply Length x Width (L x W)!";
+  if (qLower.includes('pattern')) return "💡 Pattern Tip: Subtract the first two numbers to find the gap difference!";
+  if (qLower.includes('decimal') || qLower.includes('.')) return "💡 Decimal Tip: Line up the decimal points! Add and subtract them like whole numbers.";
+  if (qLower.includes('fraction')) return "💡 Fraction Tip: Numerator is the top (parts owned), Denominator is the bottom (total parts).";
+  if (qLower.includes('*') || qLower.includes('x') || qLower.includes('multiply') || qLower.includes('times')) return "💡 Multiplication Tip: Multiplying by 4? Double the number, then double it again!";
+  if (qLower.includes('/') || qLower.includes('divided') || qLower.includes('divide')) return "💡 Division Tip: Think of it as backward multiplication! (e.g. 40 / 8 is: what x 8 = 40?)";
+  if (qLower.includes('+') || qLower.includes('plus') || qLower.includes('added')) return "💡 Addition Tip: Break numbers into place values! (e.g., 24 + 35 is 20 + 30 and 4 + 5).";
+  if (qLower.includes('-') || qLower.includes('minus') || qLower.includes('subtract')) return "💡 Subtraction Tip: Try 'counting up' from the smaller number to the larger number.";
+  return "💡 Coach's Tip: Speed comes with practice! If you get stuck, click PASS to save time.";
+};
+
 const BriefingRoom = () => {
   const navigate = useNavigate();
   const { questId } = useParams();
@@ -418,6 +434,11 @@ const BriefingRoom = () => {
               ) : (
                 <>
                   <input type="text" value={blitzInput} onChange={(e) => setBlitzInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleBlitzSubmit(); }} autoFocus className="w-full bg-black border-2 border-cyan-500 text-cyan-400 font-mono text-3xl p-4 rounded text-center focus:outline-none focus:ring-4 focus:ring-cyan-600 mb-4" placeholder="> Enter answer..." />
+                  <div className="bg-amber-950/20 border border-amber-500/30 rounded-lg p-3 text-center mb-4 transition-all duration-300">
+                    <p className="font-['VT323'] text-lg text-amber-300 leading-normal tracking-wide animate-pulse">
+                      {getMathTip(activeBlitz.currentQ?.q)}
+                    </p>
+                  </div>
                   <div className="flex gap-4">
                     <button onClick={() => handleBlitzSubmit()} className="flex-1 px-4 py-4 bg-cyan-700 text-white font-bold font-['Press_Start_2P'] text-sm rounded hover:bg-cyan-600 transition-colors">SUBMIT</button>
                     <button onClick={handleBlitzPass} className="flex-1 px-4 py-4 bg-stone-700 text-white font-bold font-['Press_Start_2P'] text-sm rounded hover:bg-stone-600 transition-colors">PASS</button>
