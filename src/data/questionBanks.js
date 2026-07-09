@@ -843,10 +843,33 @@ export const GAUNTLET_BANK = [
 ];
 
 export const INCANTATION_BANK = [
+    // --- Original Core Phrases ---
     { q: "To be, or not to be, that is the question.", a: "To be, or not to be, that is the question." },
     { q: "The quick brown fox jumps over the lazy dog.", a: "The quick brown fox jumps over the lazy dog." },
     { q: "A wizard is never late, nor is he early.", a: "A wizard is never late, nor is he early." },
-    { q: "Knowledge is the ultimate weapon of the realm.", a: "Knowledge is the ultimate weapon of the realm." }
+    { q: "Knowledge is the ultimate weapon of the realm.", a: "Knowledge is the ultimate weapon of the realm." },
+
+    // --- 20 New Gothic Fantasy / Scribe's Scriptorium Phrases ---
+    { q: "The magic of the scroll is written in the stars.", a: "The magic of the scroll is written in the stars." },
+    { q: "Deep in the dungeon, a shadow beast awakens.", a: "Deep in the dungeon, a shadow beast awakens." },
+    { q: "A hero is measured by their courage, not their gold.", a: "A hero is measured by their courage, not their gold." },
+    { q: "The ancient spell book is locked with a golden key.", a: "The ancient spell book is locked with a golden key." },
+    { q: "Focus your mind to unleash the lightning blast.", a: "Focus your mind to unleash the lightning blast." },
+    { q: "Only those who train hard can defeat the void bosses.", a: "Only those who train hard can defeat the void bosses." },
+    { q: "A scribe must record the legendary deeds of the realm.", a: "A scribe must record the legendary deeds of the realm." },
+    { q: "The dragon's breath burns hotter than molten lava.", a: "The dragon's breath burns hotter than molten lava." },
+    { q: "Speak the hidden words to disarm the mimic trap.", a: "Speak the hidden words to disarm the mimic trap." },
+    { q: "Wisdom is a shield that defends against the darkness.", a: "Wisdom is a shield that defends against the darkness." },
+    { q: "A true champion never flees from a worthy challenge.", a: "A true champion never flees from a worthy challenge." },
+    { q: "Scribe your daily thoughts to clear the misty path.", a: "Scribe your daily thoughts to clear the misty path." },
+    { q: "The phoenix rises from the ashes of the old world.", a: "The phoenix rises from the ashes of the old world." },
+    { q: "Solve the riddle to bypass the stone sphinx.", a: "Solve the riddle to bypass the stone sphinx." },
+    { q: "The crystal owl watches over the quiet library.", a: "The crystal owl watches over the quiet library." },
+    { q: "Run fast, strike hard, and protect the peaceful town.", a: "Run fast, strike hard, and protect the peaceful town." },
+    { q: "Mix the blue and green potions in the alchemist's lab.", a: "Mix the blue and green potions in the alchemist's lab." },
+    { q: "Every level you gain makes your inner light brighter.", a: "Every level you gain makes your inner light brighter." },
+    { q: "The King and Queen have summoned you to the castle.", a: "The King and Queen have summoned you to the castle." },
+    { q: "With iron determination, we shall reclaim our home.", a: "With iron determination, we shall reclaim our home." }
 ];
 
 export const MULTISTEP_BANK = [
