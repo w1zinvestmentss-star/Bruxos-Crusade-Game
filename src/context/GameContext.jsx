@@ -324,7 +324,7 @@ export function GameProvider({ children }) {
       xp: 60,
       gold: 20,
       frequency: 'daily',
-      timeLimit: 45,
+      timeLimit: 120,
       questionBank: INCANTATION_BANK
     },
     { id: 106, title: "Weekly Reflection", description: "Write a short paragraph about what you learned this week.", xp: 100, gold: 50, type: 'journal', frequency: 'weekly', unlockDate: '2025-01-01' },
@@ -1315,6 +1315,42 @@ export function GameProvider({ children }) {
     }
   };
 
+  const attemptIncantation = async (questId, score) => {
+    const quest = quests.find(q => q.id === questId);
+    if (!quest) return { success: false, message: 'Quest not found' };
+    if (score === 0) return { success: false, message: 'No runes transcribed. Try again!' };
+
+    // Cap rewards at 5 correct typings
+    const cappedScore = Math.min(score, 5);
+
+    // Base 60 XP / 20 Gold. Each correct typing adds +10 XP / +5 Gold. Max payout: 100 XP, 40 Gold
+    let baseXp = 60 + ((cappedScore - 1) * 10);
+    let baseGold = 20 + ((cappedScore - 1) * 5);
+
+    let xpEarned = applyClassBonus(quest.type, baseXp, currentUser.heroClass);
+    xpEarned = applyPetBonus(quest.type, xpEarned, false, currentUser.equippedPet);
+
+    let goldEarned = applyClassBonus(quest.type, baseGold, currentUser.heroClass);
+    goldEarned = applyPetBonus(quest.type, goldEarned, true, currentUser.equippedPet);
+
+    const updates = {
+      xp: (currentUser.xp || 0) + xpEarned,
+      gold: (currentUser.gold || 0) + goldEarned,
+      incantationQuestsCompleted: (currentUser.incantationQuestsCompleted || 0) + 1,
+    };
+
+    syncUserUpdate(updates);
+
+    const newSubmission = {
+      id: Date.now(), questId, studentId: currentUser.id, studentName: currentUser.heroName,
+      status: 'approved', timestamp: new Date().toISOString().split('T')[0], type: 'incantation'
+    };
+    setSubmissions(prev => [...prev, newSubmission]);
+    saveSubmissionToCloud(newSubmission);
+
+    return { success: true, message: `Superb scribe! You transcribed ${score} spells! +${xpEarned} XP, +${goldEarned} Gold` };
+  };
+
   const recordGauntletFailure = (questId) => {
     if (!currentUser) return;
     const newSubmission = {
@@ -1919,6 +1955,7 @@ export function GameProvider({ children }) {
     calculateComebackScore,
     updateStudentStats,
     attemptQuiz,
+    attemptIncantation,
     recordGauntletFailure,
     attemptScenario,
     clearNotifications,

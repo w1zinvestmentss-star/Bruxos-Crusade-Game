@@ -85,7 +85,7 @@ const getMathTip = (questionText) => {
 const BriefingRoom = () => {
   const navigate = useNavigate();
   const { questId } = useParams();
-  const { quests, submitQuest, attemptQuiz, recordGauntletFailure, attemptBlitz, getHighScore, currentUser } = useGame();
+  const { quests, submitQuest, attemptQuiz, attemptIncantation, recordGauntletFailure, attemptBlitz, getHighScore, currentUser } = useGame();
   const quest = quests.find(q => String(q.id) === String(questId));
   const currentTheme = quest ? (THEMES[quest.id] || THEMES[quest.type] || THEMES.journal) : THEMES.journal;
   const theme = currentTheme;
@@ -99,6 +99,7 @@ const BriefingRoom = () => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [isTrialActive, setIsTrialActive] = useState(false);
   const [currentQ, setCurrentQ] = useState(null);
+  const [incantationScore, setIncantationScore] = useState(0);
   const [showVictoryModal, setShowVictoryModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [modalQuote, setModalQuote] = useState('');
@@ -132,6 +133,7 @@ const BriefingRoom = () => {
     const randomIndex = Math.floor(Math.random() * quest.questionBank.length);
     setCurrentQ(quest.questionBank[randomIndex]);
     setTypedText('');
+    setIncantationScore(0);
     setTimeLeft(quest.timeLimit || 45);
     setIsTrialActive(true);
   };
@@ -182,14 +184,16 @@ const BriefingRoom = () => {
     }
   };
 
-  const handleIncantationSubmit = async () => {
+  const handleIncantationSubmit = () => {
     if (!currentQ) return;
-    const result = await attemptQuiz(quest.id, typedText, currentQ.a, true);
-    if (result.success) {
-      triggerVictory(result.message);
-    } else {
-      alert('Incorrect! Keep trying!');
+    if (typedText.trim().toLowerCase() === currentQ.a.trim().toLowerCase()) {
+      setIncantationScore(prev => prev + 1);
+      const randomIndex = Math.floor(Math.random() * quest.questionBank.length);
+      setCurrentQ(quest.questionBank[randomIndex]);
       setTypedText('');
+      alert("Spell successfully cast! Next rune loaded!");
+    } else {
+      alert("Incorrect! Check spelling, capitalization, and punctuation.");
     }
   };
 
@@ -238,10 +242,23 @@ const BriefingRoom = () => {
       interval = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
     } else if (isTrialActive && timeLeft <= 0) {
       setIsTrialActive(false);
-      alert('Time expired! The spell fizzled.');
+      if (quest?.type === 'incantation') {
+        if (incantationScore >= 1) {
+          attemptIncantation(quest.id, incantationScore).then(res => {
+            if (res.success) triggerVictory(res.message);
+            else { alert(res.message); setIsAccepted(false); }
+          });
+        } else {
+          alert('Time expired! You did not complete any incantations.');
+          setIsAccepted(false);
+        }
+      } else {
+        alert('Time expired! The spell fizzled.');
+        setIsAccepted(false);
+      }
     }
     return () => clearInterval(interval);
-  }, [isTrialActive, timeLeft]);
+  }, [isTrialActive, timeLeft, incantationScore]); // Add incantationScore dependency to prevent stale closure values
 
   useEffect(() => {
     let timerId;
@@ -384,14 +401,18 @@ const BriefingRoom = () => {
               </div>
             ) : (
               <div className="flex flex-col items-center w-full">
-                <div className="text-4xl text-red-500 font-mono text-center mb-4">{timeLeft}s</div>
+                <div className="flex justify-between items-center w-full mb-4">
+                  <div className="text-4xl text-red-500 font-mono">{timeLeft}s</div>
+                  <div className="text-yellow-400 font-['Press_Start_2P'] text-lg">Spells: {incantationScore}</div>
+                </div>
                 <div className={`text-xl text-cyan-300 font-mono mb-4 text-center transition-opacity duration-300 ${typedText.length > 0 ? 'opacity-0' : 'opacity-100'}`}>
                   {currentQ?.q}
                 </div>
                 <textarea 
                   value={typedText} 
                   onChange={e => setTypedText(e.target.value)} 
-                  onPaste={e => e.preventDefault()} 
+                  onPaste={e => e.preventDefault()}
+                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleIncantationSubmit(); } }}
                   className="w-full bg-black/80 border-2 border-cyan-500 rounded-lg p-4 text-white font-mono h-32 focus:outline-none focus:ring-2 focus:ring-cyan-300 resize-none mb-4" 
                   placeholder="Type the incantation perfectly..." 
                 />
