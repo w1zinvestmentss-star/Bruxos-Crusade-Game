@@ -1633,7 +1633,9 @@ export function GameProvider({ children }) {
 
   const calculateScholarScore = (student) => {
     const currentAttribute = student.finalGPA !== null ? student.finalGPA : student.midtermGPA;
-    return currentAttribute + Math.floor(student.xp * 0.1);
+    const level = Math.floor((student.xp || 0) / 1000) + 1;
+    // Awards a flat +5 points per level as a strategic bonus
+    return currentAttribute + (level * 5);
   };
 
   const calculateComebackScore = (student) => {
