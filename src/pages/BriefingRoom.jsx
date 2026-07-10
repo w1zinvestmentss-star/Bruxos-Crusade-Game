@@ -91,7 +91,7 @@ const getMathTip = (questionText) => {
 const BriefingRoom = () => {
   const navigate = useNavigate();
   const { questId } = useParams();
-  const { quests, submitQuest, attemptQuiz, attemptIncantation, recordGauntletFailure, attemptBlitz, getHighScore, currentUser } = useGame();
+  const { quests, submitQuest, attemptQuiz, attemptIncantation, recordGauntletFailure, attemptBlitz, getHighScore, attemptMultiStep, currentUser } = useGame();
   const quest = quests.find(q => String(q.id) === String(questId));
   const currentTheme = quest ? (THEMES[quest.id] || THEMES[quest.type] || THEMES.journal) : THEMES.journal;
   const theme = currentTheme;
@@ -120,6 +120,7 @@ const BriefingRoom = () => {
   const [blitzInput, setBlitzInput] = useState('');
   const [activeMultiStep, setActiveMultiStep] = useState(null);
   const [multiStepInput, setMultiStepInput] = useState('');
+  const [hydraScore, setHydraScore] = useState(0);
 
   const VICTORY_QUOTES = [
     'Your mind is as sharp as a sword!',
@@ -157,12 +158,15 @@ const BriefingRoom = () => {
     if (quest?.type === 'blitz') {
       const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
       setActiveBlitz({ isActive: true, timeLeft: quest.timeLimit || 60, score: 0, currentQ: randomQ });
-      setIsAccepted(true);
     }
     if (quest?.type === 'multi-step') {
       if (quest.stepBank && quest.stepBank.length > 0) {
+        setHydraScore(0);
+        setTimeLeft(quest.timeLimit || 120);
         const randomIndex = Math.floor(Math.random() * quest.stepBank.length);
         setActiveMultiStep({ bankIndex: randomIndex, stepIndex: 0 });
+        setMultiStepInput('');
+        setIsTrialActive(true);
       }
     }
     setIsAccepted(true);
@@ -256,7 +260,17 @@ const BriefingRoom = () => {
       interval = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
     } else if (isTrialActive && timeLeft <= 0) {
       setIsTrialActive(false);
-      if (quest?.type === 'incantation') {
+      if (quest?.type === 'multi-step') {
+        if (hydraScore >= 1) {
+          attemptMultiStep(quest.id, hydraScore).then(res => {
+            if (res.success) triggerVictory(res.message);
+            else { alert(res.message); setIsAccepted(false); }
+          });
+        } else {
+          alert('Time expired! You did not slay any Hydras.');
+          setIsAccepted(false);
+        }
+      } else if (quest?.type === 'incantation') {
         if (incantationScore >= 1) {
           attemptIncantation(quest.id, incantationScore).then(res => {
             if (res.success) triggerVictory(res.message);
@@ -272,7 +286,7 @@ const BriefingRoom = () => {
       }
     }
     return () => clearInterval(interval);
-  }, [isTrialActive, timeLeft, incantationScore]); // Add incantationScore dependency to prevent stale closure values
+  }, [isTrialActive, timeLeft, hydraScore, incantationScore]);
 
   useEffect(() => {
     let timerId;
@@ -342,21 +356,25 @@ const BriefingRoom = () => {
     setBlitzInput('');
   };
 
-  const handleMultiStepSubmit = async () => {
+  const handleMultiStepSubmit = () => {
     if (!activeMultiStep) return;
     const problem = quest.stepBank[activeMultiStep.bankIndex];
     const steps = problem.steps;
     const currentStep = steps[activeMultiStep.stepIndex];
     const isLast = activeMultiStep.stepIndex === steps.length - 1;
 
-    const result = await attemptQuiz(quest.id, multiStepInput, currentStep.a, isLast);
-    if (result.success) {
+    const isCorrect = multiStepInput.trim().toLowerCase() === currentStep.a.trim().toLowerCase();
+
+    if (isCorrect) {
       if (!isLast) {
         setActiveMultiStep(prev => ({ ...prev, stepIndex: prev.stepIndex + 1 }));
         setMultiStepInput('');
-        alert("Step Complete! The Hydra growls... another head emerges!");
       } else {
-        triggerVictory(result.message);
+        setHydraScore(prev => prev + 1);
+        const randomIndex = Math.floor(Math.random() * quest.stepBank.length);
+        setActiveMultiStep({ bankIndex: randomIndex, stepIndex: 0 });
+        setMultiStepInput('');
+        alert("HYDRA SLAYED! Another one emerges from the deep!");
       }
     } else {
       alert("Incorrect answer! The Hydra strikes back! Keep trying!");
@@ -560,7 +578,13 @@ const BriefingRoom = () => {
               <div className="relative p-6 w-full bg-black/90 rounded-lg border-2 border-purple-600 shadow-[0_0_30px_rgba(168,85,247,0.6)]">
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-purple-400 font-['Press_Start_2P'] text-[10px] uppercase tracking-wider">{problem.title}</span>
-                  <span className="text-yellow-400 font-['Press_Start_2P'] text-[10px]">STEP {activeMultiStep.stepIndex + 1} OF {steps.length}</span>
+                  <div className="flex gap-4 items-center">
+                    <span className="text-yellow-400 font-['Press_Start_2P'] text-[10px]">STEP {activeMultiStep.stepIndex + 1} OF {steps.length}</span>
+                    <span className="text-purple-300 font-['Press_Start_2P'] text-[10px]">SLAYED: {hydraScore}</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center mb-6">
+                  <div className={`text-5xl font-mono font-bold ${timeLeft < 15 ? 'text-red-500 animate-pulse' : 'text-cyan-400'}`}>{timeLeft}s</div>
                 </div>
                 <p className="text-3xl text-white text-center font-['VT323'] mb-6 bg-stone-900 p-4 rounded-lg border border-stone-700">{currentStep.q}</p>
                 <div className="flex gap-4">

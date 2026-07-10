@@ -331,13 +331,14 @@ export function GameProvider({ children }) {
     {
       id: 111,
       title: "Trial of the Hydra",
-      description: "Face a multi-headed mathematical beast! Complete every step of the challenge to defeat the Hydra and earn your rewards.",
+      description: "Solve as many sequential math problems as you can in 120 seconds! Complete at least 1 full Hydra to succeed. Extra victories award bonus Gold & XP.",
       type: 'multi-step',
       xp: 150,
       gold: 75,
       frequency: 'daily',
       unlockDate: '2025-01-01',
-      stepBank: MULTISTEP_BANK
+      stepBank: MULTISTEP_BANK,
+      timeLimit: 120
     },
     { id: 108, title: "Scout Report: Athletics", description: "Complete a 1-mile walk and upload a photo of your route/shoes.", type: 'scout-sports', xp: 100, gold: 40, frequency: 'daily' },
     { id: 109, title: "Scout Report: The Arts", description: "Draw a sketch of a castle and upload a picture of it.", type: 'scout-arts', xp: 100, gold: 40, frequency: 'weekly' },
@@ -1877,6 +1878,40 @@ export function GameProvider({ children }) {
     return { success: true, message: `Time's up! You scored ${score}! +${xpEarned} XP, +${goldEarned} Gold` };
   };
 
+  const attemptMultiStep = async (questId, score) => {
+    const quest = quests.find(q => q.id === questId);
+    if (!quest) return { success: false, message: 'Quest not found' };
+    if (score === 0) return { success: false, message: 'No hydras slain. Try again!' };
+
+    const cappedScore = Math.min(score, 5);
+
+    let baseXp = 150 + ((cappedScore - 1) * 30);
+    let baseGold = 75 + ((cappedScore - 1) * 15);
+
+    let xpEarned = applyClassBonus(quest.type, baseXp, currentUser.heroClass);
+    xpEarned = applyPetBonus(quest.type, xpEarned, false, currentUser.equippedPet);
+
+    let goldEarned = applyClassBonus(quest.type, baseGold, currentUser.heroClass);
+    goldEarned = applyPetBonus(quest.type, goldEarned, true, currentUser.equippedPet);
+
+    const updates = {
+      xp: (currentUser.xp || 0) + xpEarned,
+      gold: (currentUser.gold || 0) + goldEarned,
+      multiStepQuestsCompleted: (currentUser.multiStepQuestsCompleted || 0) + 1,
+    };
+
+    syncUserUpdate(updates);
+
+    const newSubmission = {
+      id: Date.now(), questId, studentId: currentUser.id, studentName: currentUser.heroName,
+      status: 'approved', timestamp: new Date().toISOString().split('T')[0], type: 'multi-step'
+    };
+    setSubmissions(prev => [...prev, newSubmission]);
+    saveSubmissionToCloud(newSubmission);
+
+    return { success: true, message: `Spectacular! You slew ${score} Hydras! +${xpEarned} XP, +${goldEarned} Gold` };
+  };
+
   const getHighScore = (questId) => {
     return highScores[questId] || null;
   };
@@ -1984,6 +2019,7 @@ export function GameProvider({ children }) {
     resolveVoidGrasp,
     attemptBlitz,
     getHighScore,
+    attemptMultiStep,
     prizeClaims,
     claimAchievementPrize,
     fulfillAchievementClaim,
