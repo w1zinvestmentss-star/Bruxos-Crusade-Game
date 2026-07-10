@@ -71,7 +71,7 @@ const Leaderboard = () => {
   const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
 
   const TAB_INFO = {
-    scholar: { title: "Path of the Scholar", desc: "Measures true mastery. Heavily weighs your Academic Attributes (Intellect & Wisdom) with your total XP acting as a tie-breaker. Ace your exams!" },
+    scholar: { title: "Path of the Scholar", desc: "Measures true mastery. Heavily weighs your Academic Attributes (Intellect & Wisdom) with your overall in-game performance. Grow your power to secure your spot!" },
     slayer: { title: "Path of the Slayer", desc: "Honors the greatest monster hunters. Earn points by defeating Bosses in the Dungeon. Higher tier bosses grant more points. XP breaks ties!" },
     grinder: { title: "Path of the Grinder", desc: "Rewards pure, unrelenting effort. Ranks heroes strictly by Total XP. Complete daily quests, reports, and bounties to climb to the top!" },
     comeback: { title: "Path of the Comeback", desc: "Celebrates resilience and growth. Ranks heroes by the greatest improvement from their Midterm (Intellect) to their Final (Wisdom). Never give up!" }
