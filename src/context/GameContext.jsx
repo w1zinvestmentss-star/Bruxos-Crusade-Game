@@ -5,18 +5,18 @@ import { HISTORY_BANK, MATH_BLITZ_BANK, SCIENCE_BLITZ_BANK, GAUNTLET_BANK, INCAN
 const GameContext = createContext();
 
 const ACHIEVEMENTS = [
-  // --- THE LEVEL PROGRESSION TRACK (Guaranteed Real-World Prizes) ---
-  { id: 'lvl_5', metric: 'level', target: 5, title: 'The Apprentice', desc: 'Reach Level 5.', rewardXp: 500, rewardGold: 250, rewardTicket: 2, realWorldPrize: '$5 STC Gift Card', limit: null },
-  { id: 'lvl_10', metric: 'level', target: 10, title: 'The Journeyman', desc: 'Reach Level 10.', rewardXp: 1000, rewardGold: 500, rewardTicket: 3, realWorldPrize: '$10 STC Gift Card', limit: null },
-  { id: 'lvl_15', metric: 'level', target: 15, title: 'The Adept', desc: 'Reach Level 15.', rewardXp: 1500, rewardGold: 1000, rewardTicket: 4, realWorldPrize: '$15 STC Gift Card', limit: null },
-  { id: 'lvl_20', metric: 'level', target: 20, title: 'The Master', desc: 'Reach Level 20.', rewardXp: 3000, rewardGold: 2000, rewardTicket: 5, realWorldPrize: '$20 STC Gift Card', limit: null },
-  { id: 'lvl_30', metric: 'level', target: 30, title: 'The Grandmaster', desc: 'Reach Level 30. You beat the game!', rewardXp: 10000, rewardGold: 5000, rewardTicket: 10, realWorldPrize: '$50 STC Gift Card', limit: null },
+  // --- THE LEVEL PROGRESSION TRACK (Guaranteed Real-World Prizes - $80 Total) ---
+  { id: 'lvl_5', metric: 'level', target: 5, title: 'The Apprentice', desc: 'Reach Level 5.', rewardXp: 500, rewardGold: 500, rewardTicket: 1, realWorldPrize: null, limit: null },
+  { id: 'lvl_10', metric: 'level', target: 10, title: 'The Journeyman', desc: 'Reach Level 10.', rewardXp: 1000, rewardGold: 500, rewardTicket: 2, realWorldPrize: '$10 STC Gift Card', limit: null },
+  { id: 'lvl_20', metric: 'level', target: 20, title: 'The Adept', desc: 'Reach Level 20.', rewardXp: 2000, rewardGold: 1000, rewardTicket: 3, realWorldPrize: '$15 STC Gift Card', limit: null },
+  { id: 'lvl_35', metric: 'level', target: 35, title: 'The Master', desc: 'Reach Level 35.', rewardXp: 4000, rewardGold: 2000, rewardTicket: 5, realWorldPrize: '$20 STC Gift Card', limit: null },
+  { id: 'lvl_50', metric: 'level', target: 50, title: 'The Grandmaster', desc: 'Reach Level 50. You beat the game!', rewardXp: 10000, rewardGold: 5000, rewardTicket: 10, realWorldPrize: '$35 STC Gift Card', limit: null },
 
-  // --- THE SPEED RACES (Limited Quantity Bonuses) ---
-  { id: 'speed_vanguard', metric: 'level', target: 15, title: 'Realm Vanguard', desc: 'First 3 heroes to Level 15!', rewardXp: 2000, rewardGold: 0, rewardTicket: 5, realWorldPrize: '$25 STC Gift Card', limit: 3, fallbackGold: 5000 },
+  // --- THE SPEED RACES (Limited Quantity Bonuses - No Impact on Guaranteed Budget) ---
+  { id: 'speed_vanguard', metric: 'level', target: 30, title: 'Realm Vanguard', desc: 'First 3 heroes to Level 30!', rewardXp: 2000, rewardGold: 0, rewardTicket: 5, realWorldPrize: '$25 STC Gift Card', limit: 3, fallbackGold: 5000 },
   { id: 'speed_boutique', metric: 'outfits', target: 15, title: 'Boutique Owner', desc: 'First 2 to own 15 outfits!', rewardXp: 3000, rewardGold: 0, rewardTicket: 5, realWorldPrize: '$20 STC Gift Card', limit: 2, fallbackGold: 3000 },
-  { id: 'speed_legend', metric: 'total_quests', target: 120, title: 'The Legend', desc: 'First to complete 120 quests!', rewardXp: 10000, rewardGold: 5000, rewardTicket: 10, realWorldPrize: '$100 STC Gift Card', limit: 1, fallbackGold: 15000 },
-  { id: 'speed_slayer', metric: 'bosses', target: 10, title: 'Elite Slayer', desc: 'First 2 heroes to defeat 10 Bosses!', rewardXp: 2000, rewardGold: 0, rewardTicket: 5, realWorldPrize: '$15 STC Gift Card', limit: 2, fallbackGold: 4000 },
+  { id: 'speed_legend', metric: 'total_quests', target: 250, title: 'The Legend', desc: 'First to complete 250 total quests!', rewardXp: 10000, rewardGold: 5000, rewardTicket: 10, realWorldPrize: '$100 STC Gift Card', limit: 1, fallbackGold: 15000 },
+  { id: 'speed_slayer', metric: 'bosses', target: 15, title: 'Elite Slayer', desc: 'First 2 heroes to defeat 15 Bosses!', rewardXp: 2000, rewardGold: 0, rewardTicket: 5, realWorldPrize: '$15 STC Gift Card', limit: 2, fallbackGold: 4000 },
 
   // --- CONSISTENCY (Streaks) ---
   { id: 'streak_7', metric: 'streak', target: 7, title: 'Dedicated', desc: 'Achieve a 7-day login streak.', rewardXp: 300, rewardGold: 150, rewardTicket: 1, realWorldPrize: null, limit: null },
@@ -40,10 +40,10 @@ const ACHIEVEMENTS = [
   { id: 'dedicated_student', metric: 'total_quests', target: 150, title: 'Dedicated Student', desc: 'Complete 150 total quests.', rewardXp: 4000, rewardGold: 2000, rewardTicket: 8, realWorldPrize: null, limit: null },
   { id: 'quest_addict', metric: 'total_quests', target: 250, title: 'Quest Addict', desc: 'Complete 250 total quests.', rewardXp: 8000, rewardGold: 4000, rewardTicket: 10, realWorldPrize: null, limit: null },
 
-  // --- ACADEMICS (Specific Quests) ---
+  // --- ACADEMICS (Specific Quests - $40 Total) ---
   { id: 'hw_hero_1', metric: 'uploads', target: 10, title: 'Homework Hero I', desc: 'Submit 10 Homework assignments.', rewardXp: 500, rewardGold: 250, rewardTicket: 2, realWorldPrize: null, limit: null },
-  { id: 'hw_hero_2', metric: 'uploads', target: 50, title: 'Homework Hero II', desc: 'Submit 50 Homework assignments.', rewardXp: 2500, rewardGold: 1250, rewardTicket: 5, realWorldPrize: null, limit: null },
-  { id: 'hw_hero_3', metric: 'uploads', target: 100, title: 'Homework Hero III', desc: 'Submit 100 Homework assignments.', rewardXp: 5000, rewardGold: 2500, rewardTicket: 10, realWorldPrize: '$15 STC Gift Card', limit: null },
+  { id: 'hw_hero_2', metric: 'uploads', target: 50, title: 'Homework Hero II', desc: 'Submit 50 Homework assignments.', rewardXp: 2500, rewardGold: 1250, rewardTicket: 5, realWorldPrize: '$15 STC Gift Card', limit: null },
+  { id: 'hw_hero_3', metric: 'uploads', target: 100, title: 'Homework Hero III', desc: 'Submit 100 Homework assignments.', rewardXp: 5000, rewardGold: 2500, rewardTicket: 10, realWorldPrize: '$20 STC Gift Card', limit: null },
   { id: 'quiz_novice', metric: 'quizzes', target: 10, title: 'Quiz Novice', desc: 'Ace 10 Quizzes.', rewardXp: 300, rewardGold: 150, rewardTicket: 1, realWorldPrize: null, limit: null },
   { id: 'quiz_master', metric: 'quizzes', target: 50, title: 'Quiz Master', desc: 'Ace 50 Quizzes.', rewardXp: 2000, rewardGold: 1000, rewardTicket: 5, realWorldPrize: null, limit: null },
   { id: 'quiz_grandmaster', metric: 'quizzes', target: 100, title: 'Quiz Grandmaster', desc: 'Ace 100 Quizzes.', rewardXp: 4000, rewardGold: 2000, rewardTicket: 8, realWorldPrize: null, limit: null },
@@ -63,15 +63,15 @@ const ACHIEVEMENTS = [
   { id: 'master_disguise', metric: 'outfits', target: 20, title: 'Master of Disguise', desc: 'Purchase 20 different outfits.', rewardXp: 3000, rewardGold: 0, rewardTicket: 5, realWorldPrize: null, limit: null },
   { id: 'realm_icon', metric: 'outfits', target: 30, title: 'Realm Icon', desc: 'Purchase 30 different outfits.', rewardXp: 6000, rewardGold: 0, rewardTicket: 10, realWorldPrize: null, limit: null },
 
-  // --- RAFFLE PITY TIMERS (Bad Luck Protection) ---
+  // --- RAFFLE PITY TIMERS (Bad Luck Protection - $30 Total) ---
   { id: 'pity_15', metric: 'tickets', target: 15, title: 'Adept Challenger', desc: 'Earn 15 Raffle Tickets overall.', rewardXp: 0, rewardGold: 0, rewardTicket: 0, realWorldPrize: '$5 STC Gift Card', limit: null },
   { id: 'pity_35', metric: 'tickets', target: 35, title: 'Master Challenger', desc: 'Earn 35 Raffle Tickets overall.', rewardXp: 0, rewardGold: 0, rewardTicket: 0, realWorldPrize: '$10 STC Gift Card', limit: null },
   { id: 'pity_50', metric: 'tickets', target: 50, title: 'Grand Challenger', desc: 'Earn 50 Raffle Tickets overall.', rewardXp: 0, rewardGold: 0, rewardTicket: 0, realWorldPrize: '$15 STC Gift Card', limit: null },
 
   // --- SEASONAL / SCHEDULED (Time-Gated) ---
   { id: 'spring_awakening', metric: 'total_quests', target: 80, title: 'Spring Awakening', desc: 'Complete 80 quests. Unlocks April 1st!', rewardXp: 2000, rewardGold: 1000, rewardTicket: 5, realWorldPrize: null, limit: null, unlockDate: '2026-04-01' },
-  { id: 'may_madness', metric: 'bosses', target: 20, title: 'May Madness', desc: 'Defeat 20 Bosses. Unlocks May 1st!', rewardXp: 3000, rewardGold: 1500, rewardTicket: 5, realWorldPrize: '$10 STC Gift Card', limit: null, unlockDate: '2026-05-01' },
-  { id: 'year_end', metric: 'level', target: 25, title: 'End of Year Champion', desc: 'Reach Level 25. Unlocks June 1st!', rewardXp: 5000, rewardGold: 2500, rewardTicket: 10, realWorldPrize: '$25 STC Gift Card', limit: null, unlockDate: '2026-06-01' }
+  { id: 'may_madness', metric: 'bosses', target: 20, title: 'May Madness', desc: 'Defeat 20 Bosses. Unlocks May 1st!', rewardXp: 3000, rewardGold: 5000, rewardTicket: 5, realWorldPrize: null, limit: null, unlockDate: '2026-05-01' },
+  { id: 'year_end', metric: 'level', target: 25, title: 'End of Year Champion', desc: 'Reach Level 25. Unlocks June 1st!', rewardXp: 5000, rewardGold: 2500, rewardTicket: 10, realWorldPrize: null, limit: null, unlockDate: '2026-06-01' }
 ];
 
 const BOSSES = [
