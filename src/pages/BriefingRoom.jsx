@@ -63,6 +63,12 @@ const THEMES = {
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Drillmaster.png',
     title: 'The Proving Grounds',
     dialogue: 'Words will not save you in battle. Only strength and endurance. Show me proof of your physical training, recruit!'
+  },
+  'multi-step': {
+    bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Sunken.Lagoon.png',
+    npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Keeper.of.the.Cavern.png',
+    title: 'The Sunken Lagoon',
+    dialogue: 'You dare enter the domain of the multi-headed beast? To pass, you must solve its sequential riddles. Answer each step carefully!'
   }
 };
 
@@ -112,6 +118,8 @@ const BriefingRoom = () => {
   const [gauntletAnswer, setGauntletAnswer] = useState('');
   const [activeBlitz, setActiveBlitz] = useState(null);
   const [blitzInput, setBlitzInput] = useState('');
+  const [activeMultiStep, setActiveMultiStep] = useState(null);
+  const [multiStepInput, setMultiStepInput] = useState('');
 
   const VICTORY_QUOTES = [
     'Your mind is as sharp as a sword!',
@@ -150,6 +158,12 @@ const BriefingRoom = () => {
       const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
       setActiveBlitz({ isActive: true, timeLeft: quest.timeLimit || 60, score: 0, currentQ: randomQ });
       setIsAccepted(true);
+    }
+    if (quest?.type === 'multi-step') {
+      if (quest.stepBank && quest.stepBank.length > 0) {
+        const randomIndex = Math.floor(Math.random() * quest.stepBank.length);
+        setActiveMultiStep({ bankIndex: randomIndex, stepIndex: 0 });
+      }
     }
     setIsAccepted(true);
   };
@@ -326,6 +340,27 @@ const BriefingRoom = () => {
     const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
     setActiveBlitz(prev => ({ ...prev, currentQ: randomQ }));
     setBlitzInput('');
+  };
+
+  const handleMultiStepSubmit = async () => {
+    if (!activeMultiStep) return;
+    const problem = quest.stepBank[activeMultiStep.bankIndex];
+    const steps = problem.steps;
+    const currentStep = steps[activeMultiStep.stepIndex];
+    const isLast = activeMultiStep.stepIndex === steps.length - 1;
+
+    const result = await attemptQuiz(quest.id, multiStepInput, currentStep.a, isLast);
+    if (result.success) {
+      if (!isLast) {
+        setActiveMultiStep(prev => ({ ...prev, stepIndex: prev.stepIndex + 1 }));
+        setMultiStepInput('');
+        alert("Step Complete! The Hydra growls... another head emerges!");
+      } else {
+        triggerVictory(result.message);
+      }
+    } else {
+      alert("Incorrect answer! The Hydra strikes back! Keep trying!");
+    }
   };
 
   if (!quest || !currentUser || !assetsLoaded) {
@@ -516,7 +551,33 @@ const BriefingRoom = () => {
                 PRESENT REPORT
               </button>
             </div>
-          ) : (
+          ) : quest.type === 'multi-step' && activeMultiStep ? (() => {
+            const problem = quest.stepBank[activeMultiStep.bankIndex];
+            const steps = problem.steps;
+            const currentStep = steps[activeMultiStep.stepIndex];
+
+            return (
+              <div className="relative p-6 w-full bg-black/90 rounded-lg border-2 border-purple-600 shadow-[0_0_30px_rgba(168,85,247,0.6)]">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-purple-400 font-['Press_Start_2P'] text-[10px] uppercase tracking-wider">{problem.title}</span>
+                  <span className="text-yellow-400 font-['Press_Start_2P'] text-[10px]">STEP {activeMultiStep.stepIndex + 1} OF {steps.length}</span>
+                </div>
+                <p className="text-3xl text-white text-center font-['VT323'] mb-6 bg-stone-900 p-4 rounded-lg border border-stone-700">{currentStep.q}</p>
+                <div className="flex gap-4">
+                  <input 
+                    type="text" 
+                    value={multiStepInput} 
+                    onChange={(e) => setMultiStepInput(e.target.value)} 
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleMultiStepSubmit(); }} 
+                    autoFocus 
+                    className="w-full bg-black border-2 border-purple-500 text-purple-400 font-mono text-3xl p-4 rounded text-center focus:outline-none focus:ring-4 focus:ring-purple-600" 
+                    placeholder="> enter solution..." 
+                  />
+                  <button onClick={handleMultiStepSubmit} className="px-8 py-4 bg-purple-700 text-white font-bold font-['Press_Start_2P'] text-lg rounded hover:bg-purple-600 transition-colors">STRIKE</button>
+                </div>
+              </div>
+            );
+          })() : (
             <div>
               <h1 className="text-yellow-400 font-['Press_Start_2P'] text-2xl md:text-3xl mb-4">
                 Record Your Journey

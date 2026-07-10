@@ -360,45 +360,9 @@ const QuestBoard = () => {
                             <AlertTriangle size={18} /> ENTER THE DOJO
                           </button>
                         ) : isMultiStep ? (
-                          !activeSession ? (
-                            <div className="text-center py-4">
-                              <p className="text-stone-400 mb-4">{quest.description}</p>
-                              <button 
-                                onClick={() => startMultiStep(quest)}
-                                className="bg-red-700 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-yellow-500 animate-pulse"
-                              >
-                                AWAKEN THE HYDRA
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="bg-red-900/20 p-4 rounded-lg border border-red-500/50">
-                              <div className="text-xs font-mono text-red-300 mb-2 uppercase tracking-wider">
-                                {quest.stepBank?.[activeSession.bankIndex]?.title}
-                              </div>
-                              <div className="flex justify-between text-xs font-mono text-red-400 mb-2">
-                                <span>BATTLE IN PROGRESS</span>
-                                <span>STEP {activeSession.stepIndex + 1} OF {quest.stepBank?.[activeSession.bankIndex]?.steps?.length}</span>
-                              </div>
-                              <p className="text-xl mb-4 text-white">
-                                {quest.stepBank?.[activeSession.bankIndex]?.steps?.[activeSession.stepIndex]?.q}
-                              </p>
-                              <div className="flex items-center gap-2">
-                                <input 
-                                  type="text" 
-                                  placeholder="> answer" 
-                                  value={staticQuizAnswers[quest.id] || ''} 
-                                  onChange={(e) => handleStaticQuizAnswerChange(quest.id, e.target.value)} 
-                                  className="bg-black/80 border border-stone-600 rounded-md p-2 w-full text-green-400 font-mono focus:ring-1 focus:ring-green-500" 
-                                />
-                                <button 
-                                  onClick={() => handleMultiStepQuizSubmit(quest.id)} 
-                                  className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 font-['VT323'] text-lg"
-                                >
-                                  Strike
-                                </button>
-                              </div>
-                            </div>
-                          )
+                          <button onClick={() => navigate('/briefing/' + quest.id)} className="w-full px-4 py-3 bg-gradient-to-r from-purple-950 to-indigo-900 text-purple-200 border-2 border-purple-700 rounded-lg shadow-[0_0_15px_rgba(168,85,247,0.4)] font-['Press_Start_2P'] text-[10px] hover:bg-purple-900 transition-colors flex items-center justify-center gap-2">
+                            <BookText size={18} /> ENTER THE LAGOON
+                          </button>
                         ) : quest.type === 'scenario' ? (
                             !currentScenario ? (
                                 <button onClick={() => rollScenario(quest)} className="w-full px-4 py-3 bg-gradient-to-r from-orange-700 to-yellow-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm hover:from-orange-600 hover:to-yellow-500 flex items-center justify-center gap-2">Face a Scenario</button>
