@@ -1,6 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
-import { HISTORY_BANK, MATH_BLITZ_BANK, SCIENCE_BLITZ_BANK, GAUNTLET_BANK, INCANTATION_BANK, MULTISTEP_BANK } from '../data/questionBanks';
+import { MATH_BLITZ_BANK } from '../data/mathBank';
+import { HISTORY_BANK } from '../data/historyBank';
+import { SCIENCE_BLITZ_BANK } from '../data/scienceBank';
+import { INCANTATION_BANK } from '../data/incantationBank';
+import { MULTISTEP_BANK } from '../data/multistepBank';
+import { GAUNTLET_BANK } from '../data/gauntletBank';
 
 const GameContext = createContext();
 
