@@ -5,18 +5,18 @@ import { HISTORY_BANK, MATH_BLITZ_BANK, SCIENCE_BLITZ_BANK, GAUNTLET_BANK, INCAN
 const GameContext = createContext();
 
 const ACHIEVEMENTS = [
-  // --- THE LEVEL PROGRESSION TRACK (Guaranteed Real-World Prizes - $80 Total) ---
-  { id: 'lvl_5', metric: 'level', target: 5, title: 'The Apprentice', desc: 'Reach Level 5.', rewardXp: 500, rewardGold: 500, rewardTicket: 1, realWorldPrize: null, limit: null },
+  // --- THE LEVEL PROGRESSION TRACK (Guaranteed Real-World Prizes - $75 Total) ---
+  { id: 'lvl_5', metric: 'level', target: 5, title: 'The Apprentice', desc: 'Reach Level 5.', rewardXp: 500, rewardGold: 500, rewardTicket: 1, realWorldPrize: '$10 STC Gift Card', limit: null },
   { id: 'lvl_10', metric: 'level', target: 10, title: 'The Journeyman', desc: 'Reach Level 10.', rewardXp: 1000, rewardGold: 500, rewardTicket: 2, realWorldPrize: '$10 STC Gift Card', limit: null },
-  { id: 'lvl_20', metric: 'level', target: 20, title: 'The Adept', desc: 'Reach Level 20.', rewardXp: 2000, rewardGold: 1000, rewardTicket: 3, realWorldPrize: '$15 STC Gift Card', limit: null },
-  { id: 'lvl_35', metric: 'level', target: 35, title: 'The Master', desc: 'Reach Level 35.', rewardXp: 4000, rewardGold: 2000, rewardTicket: 5, realWorldPrize: '$20 STC Gift Card', limit: null },
-  { id: 'lvl_50', metric: 'level', target: 50, title: 'The Grandmaster', desc: 'Reach Level 50. You beat the game!', rewardXp: 10000, rewardGold: 5000, rewardTicket: 10, realWorldPrize: '$35 STC Gift Card', limit: null },
+  { id: 'lvl_20', metric: 'level', target: 25, title: 'The Adept', desc: 'Reach Level 25.', rewardXp: 2000, rewardGold: 1000, rewardTicket: 3, realWorldPrize: '$15 STC Gift Card', limit: null }, // Target set to 25, prize set to $15
+  { id: 'lvl_35', metric: 'level', target: 40, title: 'The Master', desc: 'Reach Level 40.', rewardXp: 4000, rewardGold: 2000, rewardTicket: 5, realWorldPrize: '$20 STC Gift Card', limit: null }, // Target set to 40, prize set to $20
+  { id: 'lvl_50', metric: 'level', target: 50, title: 'The Grandmaster', desc: 'Reach Level 50. You beat the game!', rewardXp: 10000, rewardGold: 5000, rewardTicket: 10, realWorldPrize: '$30 STC Gift Card', limit: null }, // Prize set to $30
 
-  // --- THE SPEED RACES (Limited Quantity Bonuses - No Impact on Guaranteed Budget) ---
-  { id: 'speed_vanguard', metric: 'level', target: 30, title: 'Realm Vanguard', desc: 'First 3 heroes to Level 30!', rewardXp: 2000, rewardGold: 0, rewardTicket: 5, realWorldPrize: '$25 STC Gift Card', limit: 3, fallbackGold: 5000 },
-  { id: 'speed_boutique', metric: 'outfits', target: 15, title: 'Boutique Owner', desc: 'First 2 to own 15 outfits!', rewardXp: 3000, rewardGold: 0, rewardTicket: 5, realWorldPrize: '$20 STC Gift Card', limit: 2, fallbackGold: 3000 },
-  { id: 'speed_legend', metric: 'total_quests', target: 250, title: 'The Legend', desc: 'First to complete 250 total quests!', rewardXp: 10000, rewardGold: 5000, rewardTicket: 10, realWorldPrize: '$100 STC Gift Card', limit: 1, fallbackGold: 15000 },
-  { id: 'speed_slayer', metric: 'bosses', target: 15, title: 'Elite Slayer', desc: 'First 2 heroes to defeat 15 Bosses!', rewardXp: 2000, rewardGold: 0, rewardTicket: 5, realWorldPrize: '$15 STC Gift Card', limit: 2, fallbackGold: 4000 },
+  // --- THE SPEED RACES (Limited Quantity Bonuses - $150 Maximum Total Liability) ---
+  { id: 'speed_vanguard', metric: 'level', target: 30, title: 'Realm Vanguard', desc: 'First 2 heroes to Level 30!', rewardXp: 2000, rewardGold: 0, rewardTicket: 5, realWorldPrize: '$25 STC Gift Card', limit: 2, fallbackGold: 5000 }, // Limit set to 2, prize set to $25
+  { id: 'speed_boutique', metric: 'outfits', target: 15, title: 'Boutique Owner', desc: 'First 2 to own 15 outfits!', rewardXp: 3000, rewardGold: 0, rewardTicket: 5, realWorldPrize: '$15 STC Gift Card', limit: 2, fallbackGold: 3000 }, // Prize set to $15
+  { id: 'speed_legend', metric: 'total_quests', target: 250, title: 'The Legend', desc: 'First to complete 250 total quests!', rewardXp: 10000, rewardGold: 5000, rewardTicket: 10, realWorldPrize: '$40 STC Gift Card', limit: 1, fallbackGold: 15000 }, // Prize set to $40
+  { id: 'speed_slayer', metric: 'bosses', target: 15, title: 'Elite Slayer', desc: 'First 2 heroes to defeat 15 Bosses!', rewardXp: 2000, rewardGold: 0, rewardTicket: 5, realWorldPrize: '$15 STC Gift Card', limit: 2, fallbackGold: 4000 }, // Prize set to $15
 
   // --- CONSISTENCY (Streaks) ---
   { id: 'streak_7', metric: 'streak', target: 7, title: 'Dedicated', desc: 'Achieve a 7-day login streak.', rewardXp: 300, rewardGold: 150, rewardTicket: 1, realWorldPrize: null, limit: null },
@@ -42,7 +42,7 @@ const ACHIEVEMENTS = [
 
   // --- ACADEMICS (Specific Quests - $40 Total) ---
   { id: 'hw_hero_1', metric: 'uploads', target: 10, title: 'Homework Hero I', desc: 'Submit 10 Homework assignments.', rewardXp: 500, rewardGold: 250, rewardTicket: 2, realWorldPrize: null, limit: null },
-  { id: 'hw_hero_2', metric: 'uploads', target: 50, title: 'Homework Hero II', desc: 'Submit 50 Homework assignments.', rewardXp: 2500, rewardGold: 1250, rewardTicket: 5, realWorldPrize: '$15 STC Gift Card', limit: null },
+  { id: 'hw_hero_2', metric: 'uploads', target: 50, title: 'Homework Hero II', desc: 'Submit 50 Homework assignments.', rewardXp: 2500, rewardGold: 1250, rewardTicket: 5, realWorldPrize: '$10 STC Gift Card', limit: null }, // Prize set to $10
   { id: 'hw_hero_3', metric: 'uploads', target: 100, title: 'Homework Hero III', desc: 'Submit 100 Homework assignments.', rewardXp: 5000, rewardGold: 2500, rewardTicket: 10, realWorldPrize: '$20 STC Gift Card', limit: null },
   { id: 'quiz_novice', metric: 'quizzes', target: 10, title: 'Quiz Novice', desc: 'Ace 10 Quizzes.', rewardXp: 300, rewardGold: 150, rewardTicket: 1, realWorldPrize: null, limit: null },
   { id: 'quiz_master', metric: 'quizzes', target: 50, title: 'Quiz Master', desc: 'Ace 50 Quizzes.', rewardXp: 2000, rewardGold: 1000, rewardTicket: 5, realWorldPrize: null, limit: null },
@@ -52,7 +52,7 @@ const ACHIEVEMENTS = [
   { id: 'the_tactician', metric: 'scenarios', target: 15, title: 'The Tactician', desc: 'Make the right choice in 15 Scenarios.', rewardXp: 800, rewardGold: 400, rewardTicket: 2, realWorldPrize: null, limit: null },
   { id: 'the_codebreaker', metric: 'ciphers', target: 15, title: 'The Codebreaker', desc: 'Solve 15 Riddles or Ciphers.', rewardXp: 800, rewardGold: 400, rewardTicket: 2, realWorldPrize: null, limit: null },
   { id: 'the_wordsmith', metric: 'incantations', target: 15, title: 'The Wordsmith', desc: 'Type 15 Incantations perfectly.', rewardXp: 800, rewardGold: 400, rewardTicket: 2, realWorldPrize: null, limit: null },
-  { id: 'active_hero', metric: 'sports', target: 10, title: 'Active Hero', desc: 'Complete 10 Physical Education Scout Reports.', rewardXp: 1000, rewardGold: 500, rewardTicket: 3, realWorldPrize: '$5 STC Gift Card', limit: null },
+  { id: 'active_hero', metric: 'sports', target: 10, title: 'Active Hero', desc: 'Complete 10 Physical Education Scout Reports.', rewardXp: 1000, rewardGold: 500, rewardTicket: 3, realWorldPrize: null, limit: null },
   { id: 'creative_soul', metric: 'arts', target: 10, title: 'Creative Soul', desc: 'Complete 10 Fine Arts Scout Reports.', rewardXp: 1000, rewardGold: 500, rewardTicket: 3, realWorldPrize: null, limit: null },
   { id: 'sound_mind', metric: 'wellness', target: 10, title: 'Sound Mind', desc: 'Complete 10 Tavern Rests.', rewardXp: 300, rewardGold: 150, rewardTicket: 1, realWorldPrize: null, limit: null },
   { id: 'inner_peace', metric: 'wellness', target: 30, title: 'Inner Peace', desc: 'Complete 30 Tavern Rests.', rewardXp: 1000, rewardGold: 500, rewardTicket: 3, realWorldPrize: null, limit: null },
@@ -63,8 +63,8 @@ const ACHIEVEMENTS = [
   { id: 'master_disguise', metric: 'outfits', target: 20, title: 'Master of Disguise', desc: 'Purchase 20 different outfits.', rewardXp: 3000, rewardGold: 0, rewardTicket: 5, realWorldPrize: null, limit: null },
   { id: 'realm_icon', metric: 'outfits', target: 30, title: 'Realm Icon', desc: 'Purchase 30 different outfits.', rewardXp: 6000, rewardGold: 0, rewardTicket: 10, realWorldPrize: null, limit: null },
 
-  // --- RAFFLE PITY TIMERS (Bad Luck Protection - $30 Total) ---
-  { id: 'pity_15', metric: 'tickets', target: 15, title: 'Adept Challenger', desc: 'Earn 15 Raffle Tickets overall.', rewardXp: 0, rewardGold: 0, rewardTicket: 0, realWorldPrize: '$5 STC Gift Card', limit: null },
+  // --- RAFFLE PITY TIMERS (Bad Luck Protection - $35 Total) ---
+  { id: 'pity_15', metric: 'tickets', target: 15, title: 'Adept Challenger', desc: 'Earn 15 Raffle Tickets overall.', rewardXp: 0, rewardGold: 0, rewardTicket: 0, realWorldPrize: '$10 STC Gift Card', limit: null }, // Prize set to $10
   { id: 'pity_35', metric: 'tickets', target: 35, title: 'Master Challenger', desc: 'Earn 35 Raffle Tickets overall.', rewardXp: 0, rewardGold: 0, rewardTicket: 0, realWorldPrize: '$10 STC Gift Card', limit: null },
   { id: 'pity_50', metric: 'tickets', target: 50, title: 'Grand Challenger', desc: 'Earn 50 Raffle Tickets overall.', rewardXp: 0, rewardGold: 0, rewardTicket: 0, realWorldPrize: '$15 STC Gift Card', limit: null },
 
