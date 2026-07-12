@@ -1877,12 +1877,12 @@ export function GameProvider({ children }) {
   const attemptMultiStep = async (questId, score) => {
     const quest = quests.find(q => q.id === questId);
     if (!quest) return { success: false, message: 'Quest not found' };
-    if (score === 0) return { success: false, message: 'No hydras slain. Try again!' };
+    if (score === 0) return { success: false, message: 'No hydra heads vanquished. Try again!' };
 
-    const cappedScore = Math.min(score, 5);
+    const cappedScore = Math.min(score, 7);
 
-    let baseXp = 150 + ((cappedScore - 1) * 30);
-    let baseGold = 75 + ((cappedScore - 1) * 15);
+    let baseXp = quest.xp + (cappedScore - 1) * 3;
+    let baseGold = quest.gold + (cappedScore - 1) * 1;
 
     let xpEarned = applyClassBonus(quest.type, baseXp, currentUser.heroClass);
     xpEarned = applyPetBonus(quest.type, xpEarned, false, currentUser.equippedPet);
@@ -1905,7 +1905,7 @@ export function GameProvider({ children }) {
     setSubmissions(prev => [...prev, newSubmission]);
     saveSubmissionToCloud(newSubmission);
 
-    return { success: true, message: `Spectacular! You slew ${score} Hydras! +${xpEarned} XP, +${goldEarned} Gold` };
+    return { success: true, message: `Hydra Defeated! You banished ${score} beasts! +${xpEarned} XP, +${goldEarned} Gold` };
   };
 
   const getHighScore = (questId) => {

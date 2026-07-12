@@ -267,7 +267,7 @@ const BriefingRoom = () => {
             else { alert(res.message); setIsAccepted(false); }
           });
         } else {
-          alert('Time expired! You did not slay any Hydras.');
+          alert('Time expired! You did not complete any Hydras.');
           setIsAccepted(false);
         }
       } else if (quest?.type === 'incantation') {
@@ -286,7 +286,7 @@ const BriefingRoom = () => {
       }
     }
     return () => clearInterval(interval);
-  }, [isTrialActive, timeLeft, hydraScore, incantationScore]);
+  }, [isTrialActive, timeLeft, hydraScore]);
 
   useEffect(() => {
     let timerId;
@@ -369,12 +369,13 @@ const BriefingRoom = () => {
       if (!isLast) {
         setActiveMultiStep(prev => ({ ...prev, stepIndex: prev.stepIndex + 1 }));
         setMultiStepInput('');
+        alert("Step Complete! The Hydra growls... another head emerges!");
       } else {
         setHydraScore(prev => prev + 1);
         const randomIndex = Math.floor(Math.random() * quest.stepBank.length);
         setActiveMultiStep({ bankIndex: randomIndex, stepIndex: 0 });
         setMultiStepInput('');
-        alert("HYDRA SLAYED! Another one emerges from the deep!");
+        alert("🔥 HYDRA BANISHED! A new beast emerges from the deep!");
       }
     } else {
       alert("Incorrect answer! The Hydra strikes back! Keep trying!");
@@ -577,14 +578,11 @@ const BriefingRoom = () => {
             return (
               <div className="relative p-6 w-full bg-black/90 rounded-lg border-2 border-purple-600 shadow-[0_0_30px_rgba(168,85,247,0.6)]">
                 <div className="flex justify-between items-center mb-4">
-                  <span className="text-purple-400 font-['Press_Start_2P'] text-[10px] uppercase tracking-wider">{problem.title}</span>
                   <div className="flex gap-4 items-center">
-                    <span className="text-yellow-400 font-['Press_Start_2P'] text-[10px]">STEP {activeMultiStep.stepIndex + 1} OF {steps.length}</span>
-                    <span className="text-purple-300 font-['Press_Start_2P'] text-[10px]">SLAYED: {hydraScore}</span>
+                    <span className="text-purple-400 font-['Press_Start_2P'] text-[10px] uppercase tracking-wider">{problem.title}</span>
+                    <div className={`text-2xl font-mono font-bold ${timeLeft < 15 ? 'text-red-500 animate-pulse' : 'text-cyan-400'}`}>{timeLeft}s</div>
                   </div>
-                </div>
-                <div className="flex justify-between items-center mb-6">
-                  <div className={`text-5xl font-mono font-bold ${timeLeft < 15 ? 'text-red-500 animate-pulse' : 'text-cyan-400'}`}>{timeLeft}s</div>
+                  <span className="text-yellow-400 font-['Press_Start_2P'] text-[10px]">LAGOON SCORE: {hydraScore}</span>
                 </div>
                 <p className="text-3xl text-white text-center font-['VT323'] mb-6 bg-stone-900 p-4 rounded-lg border border-stone-700">{currentStep.q}</p>
                 <div className="flex gap-4">
