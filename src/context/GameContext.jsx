@@ -294,14 +294,14 @@ export function GameProvider({ children }) {
   const nextYearString = nextYear.toISOString().split('T')[0];
 
   const INITIAL_QUESTS = [
-    { id: 101, title: "The Herald's Post I", description: "Deliver proof of your completed homework here (e.g., Math, Science, English, Geography, and other types of work). Take a picture of your homework as proof.", xp: 50, gold: 20, type: 'upload', frequency: 'daily', unlockDate: null },
-    { id: 102, title: "The Herald's Post II", description: "Deliver proof of additional completed homework here (e.g., Math, Science, English, Geography, etc.). Take a picture of your homework as proof.", xp: 50, gold: 20, type: 'upload', frequency: 'daily', unlockDate: null },
+    { id: 101, title: "The Herald's Post I", description: "Deliver proof of your completed homework here (e.g., Math, Science, English, Geography, and other types of work). Take a picture of your homework as proof.", xp: 30, gold: 10, type: 'upload', frequency: 'daily', unlockDate: null },
+    { id: 102, title: "The Herald's Post II", description: "Deliver proof of additional completed homework here (e.g., Math, Science, English, Geography, etc.). Take a picture of your homework as proof.", xp: 30, gold: 10, type: 'upload', frequency: 'daily', unlockDate: null },
     {
       id: 103,
       title: "Math Speed Run",
       description: "Answer as many questions as you can in 120 seconds! Skip if you get stuck. Max rewards at 30 correct answers.",
-      xp: 50,
-      gold: 20,
+      xp: 15,
+      gold: 5,
       type: 'blitz',
       frequency: 'daily',
       unlockDate: null,
@@ -312,43 +312,43 @@ export function GameProvider({ children }) {
       id: 104,
       title: "History Check",
       description: "Test your knowledge of history and geography. Answer as many questions as you can in 120 seconds!",
-      xp: 50,
-      gold: 20,
+      xp: 15,
+      gold: 5,
       type: 'blitz',
       frequency: 'daily',
       unlockDate: null,
       timeLimit: 120,
       questionBank: HISTORY_BANK
     },
-    { id: 112, title: "Science Speed Run", description: "Answer as many science questions as you can in 120 seconds!", type: 'blitz', xp: 50, gold: 20, frequency: 'daily', timeLimit: 120, questionBank: SCIENCE_BLITZ_BANK },
+    { id: 112, title: "Science Speed Run", description: "Answer as many science questions as you can in 120 seconds!", type: 'blitz', xp: 15, gold: 5, frequency: 'daily', timeLimit: 120, questionBank: SCIENCE_BLITZ_BANK },
     {
       id: 107,
       title: "The Memory Spell",
       description: "Memorize the phrase, then type it perfectly before time runs out!",
       type: 'incantation',
-      xp: 60,
-      gold: 20,
+      xp: 15,
+      gold: 5,
       frequency: 'daily',
       timeLimit: 120,
       questionBank: INCANTATION_BANK
     },
-    { id: 106, title: "Weekly Reflection", description: "Write a short paragraph about what you learned this week.", xp: 100, gold: 50, type: 'journal', frequency: 'weekly', unlockDate: '2025-01-01' },
+    { id: 106, title: "Weekly Reflection", description: "Write a short paragraph about what you learned this week.", xp: 30, gold: 10, type: 'journal', frequency: 'weekly', unlockDate: '2025-01-01' },
     {
       id: 111,
       title: "Trial of the Hydra",
       description: "Solve as many sequential math problems as you can in 120 seconds! Complete at least 1 full Hydra to succeed. Extra victories award bonus Gold & XP.",
       type: 'multi-step',
-      xp: 150,
-      gold: 75,
+      xp: 20,
+      gold: 10,
       frequency: 'daily',
       unlockDate: '2025-01-01',
       stepBank: MULTISTEP_BANK,
       timeLimit: 120
     },
-    { id: 108, title: "Scout Report: Athletics", description: "Complete a 1-mile walk and upload a photo of your route/shoes.", type: 'scout-sports', xp: 100, gold: 40, frequency: 'daily' },
-    { id: 109, title: "Scout Report: The Arts", description: "Draw a sketch of a castle and upload a picture of it.", type: 'scout-arts', xp: 100, gold: 40, frequency: 'weekly' },
-    { id: 110, title: "Tavern Rest", description: "How rests your spirit today, hero?", type: 'wellness', xp: 10, gold: 10, frequency: 'daily' },
-    { id: 999, title: "The Gauntlet", description: "5 Questions. 7 Seconds each. No mistakes allowed. One attempt per day.", type: 'gauntlet', xp: 100, gold: 40, frequency: 'daily', totalSteps: 5, timePerStep: 7, questionBank: GAUNTLET_BANK }
+    { id: 108, title: "Scout Report: Athletics", description: "Complete a 1-mile walk and upload a photo of your route/shoes.", type: 'scout-sports', xp: 25, gold: 5, frequency: 'daily' },
+    { id: 109, title: "Scout Report: The Arts", description: "Draw a sketch of a castle and upload a picture of it.", type: 'scout-arts', xp: 30, gold: 10, frequency: 'weekly' },
+    { id: 110, title: "Tavern Rest", description: "How rests your spirit today, hero?", type: 'wellness', xp: 5, gold: 2, frequency: 'daily' },
+    { id: 999, title: "The Gauntlet", description: "5 Questions. 7 Seconds each. No mistakes allowed. One attempt per day.", type: 'gauntlet', xp: 20, gold: 10, frequency: 'daily', totalSteps: 5, timePerStep: 7, questionBank: GAUNTLET_BANK }
   ];
 
   const [students, setStudents] = useState([]);
@@ -1326,12 +1326,11 @@ export function GameProvider({ children }) {
     if (!quest) return { success: false, message: 'Quest not found' };
     if (score === 0) return { success: false, message: 'No runes transcribed. Try again!' };
 
-    // Cap rewards at 5 correct typings
     const cappedScore = Math.min(score, 5);
 
-    // Base 60 XP / 20 Gold. Each correct typing adds +10 XP / +5 Gold. Max payout: 100 XP, 40 Gold
-    let baseXp = 60 + ((cappedScore - 1) * 10);
-    let baseGold = 20 + ((cappedScore - 1) * 5);
+    // Base: 15 XP / 5 Gold. Each correct typing adds +3 XP / +1 Gold. Max: 27 XP, 9 Gold
+    let baseXp = quest.xp + (cappedScore - 1) * 3;
+    let baseGold = quest.gold + (cappedScore - 1) * 1;
 
     let xpEarned = applyClassBonus(quest.type, baseXp, currentUser.heroClass);
     xpEarned = applyPetBonus(quest.type, xpEarned, false, currentUser.equippedPet);
@@ -1824,12 +1823,11 @@ export function GameProvider({ children }) {
     if (!quest) return { success: false, message: 'Quest not found' };
     if (score === 0) return { success: false, message: 'No points scored. Try again!' };
 
-    // Unified balance limits for all 120-second (2 Minute) Blitzes
     const cappedScore = Math.min(score, 30);
 
-    // Base 50 XP / 20 Gold. Each correct answer beyond the first adds +4 XP / +1 Gold. Max: 166 XP, 49 Gold
-    let baseXp = 50 + ((cappedScore - 1) * 4);
-    let baseGold = 20 + ((cappedScore - 1) * 1);
+    // Base: 15 XP / 5 Gold. Each correct answer adds +1 XP / +1 Gold. Max: 44 XP, 34 Gold
+    let baseXp = quest.xp + (cappedScore - 1) * 1;
+    let baseGold = quest.gold + (cappedScore - 1) * 1;
 
     let xpEarned = applyClassBonus(quest.type, baseXp, currentUser.heroClass);
     xpEarned = applyPetBonus(quest.type, xpEarned, false, currentUser.equippedPet);
