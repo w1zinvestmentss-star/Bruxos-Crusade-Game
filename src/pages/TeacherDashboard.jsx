@@ -542,7 +542,7 @@ const TeacherDashboard = () => {
                   <th className="p-4 text-left text-yellow-400 font-['Press_Start_2P'] text-xs">Level</th>
                   <th className="p-4 text-left text-yellow-400 font-['Press_Start_2P'] text-xs">Quests</th>
                   <th className="p-4 text-left text-yellow-400 font-['Press_Start_2P'] text-xs">Bosses</th>
-                  <th className="p-4 text-left text-yellow-400 font-['Press_Start_2P'] text-xs">Streak</th>
+                  <th className="p-4 text-left text-yellow-400 font-['Press_Start_2P'] text-xs">Active Days</th>
                 </tr>
               </thead>
               <tbody>

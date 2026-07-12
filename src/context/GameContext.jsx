@@ -24,12 +24,12 @@ const ACHIEVEMENTS = [
   { id: 'speed_slayer', metric: 'bosses', target: 15, title: 'Elite Slayer', desc: 'First 2 heroes to defeat 15 Bosses!', rewardXp: 1000, rewardGold: 0, rewardTicket: 5, realWorldPrize: '$15 STC Gift Card', limit: 2, fallbackGold: 1000 },
 
   // --- CONSISTENCY (Streaks) ---
-  { id: 'streak_7', metric: 'streak', target: 7, title: 'Dedicated', desc: 'Achieve a 7-day login streak.', rewardXp: 100, rewardGold: 50, rewardTicket: 1, realWorldPrize: null, limit: null },
-  { id: 'streak_14', metric: 'streak', target: 14, title: 'Unbreakable', desc: 'Achieve a 14-day login streak.', rewardXp: 250, rewardGold: 100, rewardTicket: 2, realWorldPrize: null, limit: null },
-  { id: 'streak_30', metric: 'streak', target: 30, title: 'Relentless', desc: 'Achieve a 30-day login streak.', rewardXp: 500, rewardGold: 200, rewardTicket: 3, realWorldPrize: null, limit: null },
-  { id: 'streak_50', metric: 'streak', target: 50, title: 'Iron Will', desc: 'Achieve a 50-day login streak.', rewardXp: 1000, rewardGold: 300, rewardTicket: 5, realWorldPrize: null, limit: null },
-  { id: 'streak_100', metric: 'streak', target: 100, title: 'Century Mark', desc: 'Achieve a legendary 100-day streak!', rewardXp: 1500, rewardGold: 500, rewardTicket: 10, realWorldPrize: null, limit: null },
-  { id: 'streak_150', metric: 'streak', target: 150, title: 'Timeless Hero', desc: 'Achieve a 150-day login streak!', rewardXp: 2000, rewardGold: 1000, rewardTicket: 15, realWorldPrize: null, limit: null },
+  { id: 'streak_7', metric: 'streak', target: 7, title: 'Dedicated', desc: 'Log in for 7 total days.', rewardXp: 100, rewardGold: 50, rewardTicket: 1, realWorldPrize: null, limit: null },
+  { id: 'streak_14', metric: 'streak', target: 14, title: 'Unbreakable', desc: 'Log in for 14 total days.', rewardXp: 250, rewardGold: 100, rewardTicket: 2, realWorldPrize: null, limit: null },
+  { id: 'streak_30', metric: 'streak', target: 30, title: 'Relentless', desc: 'Log in for 30 total days.', rewardXp: 500, rewardGold: 200, rewardTicket: 3, realWorldPrize: null, limit: null },
+  { id: 'streak_50', metric: 'streak', target: 50, title: 'Iron Will', desc: 'Log in for 50 total days.', rewardXp: 1000, rewardGold: 300, rewardTicket: 5, realWorldPrize: null, limit: null },
+  { id: 'streak_100', metric: 'streak', target: 100, title: 'Century Mark', desc: 'Log in for 100 total days.', rewardXp: 1500, rewardGold: 500, rewardTicket: 10, realWorldPrize: null, limit: null },
+  { id: 'streak_150', metric: 'streak', target: 150, title: 'Timeless Hero', desc: 'Log in for 150 total days.', rewardXp: 2000, rewardGold: 1000, rewardTicket: 15, realWorldPrize: null, limit: null },
 
   // --- COMBAT (Bosses) ---
   { id: 'first_blood', metric: 'bosses', target: 1, title: 'First Blood', desc: 'Defeat your first boss.', rewardXp: 100, rewardGold: 50, rewardTicket: 0, realWorldPrize: null, limit: null },
@@ -481,20 +481,13 @@ export function GameProvider({ children }) {
           if (claimsResult.data) setPrizeClaims(claimsResult.data);
           if (prizesResult.data) setPendingPrizesList(prizesResult.data);
 
-          // --- LOGIN STREAK LOGIC ---
+          // --- TOTAL UNIQUE LOGIN DAYS LOGIC ---
           const todayStr = new Date().toISOString().split('T')[0];
-          const yest = new Date();
-          yest.setDate(yest.getDate() - 1);
-          const yesterdayStr = yest.toISOString().split('T')[0];
-
           let streakUpdated = false;
 
           if (formattedProfile.lastLoginDate !== todayStr) {
-            if (formattedProfile.lastLoginDate === yesterdayStr) {
-              formattedProfile.loginStreak = (formattedProfile.loginStreak || 0) + 1;
-            } else {
-              formattedProfile.loginStreak = 1;
-            }
+            // Increment total login days by 1 on any new calendar day, never reset!
+            formattedProfile.loginStreak = (formattedProfile.loginStreak || 0) + 1;
             formattedProfile.lastLoginDate = todayStr;
             streakUpdated = true;
           }

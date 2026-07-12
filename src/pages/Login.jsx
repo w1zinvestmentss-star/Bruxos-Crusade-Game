@@ -144,7 +144,7 @@ const Login = () => {
               />
               <GuideCard
                 title="The Dungeon"
-                description="A dangerous place for the brave. Battle Bosses by maintaining streaks and hitting milestones."
+                description="A dangerous place for the brave. Battle Bosses by logging in regularly and hitting milestones."
               />
               <GuideCard
                 title="Hall of Triumphs"

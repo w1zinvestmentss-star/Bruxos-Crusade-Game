@@ -268,7 +268,7 @@ const StudentDashboard = () => {
          {/* THE DUNGEON */}
         <MapLocation 
           label="The Dungeon"
-          description="Face terrifying bosses. Unlocked by maintaining streaks and completing specific quests!"
+          description="Face terrifying bosses. Unlocked by logging in regularly and completing specific quests!"
           x="50%" 
           y="65%" 
           delay={1.0}

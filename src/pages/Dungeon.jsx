@@ -82,7 +82,7 @@ const Dungeon = () => {
       case 'sports': return "Athletics Missions";
       case 'arts': return "Creative Missions";
       case 'wellness': return "Tavern Rests";
-      case 'streak': return "Days in a Row";
+      case 'streak': return "Total Logins";
       case 'journal': return "Reflections Written";
       case 'ciphers': return "History Speed Runs";
       case 'gauntlet': return "Gauntlet Victories";
@@ -100,7 +100,8 @@ const CATEGORIES = {
     arts: { title: 'The Prismatic Muses', desc: 'Submit creative art Scout Reports to face the glass entities.' },
     wellness: { title: 'The Guardian Spirits', desc: 'Complete daily Tavern Check-ins to meet the guardians.' },
     journal: { title: 'The Dream Eaters', desc: 'Write weekly Journal reflections to face your nightmares.' },
-    gauntlet: { title: 'Phantoms of the Blur', desc: 'Survive the 7-second Gauntlet Trials to banish these high-speed spirits.' }
+    gauntlet: { title: 'Phantoms of the Blur', desc: 'Survive the 7-second Gauntlet Trials to banish these high-speed spirits.' },
+    streak: { title: 'The Chronos Entities', desc: 'Log in regularly to accumulate active days and challenge the masters of time.' }
   };
 
   const sortBosses = (bossList) => {
