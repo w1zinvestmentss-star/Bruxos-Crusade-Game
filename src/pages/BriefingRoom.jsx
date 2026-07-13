@@ -382,6 +382,15 @@ const BriefingRoom = () => {
     }
   };
 
+  const handleMultiStepPass = () => {
+    if (!activeMultiStep) return;
+    // Load a brand-new random Hydra problem from the bank and reset step index to 0
+    const randomIndex = Math.floor(Math.random() * quest.stepBank.length);
+    setActiveMultiStep({ bankIndex: randomIndex, stepIndex: 0 });
+    setMultiStepInput('');
+    alert("You retreated from the Hydra! A new beast emerges from the deep!");
+  };
+
   if (!quest || !currentUser || !assetsLoaded) {
     return (
       <div className="min-h-screen bg-stone-950 flex flex-col items-center justify-center z-[200]">
@@ -585,7 +594,7 @@ const BriefingRoom = () => {
                   <span className="text-yellow-400 font-['Press_Start_2P'] text-[10px]">LAGOON SCORE: {hydraScore}</span>
                 </div>
                 <p className="text-3xl text-white text-center font-['VT323'] mb-6 bg-stone-900 p-4 rounded-lg border border-stone-700">{currentStep.q}</p>
-                <div className="flex gap-4">
+                <div className="flex flex-col gap-4 w-full">
                   <input 
                     type="text" 
                     value={multiStepInput} 
@@ -595,7 +604,10 @@ const BriefingRoom = () => {
                     className="w-full bg-black border-2 border-purple-500 text-purple-400 font-mono text-3xl p-4 rounded text-center focus:outline-none focus:ring-4 focus:ring-purple-600" 
                     placeholder="> enter solution..." 
                   />
-                  <button onClick={handleMultiStepSubmit} className="px-8 py-4 bg-purple-700 text-white font-bold font-['Press_Start_2P'] text-lg rounded hover:bg-purple-600 transition-colors">STRIKE</button>
+                  <div className="flex gap-4">
+                    <button onClick={handleMultiStepSubmit} className="flex-1 py-4 bg-purple-700 text-white font-bold font-['Press_Start_2P'] text-xs rounded hover:bg-purple-600 transition-colors">STRIKE</button>
+                    <button onClick={handleMultiStepPass} className="flex-1 py-4 bg-stone-700 text-white font-bold font-['Press_Start_2P'] text-xs rounded hover:bg-stone-600 transition-colors">PASS</button>
+                  </div>
                 </div>
               </div>
             );
