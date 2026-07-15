@@ -345,7 +345,7 @@ export function GameProvider({ children }) {
       stepBank: MULTISTEP_BANK,
       timeLimit: 120
     },
-    { id: 108, title: "Scout Report: Athletics", description: "Complete a 1-mile walk and upload a photo of your route/shoes.", type: 'scout-sports', xp: 15, gold: 5, frequency: 'daily' },
+    { id: 108, title: "Scout Report: Athletics", description: "Provide proof of any physical activity you completed today, such as running, playing a sport, dancing, biking, or working out. Upload a photo or screenshot of your activity as proof.", type: 'scout-sports', xp: 15, gold: 5, frequency: 'daily' },
     { id: 109, title: "Scout Report: The Arts", description: "Draw a sketch of a castle and upload a picture of it.", type: 'scout-arts', xp: 15, gold: 10, frequency: 'weekly' },
     { id: 110, title: "Tavern Rest", description: "How rests your spirit today, hero?", type: 'wellness', xp: 5, gold: 2, frequency: 'daily' },
     { id: 999, title: "The Gauntlet", description: "5 Questions. 7 Seconds each. No mistakes allowed. One attempt per day.", type: 'gauntlet', xp: 20, gold: 10, frequency: 'daily', totalSteps: 5, timePerStep: 7, questionBank: GAUNTLET_BANK }
