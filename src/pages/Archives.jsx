@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGame } from '../context/GameContext';
-import { Brain, Sparkle, BookOpen, Star, Award, ArrowLeft } from 'lucide-react';
+import { BookOpen, Star, Award, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Archives = () => {
@@ -117,35 +117,37 @@ const Archives = () => {
           <div className="md:col-span-2 bg-black/60 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl p-6 flex flex-col justify-center">
             <h2 className="font-['Press_Start_2P'] text-yellow-400 text-lg mb-6 flex items-center"><Award className="mr-3 text-yellow-500"/>Attributes</h2>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 rounded-lg bg-blue-900/20 border-l-4 border-l-blue-500">
-                <div className="flex items-center">
-                  <Brain className="w-8 h-8 mr-4 text-blue-300"/>
-                  <div>
-                    <h3 className="text-lg font-bold font-['VT323']">INTELLECT</h3>
-                    <p className="text-sm text-stone-400 font-['VT323']">Midterm Score</p>
-                  </div>
+              {/* INTELLECT CARD */}
+              <div className="bg-blue-950/10 border border-blue-500/20 rounded-xl p-5 flex items-center justify-between shadow-[0_0_15px_rgba(59,130,246,0.05)] transition-all duration-300">
+                <div className="flex flex-col">
+                  <span className="text-blue-400 font-['Press_Start_2P'] text-[10px] tracking-widest mb-1">[ INTELLECT ]</span>
+                  <span className="text-xs text-stone-500 font-mono uppercase tracking-wider">Midterm Score</span>
                 </div>
-                <span className="font-['VT323'] text-5xl font-bold text-blue-300">{midtermGPA !== null ? midtermGPA : '-'}</span>
+                <span className="text-4xl font-bold text-blue-300 font-['VT323'] tracking-wide">
+                  {currentUser.midtermGPA || 0}
+                </span>
               </div>
-              <div className="flex items-center justify-between p-4 rounded-lg bg-purple-900/20 border-l-4 border-l-purple-500">
-                <div className="flex items-center">
-                  <Sparkle className="w-8 h-8 mr-4 text-purple-300"/>
-                  <div>
-                    <h3 className="text-lg font-bold font-['VT323']">WISDOM</h3>
-                    <p className="text-sm text-stone-400 font-['VT323']">Final Score</p>
-                  </div>
+
+              {/* WISDOM CARD */}
+              <div className="bg-purple-950/10 border border-purple-500/20 rounded-xl p-5 flex items-center justify-between shadow-[0_0_15px_rgba(168,85,247,0.05)] transition-all duration-300">
+                <div className="flex flex-col">
+                  <span className="text-purple-400 font-['Press_Start_2P'] text-[10px] tracking-widest mb-1">[ WISDOM ]</span>
+                  <span className="text-xs text-stone-500 font-mono uppercase tracking-wider">Final Score</span>
                 </div>
-                <span className="font-['VT323'] text-5xl font-bold text-purple-300">{finalGPA !== null ? finalGPA : '-'}</span>
+                <span className="text-4xl font-bold text-purple-300 font-['VT323'] tracking-wide">
+                  {currentUser.finalGPA !== null ? currentUser.finalGPA : '---'}
+                </span>
               </div>
-              <div className="flex items-center justify-between p-4 rounded-lg bg-cyan-900/20 border-l-4 border-l-cyan-500">
-                <div className="flex items-center">
-                  <Star className="w-8 h-8 mr-4 text-cyan-300"/>
-                  <div>
-                    <h3 className="text-lg font-bold font-['VT323']">TOTAL MANA</h3>
-                    <p className="text-sm text-stone-400 font-['VT323']">Overall Power Level</p>
-                  </div>
+
+              {/* TOTAL MANA CARD */}
+              <div className="bg-cyan-950/10 border border-cyan-500/20 rounded-xl p-5 flex items-center justify-between shadow-[0_0_15px_rgba(6,182,212,0.05)] transition-all duration-300">
+                <div className="flex flex-col">
+                  <span className="text-cyan-400 font-['Press_Start_2P'] text-[10px] tracking-widest mb-1">[ TOTAL MANA ]</span>
+                  <span className="text-xs text-stone-500 font-mono uppercase tracking-wider">Overall Power Level</span>
                 </div>
-                <span className="font-['VT323'] text-5xl font-bold text-cyan-400">{Math.floor(scholarScore)}</span>
+                <span className="text-4xl font-bold text-cyan-300 font-['VT323'] tracking-wide animate-pulse">
+                  {calculateScholarScore(currentUser)}
+                </span>
               </div>
             </div>
           </div>
