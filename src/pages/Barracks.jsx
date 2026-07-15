@@ -62,6 +62,7 @@ const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equi
     { id: 'loot_904', name: 'Prism Weaver Armor', cost: 0, reqBoss: 'The Prism Weaver', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Prism.Weaver.Armor.png' },
     { id: 'loot_1004', name: 'Seraph of Hope Armor', cost: 0, reqBoss: 'The Seraph of Hope', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Seraph.of.Hope.Armor.png' },
     { id: 'loot_1104', name: 'Weaver of Fates Armor', cost: 0, reqBoss: 'The Weaver of Fates', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Weaver.of.Fates.Armor.png' },
+    { id: 'loot_1204', name: 'Storm-Born King Armor', cost: 0, reqBoss: 'The Storm-Born King', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Storm-Born%20King.outfit.png' },
 
 // COMPANIONS (PETS)
       { id: 2001, name: 'Mystic Owlet', cost: 300, reqLevel: 1, type: 'pet', icon: Bird, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mystic.Owlet.png', buff: '+15% XP (Quizzes & Puzzles)' },

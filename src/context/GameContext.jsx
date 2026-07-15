@@ -164,7 +164,8 @@ const BOSS_LOOT_OUTFITS = {
   804: { id: 'loot_804', name: 'Ivory Leviathan Armor', type: 'outfit', imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ivory.Leviathan.Armor.png' },
   904: { id: 'loot_904', name: 'Prism Weaver Armor', type: 'outfit', imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Prism.Weaver.Armor.png' },
   1004: { id: 'loot_1004', name: 'Seraph of Hope Armor', type: 'outfit', imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Seraph.of.Hope.Armor.png' },
-  1104: { id: 'loot_1104', name: 'Weaver of Fates Armor', type: 'outfit', imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Weaver.of.Fates.Armor.png' }
+  1104: { id: 'loot_1104', name: 'Weaver of Fates Armor', type: 'outfit', imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Weaver.of.Fates.Armor.png' },
+  1204: { id: 'loot_1204', name: 'Storm-Born King Armor', type: 'outfit', imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Storm-Born%20King.outfit.png' }
 };
 
 const VICTORY_QUOTES = [
@@ -444,7 +445,12 @@ export function GameProvider({ children }) {
           ]);
 
           // 4. Map results safely to state
-          formattedProfile.inventory = invResult.data || [];
+          formattedProfile.inventory = (invResult.data || []).map(item => ({
+            id: item.item_id,          // Maps database item_id to React id
+            name: item.name,
+            type: item.type,
+            imageLink: item.image_link // Maps database image_link to React imageLink
+          }));
 
           if (profilesResult.data) {
             setStudents(profilesResult.data.map(p => formatProfile(p)));
@@ -1527,7 +1533,7 @@ export function GameProvider({ children }) {
     syncUserUpdate({ currentBodySprite: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png' });
   };
 
-  const fightBoss = (bossId, overrideStudentId = null) => {
+  const fightBoss = async (bossId, overrideStudentId = null) => {
     const targetId = overrideStudentId || currentUser?.id;
     if (!targetId) return { success: false, message: "Not logged in!" };
 
@@ -1577,6 +1583,15 @@ export function GameProvider({ children }) {
             ...(currentUser.notifications || []),
             { id: Date.now() + Math.random(), title: "EPIC LOOT ACQUIRED: " + bossLoot.name, quote: 'A powerful artifact from a vanquished foe!', gold: 0, xp: 0 }
           ];
+          
+          // PERSIST LEGENDARY OUTFIT TO SUPABASE INVENTORY TABLE
+          await supabase.from('inventory').insert([{
+            student_id: currentUser.id,
+            item_id: bossLoot.id,
+            name: bossLoot.name,
+            type: bossLoot.type,
+            image_link: bossLoot.imageLink
+          }]);
         }
         syncUserUpdate(updates);
 
@@ -1608,6 +1623,15 @@ export function GameProvider({ children }) {
             title: "EPIC LOOT ACQUIRED: " + bossLoot.name,
             quote: 'A powerful artifact from a vanquished foe!', gold: 0, xp: 0
           }];
+          
+          // PERSIST LEGENDARY OUTFIT TO SUPABASE INVENTORY TABLE
+          await supabase.from('inventory').insert([{
+            student_id: targetId,
+            item_id: bossLoot.id,
+            name: bossLoot.name,
+            type: bossLoot.type,
+            image_link: bossLoot.imageLink
+          }]);
         }
 
         setStudents(prev => prev.map(s => s.id === targetId ? updatedTarget : s));
