@@ -93,6 +93,7 @@ const Dungeon = () => {
 const CATEGORIES = {
     uploads: { title: 'The Paper Constructs', desc: 'Submit physical homework (Upload Quests) to summon these golems.' },
     quizzes: { title: 'Order of the Owl', desc: 'Ace Math Speed Runs and Quizzes to attract these wise entities.' },
+    multistep: { title: 'The Ancient Colossi', desc: 'Conquer complex, Multi-Step math problems to awaken the titans.' },
     scenarios: { title: 'The Volcanic Lineage', desc: 'Conduct rapid experiments (Science Speed Runs) to face these lava dragons.' },
     ciphers: { title: 'The Shapeshifters', desc: 'Seek historical insight (History Speed Runs) to unmask these deceptive illusions.' },
     incantations: { title: 'The Spectral Scribes', desc: 'Type Incantations perfectly and quickly to summon these ghosts.' },
