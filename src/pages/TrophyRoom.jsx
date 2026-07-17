@@ -24,6 +24,74 @@ const TrophyRoom = () => {
     );
   }
 
+  const getAchievementProgress = (ach) => {
+    if (!currentUser) return 0;
+    switch (ach.metric) {
+      case 'level': 
+        return Math.floor((currentUser.xp || 0) / 1000) + 1;
+      case 'streak': 
+        return currentUser.loginStreak || 0;
+      case 'quizzes': 
+        return currentUser.quizQuestsCompleted || 0;
+      case 'journals': 
+        return currentUser.journalQuestsCompleted || 0;
+      case 'sports': 
+        return currentUser.sportsQuestsCompleted || 0;
+      case 'arts': 
+        return currentUser.artsQuestsCompleted || 0;
+      case 'total_quests':
+        return (currentUser.uploadQuestsCompleted || 0) +
+               (currentUser.quizQuestsCompleted || 0) +
+               (currentUser.multiStepQuestsCompleted || 0) +
+               (currentUser.sportsQuestsCompleted || 0) +
+               (currentUser.artsQuestsCompleted || 0) +
+               (currentUser.journalQuestsCompleted || 0) +
+               (currentUser.scenarioQuestsCompleted || 0) +
+               (currentUser.cipherQuestsCompleted || 0) +
+               (currentUser.incantationQuestsCompleted || 0) +
+               (currentUser.wellnessQuestsCompleted || 0);
+      case 'bosses': 
+        return currentUser.defeatedBosses?.length || 0;
+      case 'outfits': 
+        return currentUser.inventory?.filter(i => i.type === 'outfit').length || 0;
+      case 'scenarios': 
+        return currentUser.scenarioQuestsCompleted || 0;
+      case 'ciphers': 
+        return currentUser.cipherQuestsCompleted || 0;
+      case 'incantations': 
+        return currentUser.incantationQuestsCompleted || 0;
+      case 'wellness': 
+        return currentUser.wellnessQuestsCompleted || 0;
+      case 'tickets': 
+        return currentUser.totalTicketsEarned || 0;
+      case 'uploads': 
+        return currentUser.uploadQuestsCompleted || 0;
+      default: 
+        return 0;
+    }
+  };
+
+  const getMetricLabel = (metric) => {
+    switch (metric) {
+      case 'level': return "Hero Level";
+      case 'streak': return "Total Logins";
+      case 'quizzes': return "Math Quizzes";
+      case 'journals': return "Reflections";
+      case 'sports': return "Athletics Quests";
+      case 'arts': return "Creative Quests";
+      case 'total_quests': return "Total Quests Done";
+      case 'bosses': return "Bosses Slain";
+      case 'outfits': return "Outfits Owned";
+      case 'scenarios': return "Science Speed Runs";
+      case 'ciphers': return "History Speed Runs";
+      case 'incantations': return "Incantations Recited";
+      case 'wellness': return "Tavern Rests";
+      case 'tickets': return "Raffle Tickets Earned";
+      case 'uploads': return "Homework Uploads";
+      default: return "Progress";
+    }
+  };
+
   return (
     <div className="min-h-screen text-stone-200 p-4 sm:p-6 md:p-8 relative">
       <img src={MAP_BG} alt="Background Map" className="absolute inset-0 w-full h-full object-cover" />
@@ -158,6 +226,25 @@ const TrophyRoom = () => {
                   </div>
 
                   <p className="text-stone-300 font-['VT323'] text-2xl mb-6">{displayDesc}</p>
+                  {(() => {
+                    const progress = getAchievementProgress(achievement);
+                    const percentage = Math.min((progress / achievement.target) * 100, 100);
+
+                    return (
+                      <div className="mt-2 mb-6">
+                        <div className="flex justify-between font-mono text-xs mb-1 text-stone-500">
+                          <span>{getMetricLabel(achievement.metric)}</span>
+                          <span>{Math.min(progress, achievement.target)} / {achievement.target}</span>
+                        </div>
+                        <div className="w-full bg-black/60 rounded-full h-2.5 border border-stone-800/80 overflow-hidden relative">
+                          <div 
+                            className="bg-gradient-to-r from-yellow-600 to-yellow-400 h-full rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(234,179,8,0.4)]" 
+                            style={{ width: `${percentage}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
 
                   <div className="space-y-4 relative">
