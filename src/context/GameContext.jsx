@@ -6,6 +6,7 @@ import { SCIENCE_BLITZ_BANK } from '../data/scienceBank';
 import { INCANTATION_BANK } from '../data/incantationBank';
 import { MULTISTEP_BANK } from '../data/multistepBank';
 import { GAUNTLET_BANK } from '../data/gauntletBank';
+import { DEFINITIONS_BANK } from '../data/definitionsBank';
 
 const GameContext = createContext();
 
@@ -144,7 +145,7 @@ const BOSSES = [
   { id: 1101, name: 'The Shadow Moth', requirement: 'journal', target: 10, rewardGold: 15, rewardXp: 50, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shadow.Moth.png', finishingBlow: { type: 'manual', prompt: 'Write a short reflection on your recent habits and consistency.' } },
   { id: 1102, name: 'The Dream Weave', requirement: 'journal', target: 25, rewardGold: 25, rewardXp: 100, tier: 2, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Dream.Weave.png', finishingBlow: { type: 'manual', prompt: 'Write a paragraph reflecting on your mental health and daily routines.' } },
   { id: 1103, name: 'The Night Terror', requirement: 'journal', target: 50, rewardGold: 50, rewardXp: 200, tier: 3, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Night.Terror.png', finishingBlow: { type: 'manual', prompt: 'Write a deep reflection on how your habits have improved your well-being.' } },
-  { id: 1104, name: 'The Weaver of Fates', requirement: 'journal', target: 100, rewardGold: 150, rewardXp: 500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Weaver.of.Fates.png', tier: 5, finishingBlow: { type: 'manual', prompt: 'Write a deep, 1-paragraph reflection on your habits, mental health, or consistency to prove your dedication.' } },
+  { id: 1104, name: 'The Weaver of Fates', requirement: 'journal', target: 100, rewardGold: 150, rewardXp: 500, tier: 5, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Weaver.of.Fates.png', finishingBlow: { type: 'manual', prompt: 'Write a deep, 1-paragraph reflection on your habits, mental health, or consistency to prove your dedication.' } },
 
   // Track 12: Gauntlet Bosses (Phantoms of the Blur)
   { id: 1201, name: 'The Brick Brute', requirement: 'gauntlet', target: 5, rewardGold: 15, rewardXp: 50, tier: 1, image: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Brick.Brute.png', finishingBlow: { type: 'auto', prompt: 'Solve: 12 + 15', answer: '27', timeLimit: 7 } },
@@ -322,6 +323,18 @@ export function GameProvider({ children }) {
       questionBank: HISTORY_BANK
     },
     { id: 112, title: "Science Speed Run", description: "Answer as many science questions as you can in 120 seconds!", type: 'blitz', xp: 15, gold: 5, frequency: 'daily', timeLimit: 120, questionBank: SCIENCE_BLITZ_BANK },
+    {
+      id: 113,
+      title: "The Scribe's Glossary",
+      description: "An ancient lexicon of knowledge. Match the definition with the correct word as fast as you can in 120 seconds!",
+      xp: 15,
+      gold: 5,
+      type: 'blitz',
+      frequency: 'daily',
+      unlockDate: null,
+      timeLimit: 120,
+      questionBank: DEFINITIONS_BANK
+    },
     {
       id: 107,
       title: "The Memory Spell",
@@ -1864,6 +1877,8 @@ export function GameProvider({ children }) {
       updates.scenarioQuestsCompleted = (currentUser.scenarioQuestsCompleted || 0) + 1; // Feeds Volcanic Dragons (Track 5)
     } else if (questId === 104) {
       updates.cipherQuestsCompleted = (currentUser.cipherQuestsCompleted || 0) + 1; // Feeds Shapeshifters (Track 6)
+    } else if (questId === 113) {
+      updates.incantationQuestsCompleted = (currentUser.incantationQuestsCompleted || 0) + 1; // Feeds Spectral Scribes (Track 7)
     }
 
     syncUserUpdate(updates);

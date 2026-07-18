@@ -399,11 +399,12 @@ const QuestBoard = () => {
                               className={`w-full px-4 py-3 rounded-lg shadow-lg font-['Press_Start_2P'] text-[10px] text-white flex items-center justify-center gap-2 transition-colors ${
                                 quest.id === 104 ? 'bg-gradient-to-r from-yellow-700 to-amber-600 hover:from-yellow-600 hover:to-amber-500' :
                                 quest.id === 103 ? 'bg-gradient-to-r from-stone-800 to-stone-600 border border-stone-500 hover:from-stone-700 hover:to-stone-500' :
+                                quest.id === 113 ? 'bg-gradient-to-r from-purple-800 to-indigo-700 hover:from-purple-700 hover:to-indigo-600' :
                                 'bg-gradient-to-r from-blue-700 to-cyan-600 hover:from-blue-600 hover:to-cyan-500'
                               }`}
                             >
-                              {quest.id === 104 ? <Star size={18} /> : <Zap size={18} />} 
-                              {quest.id === 104 ? 'ENTER THE PALACE' : quest.id === 103 ? 'SEEK INSIGHT' : 'ENTER THE LABORATORY'}
+                              {quest.id === 104 ? <Star size={18} /> : quest.id === 113 ? <Wand size={18} /> : <Zap size={18} />} 
+                              {quest.id === 104 ? 'ENTER THE PALACE' : quest.id === 113 ? 'ENTER THE VAULT' : quest.id === 103 ? 'SEEK INSIGHT' : 'ENTER THE LABORATORY'}
                             </button>
                           </div>
                         ) : quest.type === 'quiz' ? (

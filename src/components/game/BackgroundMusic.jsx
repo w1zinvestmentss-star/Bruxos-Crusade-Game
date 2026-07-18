@@ -44,6 +44,8 @@ const BackgroundMusic = () => {
           targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.LegendofFahad.mp3';
         } else if (questId === 112) {
           targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Requiem.for.a.Dream(Theyaretryingtoendme).mp3';
+        } else if (questId === 113) {
+          targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-Archive-theme.mp3';
         } else {
           switch (quest.type) {
             case 'incantation':

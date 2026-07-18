@@ -52,6 +52,12 @@ const THEMES = {
     title: 'The Grand Observatory',
     dialogue: 'The laws of nature await your discovery. Answer swiftly to uncover the truth of the realm. You have 60 seconds.'
   },
+  113: {
+    bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Lexicon.Vault.jpg',
+    npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Arch.Scholar.png',
+    title: "The Lexicon Vault",
+    dialogue: "Greetings, scribe. To unlock the secrets of our ancestors, you must master the ancient tongue. Match each definition with its correct word before the sand runs out!"
+  },
   'scout-arts': {
     bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Grand.Studio.png',
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Master.Artisan.png',
