@@ -26,6 +26,7 @@ const TeacherDashboard = () => {
     ACHIEVEMENTS,
     toggleGalleryFeature,
     purgeUnpinnedImages,
+    gallerySubmissions,
   } = useGame();
 
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -699,6 +700,58 @@ const TeacherDashboard = () => {
                     </div>
                   );
                 })}
+              </div>
+            );
+          })()}
+        </div>
+
+        {/* GALLERY CURATION PANEL */}
+        <div className="bg-black/60 backdrop-blur-md border border-purple-500/50 rounded-xl p-6 mt-8">
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 text-purple-400">
+            <Gift className="text-purple-400" /> 🎨 GALLERY CURATION PANEL
+          </h2>
+          <p className="text-stone-400 text-sm mb-6">Manage the active exhibition. You can unpin any student masterpiece from the Tavern Grove Gallery with a single click [10].</p>
+          
+          {(() => {
+            // Only pull currently active, pinned gallery submissions!
+            if (!gallerySubmissions || gallerySubmissions.length === 0) {
+              return (
+                <div className="p-8 bg-black/20 rounded-xl border border-stone-850 text-center text-stone-400 italic">
+                  The Tavern Grove Gallery is currently empty. Pin some student drawings during your pending approvals [10]!
+                </div>
+              );
+            }
+
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {gallerySubmissions.map(art => (
+                  <div key={art.id} className="bg-stone-800/80 p-4 rounded-xl border border-stone-700 flex flex-col justify-between shadow-lg">
+                    <div>
+                      <div className="flex justify-between items-start mb-3">
+                        <h3 className="font-bold text-white font-mono text-sm leading-relaxed">{art.studentName}</h3>
+                        <span className="text-[10px] font-bold px-2 py-1 rounded border bg-emerald-500/10 text-emerald-400 border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.15)]">
+                          ACTIVE EXHIBIT
+                        </span>
+                      </div>
+                      {/* Visual Image Preview */}
+                      <img src={art.proofContent} alt="Student Art" className="w-full h-32 object-cover rounded border border-stone-600 mb-4" />
+                    </div>
+                    <button
+                      onClick={async () => {
+                        // Unpin from gallery in real-time
+                        const res = await toggleGalleryFeature(art.id, false);
+                        if (res.success) {
+                          alert("Artwork removed from the Tavern Grove Gallery!");
+                        } else {
+                          alert("Failed to unpin artwork.");
+                        }
+                      }}
+                      className="w-full py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-colors bg-red-900/60 hover:bg-red-800 text-red-200 border border-red-500/50"
+                    >
+                      📌 UNPIN FROM GALLERY
+                    </button>
+                  </div>
+                ))}
               </div>
             );
           })()}
