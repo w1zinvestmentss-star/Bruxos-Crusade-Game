@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, LogOut, Trophy, Palette } from 'lucide-react';
+import { User, LogOut, Trophy, Palette, Swords, Skull, BookText } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const Awakening = () => {
@@ -215,94 +215,186 @@ const StudentDashboard = () => {
       </div>
 
       {/* Map Canvas Wrapper */}
-      <div className="relative z-10 h-[96vh] w-auto max-w-[98vw] aspect-video mx-auto overflow-hidden rounded-2xl border-4 border-stone-700/80 shadow-[0_0_80px_rgba(0,0,0,1)]">
-        {/* 1. Background Map Layer */}
-        <div className="absolute inset-0 bg-black/20 z-0" />
-        <img 
-          src={MAP_BG} 
-          alt="Kingdom Map" 
-          className="absolute inset-0 w-full h-full object-cover opacity-80"
-        />
+      {/* DESKTOP MAP VIEW (Hidden on Mobile, Visible on Desktop) */}
+      <div className="hidden md:block">
+        <div className="relative z-10 h-[96vh] w-auto max-w-[98vw] aspect-video mx-auto overflow-hidden rounded-2xl border-4 border-stone-700/80 shadow-[0_0_80px_rgba(0,0,0,1)]">
+          {/* 1. Background Map Layer */}
+          <div className="absolute inset-0 bg-black/20 z-0" />
+          <img 
+            src={MAP_BG} 
+            alt="Kingdom Map" 
+            className="absolute inset-0 w-full h-full object-cover opacity-80"
+          />
 
-        {/* 3. Interactive Map Locations */}
-        
-        {/* QUEST BOARD */}
-        <MapLocation 
-          label="Quest Board" 
-          description="Accept daily tasks, quizzes, and missions to earn Gold and XP."
-          x="18%" 
-          y="45%" 
-          delay={0.2}
-          onClick={() => navigate('/quests')} 
-        />
+          {/* 3. Interactive Map Locations */}
+          
+          {/* QUEST BOARD */}
+          <MapLocation 
+            label="Quest Board" 
+            description="Accept daily tasks, quizzes, and missions to earn Gold and XP."
+            x="18%" 
+            y="45%" 
+            delay={0.2}
+            onClick={() => navigate('/quests')} 
+          />
 
-        {/* TOWN SQUARE / LEADERBOARD */}
-        <MapLocation 
-          label="Town Square" 
-          description="The Hall of Legends. See how your rank and Boss Kills stack up against the realm."
-          x="43%" 
-          y="24%" 
-          delay={0.4}
-          onClick={() => navigate('/leaderboard')} 
-        />
+          {/* TOWN SQUARE / LEADERBOARD */}
+          <MapLocation 
+            label="Town Square" 
+            description="The Hall of Legends. See how your rank and Boss Kills stack up against the realm."
+            x="43%" 
+            y="24%" 
+            delay={0.4}
+            onClick={() => navigate('/leaderboard')} 
+          />
 
-        {/* THE ARCHIVES */}
-        <MapLocation 
-          label="The Archives" 
-          description="Your permanent record. Track your Intellect, Wisdom, and overall power level."
-          x="17%" 
-          y="15%" 
-          delay={0.6}
-          onClick={() => navigate('/archives')} 
-        />
+          {/* THE ARCHIVES */}
+          <MapLocation 
+            label="The Archives" 
+            description="Your permanent record. Track your Intellect, Wisdom, and overall power level."
+            x="17%" 
+            y="15%" 
+            delay={0.6}
+            onClick={() => navigate('/archives')} 
+          />
 
-        {/* THE BARRACKS */}
-        <MapLocation 
-          label="The Barracks" 
-          description="Spend your hard-earned gold on legendary outfits and gear."
-          x="68%" 
-          y="41%" 
-          delay={0.8}
-          onClick={() => navigate('/barracks')} 
-        />
+          {/* THE BARRACKS */}
+          <MapLocation 
+            label="The Barracks" 
+            description="Spend your hard-earned gold on legendary outfits and gear."
+            x="68%" 
+            y="41%" 
+            delay={0.8}
+            onClick={() => navigate('/barracks')} 
+          />
 
-         {/* THE DUNGEON */}
-        <MapLocation 
-          label="The Dungeon"
-          description="Face terrifying bosses. Unlocked by logging in regularly and completing specific quests!"
-          x="50%" 
-          y="65%" 
-          delay={1.0}
-          onClick={() => navigate('/dungeon')}
-          variant="danger"
-        />
+           {/* THE DUNGEON */}
+          <MapLocation 
+            label="The Dungeon"
+            description="Face terrifying bosses. Unlocked by logging in regularly and completing specific quests!"
+            x="50%" 
+            y="65%" 
+            delay={1.0}
+            onClick={() => navigate('/dungeon')}
+            variant="danger"
+          />
 
-        {/* HALL OF TRIUMPHS */}
-        <MapLocation 
-          label="Hall of Triumphs"
-          description="View your unlocked Achievements and claim real-world rewards!"
-          icon={Trophy}
-          x="70%" 
-          y="13%" 
-          delay={1.2}
-          onClick={() => navigate('/trophies')}
-          variant="gold"
-        />
+          {/* HALL OF TRIUMPHS */}
+          <MapLocation 
+            label="Hall of Triumphs"
+            description="View your unlocked Achievements and claim real-world rewards!"
+            icon={Trophy}
+            x="70%" 
+            y="13%" 
+            delay={1.2}
+            onClick={() => navigate('/trophies')}
+            variant="gold"
+          />
 
-        {/* TAVERN GROVE GALLERY */}
-        <MapLocation 
-          label="Tavern Grove" 
-          description="View approved student art projects and creative masterpieces pinned to the wall!"
-          icon={Palette}
-          x="35%" 
-          y="78%" 
-          delay={1.4}
+          {/* TAVERN GROVE GALLERY */}
+          <MapLocation 
+            label="Tavern Grove" 
+            description="View approved student art projects and creative masterpieces pinned to the wall!"
+            icon={Palette}
+            x="35%" 
+            y="78%" 
+            delay={1.4}
+            onClick={() => navigate('/tavern-gallery')}
+            variant="emerald"
+          />
+
+          <div className="absolute bottom-4 right-4 text-white/50 font-mono text-xs z-10">
+            Map v1.3
+          </div>
+        </div>
+      </div>
+
+      {/* MOBILE MAP VIEW (Visible on Mobile, Hidden on Desktop) */}
+      <div className="flex md:hidden flex-col w-full h-[88vh] mt-16 overflow-y-auto px-4 pb-20 custom-scrollbar z-10 space-y-4">
+        <p className="text-stone-400 text-center font-['VT323'] text-xl italic mb-2">Select your destination, Hero...</p>
+
+        {/* 1. QUEST BOARD */}
+        <div 
+          onClick={() => navigate('/quests')}
+          className="bg-black/80 border-2 border-yellow-500/30 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(234,179,8,0.1)]"
+        >
+          <div className="w-12 h-12 bg-yellow-950/40 rounded-full border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
+            <BookText size={24} className="text-yellow-400" />
+          </div>
+          <div>
+            <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">QUEST BOARD</h3>
+            <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Accept daily tasks, quizzes, and spelling runs [10].</p>
+          </div>
+        </div>
+
+        {/* 2. TAVERN GROVE GALLERY */}
+        <div 
           onClick={() => navigate('/tavern-gallery')}
-          variant="emerald"
-        />
+          className="bg-black/80 border-2 border-emerald-500/30 active:border-emerald-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(16,185,129,0.1)]"
+        >
+          <div className="w-12 h-12 bg-emerald-950/40 rounded-full border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
+            <Palette size={24} className="text-emerald-400" />
+          </div>
+          <div>
+            <h3 className="text-xs font-['Press_Start_2P'] text-emerald-400">TAVERN GROVE</h3>
+            <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">View approved student artwork in the cave gallery [10].</p>
+          </div>
+        </div>
 
-        <div className="absolute bottom-4 right-4 text-white/50 font-mono text-xs z-10">
-          Map v1.3
+        {/* 3. THE BARRACKS */}
+        <div 
+          onClick={() => navigate('/barracks')}
+          className="bg-black/80 border-2 border-yellow-500/30 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(234,179,8,0.1)]"
+        >
+          <div className="w-12 h-12 bg-yellow-950/40 rounded-full border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
+            <User size={24} className="text-yellow-400" />
+          </div>
+          <div>
+            <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">THE BARRACKS</h3>
+            <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Spend gold on rare outfits and magic spells.</p>
+          </div>
+        </div>
+
+        {/* 4. THE DUNGEON */}
+        <div 
+          onClick={() => navigate('/dungeon')}
+          className="bg-black/80 border-2 border-red-900/80 active:border-red-600 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(220,38,38,0.1)]"
+        >
+          <div className="w-12 h-12 bg-red-950/40 rounded-full border border-red-900/50 flex items-center justify-center flex-shrink-0">
+            <Swords size={24} className="text-red-500" />
+          </div>
+          <div>
+            <h3 className="text-xs font-['Press_Start_2P'] text-red-500">THE DUNGEON</h3>
+            <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Summon and battle legendary beasts [10].</p>
+          </div>
+        </div>
+
+        {/* 5. HALL OF TRIUMPHS */}
+        <div 
+          onClick={() => navigate('/trophies')}
+          className="bg-black/80 border-2 border-yellow-400/80 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(250,204,21,0.2)] bg-black"
+        >
+          <div className="w-12 h-12 bg-yellow-950/20 rounded-full border border-yellow-400/50 flex items-center justify-center flex-shrink-0">
+            <Trophy size={24} className="text-yellow-400" />
+          </div>
+          <div>
+            <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">HALL OF TRIUMPHS</h3>
+            <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Claim real-world prizes and view achievements.</p>
+          </div>
+        </div>
+
+        {/* 6. THE ARCHIVES */}
+        <div 
+          onClick={() => navigate('/archives')}
+          className="bg-black/80 border-2 border-yellow-500/30 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(234,179,8,0.1)]"
+        >
+          <div className="w-12 h-12 bg-yellow-950/40 rounded-full border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
+            <BookText size={24} className="text-yellow-400" />
+          </div>
+          <div>
+            <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">THE ARCHIVES</h3>
+            <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Your permanent academic record and power level.</p>
+          </div>
         </div>
       </div>
     </div>
