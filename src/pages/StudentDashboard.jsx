@@ -310,19 +310,20 @@ const StudentDashboard = () => {
       </div>
 
       {/* MOBILE MAP VIEW (Visible on Mobile, Hidden on Desktop) */}
-      <div className="flex md:hidden flex-col w-full h-[88vh] mt-16 z-10 relative">
-        {/* Immersive Blurred Map Background Layer (Bypasses lag, loads instantly) */}
-        <div className="absolute inset-0 z-0 overflow-hidden rounded-xl">
+      <div className="flex md:hidden flex-col w-full h-screen relative z-10 overflow-hidden">
+        
+        {/* Fixed Background and Overlay (Exact Duplicate of Login.jsx) */}
+        <div className="absolute inset-0 z-0 h-full w-full overflow-hidden">
           <img 
-            src={MAP_BG} 
-            alt="Mobile Map Background" 
-            className="w-full h-full object-cover blur-2xl opacity-30 scale-110"
+            src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png" 
+            alt="World Map Background" 
+            className="w-full h-full object-cover" 
           />
-          <div className="absolute inset-0 bg-stone-950/80" />
+          <div className="absolute inset-0 bg-black/80"></div>
         </div>
 
-        {/* Scrollable Card Container Ledger */}
-        <div className="relative z-10 flex flex-col w-full h-full overflow-y-auto px-4 py-6 pb-20 custom-scrollbar space-y-4 bg-black/40 backdrop-blur-md rounded-xl border border-white/5">
+        {/* Scrollable Card Container Ledger (Starts below HUD using pt-24) */}
+        <div className="relative z-10 flex flex-col w-full h-full overflow-y-auto px-4 pt-24 pb-20 custom-scrollbar space-y-4">
           <p className="text-stone-400 text-center font-['VT323'] text-2xl italic mb-2">Select your destination, Hero...</p>
 
           {/* 1. QUEST BOARD */}
