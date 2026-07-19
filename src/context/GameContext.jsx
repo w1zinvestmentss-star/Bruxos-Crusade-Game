@@ -381,6 +381,7 @@ export function GameProvider({ children }) {
   const [students, setStudents] = useState([]);
   const [quests, setQuests] = useState(INITIAL_QUESTS);
   const [submissions, setSubmissions] = useState([]);
+  const [gallerySubmissions, setGallerySubmissions] = useState([]);
   const [userRole, setUserRole] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   
@@ -441,6 +442,8 @@ export function GameProvider({ children }) {
           let prizesQuery = supabase.from('pending_prizes').select('*').order('created_at', { ascending: false });
           if (!isTeacher) prizesQuery = prizesQuery.eq('student_id', session.user.id);
 
+          const galleryQuery = supabase.from('submissions').select('*').eq('type', 'scout-arts').eq('status', 'approved').eq('is_gallery_featured', true).order('created_at', { ascending: false });
+
           // 2.5. 24-Hour Expiration Cleanup (Silently delete old grasps before loading)
           const twentyFourHoursAgo = new Date(Date.now() - 86400000).toISOString();
           await supabase
@@ -458,7 +461,8 @@ export function GameProvider({ children }) {
             settingsResult,
             hsResult,
             claimsResult,
-            prizesResult
+            prizesResult,
+            galleryResult
           ] = await Promise.all([
             supabase.from('inventory').select('*').eq('student_id', session.user.id),
             supabase.from('profiles').select('*'),
@@ -467,7 +471,8 @@ export function GameProvider({ children }) {
             supabase.from('game_settings').select('value').eq('key', 'current_raffle_prize').single(),
             supabase.from('high_scores').select('*'),
             claimsQuery,
-            prizesQuery
+            prizesQuery,
+            galleryQuery
           ]);
 
           // 4. Map results safely to state
@@ -512,6 +517,16 @@ export function GameProvider({ children }) {
 
           if (claimsResult.data) setPrizeClaims(claimsResult.data);
           if (prizesResult.data) setPendingPrizesList(prizesResult.data);
+          if (galleryResult && galleryResult.data) {
+            const mappedGallery = galleryResult.data.map(s => ({
+              id: s.id,
+              studentId: s.student_id,
+              studentName: s.student_name,
+              proofContent: s.proof_content,
+              timestamp: s.created_at ? new Date(s.created_at).toLocaleDateString('en-CA') : s.timestamp
+            }));
+            setGallerySubmissions(mappedGallery);
+          }
 
           // --- TOTAL UNIQUE LOGIN DAYS LOGIC ---
           const todayStr = new Date().toISOString().split('T')[0];
@@ -543,6 +558,7 @@ export function GameProvider({ children }) {
         setGlobalEffects([]);
         setPrizeClaims([]);
         setPendingPrizesList([]);
+        setGallerySubmissions([]);
       }
     };
 
@@ -1265,6 +1281,93 @@ export function GameProvider({ children }) {
     saveProfileToCloud(targetStudent.id, { notifications: updatedStudent.notifications });
 
     return { success: true };
+  };
+
+  const toggleGalleryFeature = async (submissionId, isFeatured) => {
+    const { error } = await supabase
+      .from('submissions')
+      .update({ is_gallery_featured: isFeatured })
+      .eq('id', submissionId);
+
+    if (!error) {
+      // Refresh public gallery list instantly
+      const { data: galleryData } = await supabase
+        .from('submissions')
+        .select('*')
+        .eq('type', 'scout-arts')
+        .eq('status', 'approved')
+        .eq('is_gallery_featured', true)
+        .order('created_at', { ascending: false });
+
+      if (galleryData) {
+        setGallerySubmissions(galleryData.map(s => ({
+          id: s.id,
+          studentId: s.student_id,
+          studentName: s.student_name,
+          proofContent: s.proof_content,
+          timestamp: s.created_at ? new Date(s.created_at).toLocaleDateString('en-CA') : s.timestamp
+        })));
+      }
+      return { success: true };
+    }
+    return { success: false, error };
+  };
+
+  const purgeUnpinnedImages = async () => {
+    if (!currentUser) return { success: false, message: "Not logged in!" };
+
+    // 1. Fetch all submissions with unpinned files
+    const { data: subs, error: fetchError } = await supabase
+      .from('submissions')
+      .select('id, proof_content')
+      .in('type', ['upload', 'scout-arts', 'scout-sports'])
+      .or('is_gallery_featured.eq.false,is_gallery_featured.is.null')
+      .not('proof_content', 'is', null);
+
+    if (fetchError || !subs || subs.length === 0) {
+      return { success: false, message: "No unpinned images found to shred." };
+    }
+
+    // 2. Extract relative storage paths (ignoring already shredded placeholders)
+    const pathsToDelete = subs.map(sub => {
+      if (sub.proof_content.includes('[Shredded')) return null;
+      const parts = sub.proof_content.split('/homework/');
+      return parts.length > 1 ? parts[1] : null;
+    }).filter(Boolean);
+
+    if (pathsToDelete.length === 0) {
+      return { success: false, message: "No active files found. They may already be shredded!" };
+    }
+
+    // 3. Delete physical files from Supabase Storage
+    const { error: storageError } = await supabase.storage
+      .from('homework')
+      .remove(pathsToDelete);
+
+    if (storageError) {
+      console.error("Storage deletion error:", storageError);
+      return { success: false, message: "Failed to delete files from cloud storage." };
+    }
+
+    // 4. Redact database paths (Keeps rows intact for analytics, protects privacy)
+    const { error: updateError } = await supabase
+      .from('submissions')
+      .update({ proof_content: '[Shredded by Game Master]' })
+      .in('id', subs.map(s => s.id));
+
+    if (!updateError) {
+      // Sync local state
+      setSubmissions(prev => prev.map(s => {
+        const matchingSub = subs.find(item => item.id === s.id);
+        if (matchingSub) {
+          return { ...s, proofContent: '[Shredded by Game Master]' };
+        }
+        return s;
+      }));
+      return { success: true, count: pathsToDelete.length };
+    }
+
+    return { success: false, message: "Files deleted from storage, but database update failed." };
   };
 
   const attemptQuiz = (questId, userAnswer, dynamicCorrectAnswer = null, isFinalStep = true) => {
@@ -2075,6 +2178,10 @@ export function GameProvider({ children }) {
     fulfillAchievementClaim,
     pendingPrizesList,
     fulfillPendingPrize,
+    gallerySubmissions,
+    setGallerySubmissions,
+    toggleGalleryFeature,
+    purgeUnpinnedImages,
   };
 
   return (

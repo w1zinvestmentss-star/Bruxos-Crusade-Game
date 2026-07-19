@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, LogOut, Trophy } from 'lucide-react';
+import { User, LogOut, Trophy, Palette } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const Awakening = () => {
@@ -95,7 +95,8 @@ const StudentDashboard = () => {
     const variants = {
       default: 'border-yellow-500/50 hover:border-yellow-400',
       danger: 'border-red-900/80 hover:border-red-600',
-      gold: 'border-yellow-400 text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)] bg-black hover:bg-yellow-900/30'
+      gold: 'border-yellow-400 text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)] bg-black hover:bg-yellow-900/30',
+      emerald: 'border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)] bg-black hover:bg-emerald-950/30 hover:border-emerald-400' // Added emerald theme
     };
 
     return (
@@ -116,7 +117,7 @@ const StudentDashboard = () => {
             {Icon && <Icon size={18} />}
             <span>{label}</span>
             {description && (
-              <div className="absolute top-full mt-3 w-56 p-3 bg-black/95 border border-yellow-500/50 rounded-lg shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 text-stone-300 text-xs font-mono text-left leading-relaxed">
+              <div className={`absolute top-full mt-3 w-56 p-3 bg-black/95 border ${variant === 'emerald' ? 'border-emerald-500/50' : 'border-yellow-500/50'} rounded-lg shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 text-stone-300 text-xs font-mono text-left leading-relaxed`}>
                 {description}
               </div>
             )}
@@ -286,6 +287,18 @@ const StudentDashboard = () => {
           delay={1.2}
           onClick={() => navigate('/trophies')}
           variant="gold"
+        />
+
+        {/* TAVERN GROVE GALLERY */}
+        <MapLocation 
+          label="Tavern Grove" 
+          description="View approved student art projects and creative masterpieces pinned to the wall!"
+          icon={Palette}
+          x="35%" 
+          y="78%" 
+          delay={1.4}
+          onClick={() => navigate('/tavern-gallery')}
+          variant="emerald"
         />
 
         <div className="absolute bottom-4 right-4 text-white/50 font-mono text-xs z-10">

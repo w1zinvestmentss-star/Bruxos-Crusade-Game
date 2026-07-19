@@ -15,6 +15,7 @@ import Barracks from './pages/Barracks';
 import Archives from './pages/Archives';
 import Dungeon from './pages/Dungeon';
 import TrophyRoom from './pages/TrophyRoom';
+import TavernGallery from './pages/TavernGallery';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
           <Route path="/archives" element={<Archives />} />
           <Route path="/dungeon" element={<Dungeon />} />
           <Route path="/trophies" element={<TrophyRoom />} />
+          <Route path="/tavern-gallery" element={<TavernGallery />} />
         </Routes>
       </HashRouter>
     </GameProvider>

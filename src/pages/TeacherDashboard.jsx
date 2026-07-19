@@ -24,6 +24,8 @@ const TeacherDashboard = () => {
     pendingPrizesList,
     fulfillPendingPrize,
     ACHIEVEMENTS,
+    toggleGalleryFeature,
+    purgeUnpinnedImages,
   } = useGame();
 
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -249,6 +251,29 @@ const TeacherDashboard = () => {
           </div>
         </div>
 
+        {/* System Maintenance */}
+        <div className="bg-stone-900/60 border-2 border-red-500/50 rounded-xl p-6 mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div>
+            <h2 className="text-red-500 font-bold font-['Press_Start_2P'] text-xs mb-2">🛠️ SYSTEM MAINTENANCE</h2>
+            <p className="text-stone-400 text-sm">Purge tattered homework and PE photos from cloud storage to free up space. Pinned gallery art and data tables are kept 100% intact for analytics [10].</p>
+          </div>
+          <button
+            onClick={async () => {
+              if (window.confirm("Are you sure you want to permanently delete all unpinned student photos from the cloud storage bucket? Database rows will be preserved [10].")) {
+                const res = await purgeUnpinnedImages();
+                if (res.success) {
+                  alert(`💥 Shredder Success! Purged ${res.count} tattered files from the cloud [13]!`);
+                } else {
+                  alert(res.message);
+                }
+              }
+            }}
+            className="bg-red-700 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg whitespace-nowrap shadow-[0_0_15px_rgba(220,38,38,0.4)]"
+          >
+            SHRED UNPINNED IMAGES
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Approvals Section */}
           <div className="lg:col-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-6">
@@ -310,6 +335,22 @@ const TeacherDashboard = () => {
                           >
                             <Check size={16} /> APPROVE
                           </button>
+                          {sub.type === 'scout-arts' && (
+                            <button
+                              onClick={async () => {
+                                // Since it is pending, we set featured to true upon clicking
+                                const res = await toggleGalleryFeature(sub.id, true);
+                                if (res.success) {
+                                  alert("Artwork pinned to the Tavern Grove Gallery!");
+                                } else {
+                                  alert("Failed to pin artwork.");
+                                }
+                              }}
+                              className="mt-2 w-full bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-500/50 py-1.5 rounded-lg flex items-center justify-center gap-1.5 text-xs font-bold transition-all shadow-[0_0_10px_rgba(168,85,247,0.2)]"
+                            >
+                              📌 PIN TO GALLERY
+                            </button>
+                          )}
                           <input
                             type="text"
                             value={feedback[sub.id] || ''}
