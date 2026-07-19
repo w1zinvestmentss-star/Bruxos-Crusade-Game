@@ -316,9 +316,7 @@ const TeacherDashboard = () => {
                                 <ExternalLink size={16} /> VIEW
                               </a>
                               <a
-                                href={proofUrl}
-                                target="_blank"
-                                rel="noreferrer"
+                                href={proofUrl ? `${proofUrl}?download` : '#'}
                                 download
                                 className="bg-stone-600 hover:bg-stone-500 text-white px-2 py-2 rounded-lg flex-1 flex items-center justify-center gap-1 font-bold text-xs transition-colors"
                               >
