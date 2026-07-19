@@ -310,90 +310,103 @@ const StudentDashboard = () => {
       </div>
 
       {/* MOBILE MAP VIEW (Visible on Mobile, Hidden on Desktop) */}
-      <div className="flex md:hidden flex-col w-full h-[88vh] mt-16 overflow-y-auto px-4 pb-20 custom-scrollbar z-10 space-y-4">
-        <p className="text-stone-400 text-center font-['VT323'] text-xl italic mb-2">Select your destination, Hero...</p>
-
-        {/* 1. QUEST BOARD */}
-        <div 
-          onClick={() => navigate('/quests')}
-          className="bg-black/80 border-2 border-yellow-500/30 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(234,179,8,0.1)]"
-        >
-          <div className="w-12 h-12 bg-yellow-950/40 rounded-full border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
-            <BookText size={24} className="text-yellow-400" />
-          </div>
-          <div>
-            <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">QUEST BOARD</h3>
-            <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Accept daily tasks, quizzes, and spelling runs [10].</p>
-          </div>
+      <div className="flex md:hidden flex-col w-full h-[88vh] mt-16 z-10 relative">
+        {/* Immersive Blurred Map Background Layer (Bypasses lag, loads instantly) */}
+        <div className="absolute inset-0 z-0 overflow-hidden rounded-xl">
+          <img 
+            src={MAP_BG} 
+            alt="Mobile Map Background" 
+            className="w-full h-full object-cover blur-2xl opacity-30 scale-110"
+          />
+          <div className="absolute inset-0 bg-stone-950/80" />
         </div>
 
-        {/* 2. TAVERN GROVE GALLERY */}
-        <div 
-          onClick={() => navigate('/tavern-gallery')}
-          className="bg-black/80 border-2 border-emerald-500/30 active:border-emerald-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(16,185,129,0.1)]"
-        >
-          <div className="w-12 h-12 bg-emerald-950/40 rounded-full border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
-            <Palette size={24} className="text-emerald-400" />
-          </div>
-          <div>
-            <h3 className="text-xs font-['Press_Start_2P'] text-emerald-400">TAVERN GROVE</h3>
-            <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">View approved student artwork in the cave gallery [10].</p>
-          </div>
-        </div>
+        {/* Scrollable Card Container Ledger */}
+        <div className="relative z-10 flex flex-col w-full h-full overflow-y-auto px-4 py-6 pb-20 custom-scrollbar space-y-4 bg-black/40 backdrop-blur-md rounded-xl border border-white/5">
+          <p className="text-stone-400 text-center font-['VT323'] text-2xl italic mb-2">Select your destination, Hero...</p>
 
-        {/* 3. THE BARRACKS */}
-        <div 
-          onClick={() => navigate('/barracks')}
-          className="bg-black/80 border-2 border-yellow-500/30 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(234,179,8,0.1)]"
-        >
-          <div className="w-12 h-12 bg-yellow-950/40 rounded-full border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
-            <User size={24} className="text-yellow-400" />
+          {/* 1. QUEST BOARD */}
+          <div 
+            onClick={() => navigate('/quests')}
+            className="bg-black/80 border-2 border-yellow-500/30 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(234,179,8,0.1)]"
+          >
+            <div className="w-12 h-12 bg-yellow-950/40 rounded-full border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
+              <BookText size={24} className="text-yellow-400" />
+            </div>
+            <div>
+              <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">QUEST BOARD</h3>
+              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Accept daily tasks, quizzes, and spelling runs [10].</p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">THE BARRACKS</h3>
-            <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Spend gold on rare outfits and magic spells.</p>
-          </div>
-        </div>
 
-        {/* 4. THE DUNGEON */}
-        <div 
-          onClick={() => navigate('/dungeon')}
-          className="bg-black/80 border-2 border-red-900/80 active:border-red-600 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(220,38,38,0.1)]"
-        >
-          <div className="w-12 h-12 bg-red-950/40 rounded-full border border-red-900/50 flex items-center justify-center flex-shrink-0">
-            <Swords size={24} className="text-red-500" />
+          {/* 2. TAVERN GROVE GALLERY */}
+          <div 
+            onClick={() => navigate('/tavern-gallery')}
+            className="bg-black/80 border-2 border-emerald-500/30 active:border-emerald-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(16,185,129,0.1)]"
+          >
+            <div className="w-12 h-12 bg-emerald-950/40 rounded-full border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
+              <Palette size={24} className="text-emerald-400" />
+            </div>
+            <div>
+              <h3 className="text-xs font-['Press_Start_2P'] text-emerald-400">TAVERN GROVE</h3>
+              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">View approved student artwork in the cave gallery [10].</p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-xs font-['Press_Start_2P'] text-red-500">THE DUNGEON</h3>
-            <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Summon and battle legendary beasts [10].</p>
-          </div>
-        </div>
 
-        {/* 5. HALL OF TRIUMPHS */}
-        <div 
-          onClick={() => navigate('/trophies')}
-          className="bg-black/80 border-2 border-yellow-400/80 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(250,204,21,0.2)] bg-black"
-        >
-          <div className="w-12 h-12 bg-yellow-950/20 rounded-full border border-yellow-400/50 flex items-center justify-center flex-shrink-0">
-            <Trophy size={24} className="text-yellow-400" />
+          {/* 3. THE BARRACKS */}
+          <div 
+            onClick={() => navigate('/barracks')}
+            className="bg-black/80 border-2 border-yellow-500/30 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(234,179,8,0.1)]"
+          >
+            <div className="w-12 h-12 bg-yellow-950/40 rounded-full border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
+              <User size={24} className="text-yellow-400" />
+            </div>
+            <div>
+              <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">THE BARRACKS</h3>
+              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Spend gold on rare outfits and magic spells.</p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">HALL OF TRIUMPHS</h3>
-            <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Claim real-world prizes and view achievements.</p>
-          </div>
-        </div>
 
-        {/* 6. THE ARCHIVES */}
-        <div 
-          onClick={() => navigate('/archives')}
-          className="bg-black/80 border-2 border-yellow-500/30 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(234,179,8,0.1)]"
-        >
-          <div className="w-12 h-12 bg-yellow-950/40 rounded-full border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
-            <BookText size={24} className="text-yellow-400" />
+          {/* 4. THE DUNGEON */}
+          <div 
+            onClick={() => navigate('/dungeon')}
+            className="bg-black/80 border-2 border-red-900/80 active:border-red-600 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(220,38,38,0.1)]"
+          >
+            <div className="w-12 h-12 bg-red-950/40 rounded-full border border-red-900/50 flex items-center justify-center flex-shrink-0">
+              <Swords size={24} className="text-red-500" />
+            </div>
+            <div>
+              <h3 className="text-xs font-['Press_Start_2P'] text-red-500">THE DUNGEON</h3>
+              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Summon and battle legendary beasts [10].</p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">THE ARCHIVES</h3>
-            <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Your permanent academic record and power level.</p>
+
+          {/* 5. HALL OF TRIUMPHS */}
+          <div 
+            onClick={() => navigate('/trophies')}
+            className="bg-black/80 border-2 border-yellow-400/80 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(250,204,21,0.2)]"
+          >
+            <div className="w-12 h-12 bg-yellow-950/20 rounded-full border border-yellow-400/50 flex items-center justify-center flex-shrink-0">
+              <Trophy size={24} className="text-yellow-400" />
+            </div>
+            <div>
+              <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">HALL OF TRIUMPHS</h3>
+              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Claim real-world prizes and view achievements.</p>
+            </div>
+          </div>
+
+          {/* 6. THE ARCHIVES */}
+          <div 
+            onClick={() => navigate('/archives')}
+            className="bg-black/80 border-2 border-yellow-500/30 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(234,179,8,0.1)]"
+          >
+            <div className="w-12 h-12 bg-yellow-950/40 rounded-full border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
+              <BookText size={24} className="text-yellow-400" />
+            </div>
+            <div>
+              <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">THE ARCHIVES</h3>
+              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Your permanent academic record and power level.</p>
+            </div>
           </div>
         </div>
       </div>
