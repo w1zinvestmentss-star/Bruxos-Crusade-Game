@@ -46,6 +46,8 @@ const BackgroundMusic = () => {
           targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Requiem.for.a.Dream(Theyaretryingtoendme).mp3';
         } else if (questId === 113) {
           targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-Archive-theme.mp3';
+        } else if (questId === 114) {
+          targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Please%20dont%20say%20my%20name%20out%20of%20context.mp3';
         } else {
           switch (quest.type) {
             case 'incantation':

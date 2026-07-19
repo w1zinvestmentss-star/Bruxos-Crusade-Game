@@ -58,6 +58,12 @@ const THEMES = {
     title: "The Lexicon Vault",
     dialogue: "Greetings, scribe. To unlock the secrets of our ancestors, you must master the ancient tongue. Match each definition with its correct word before the sand runs out!"
   },
+  114: {
+    bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Decipherers.Study.jpg',
+    npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Decipherer.png',
+    title: "The Decipherer's Study",
+    dialogue: "Ah, the traveler. Many have tried to decode the fractured runes of our ancestors, but only those with absolute focus can decipher the broken words. Unscramble the spell letters before my candle burns out!"
+  },
   'scout-arts': {
     bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Grand.Studio.png',
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Master.Artisan.png',

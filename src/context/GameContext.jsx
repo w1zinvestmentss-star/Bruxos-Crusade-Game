@@ -7,6 +7,7 @@ import { INCANTATION_BANK } from '../data/incantationBank';
 import { MULTISTEP_BANK } from '../data/multistepBank';
 import { GAUNTLET_BANK } from '../data/gauntletBank';
 import { DEFINITIONS_BANK } from '../data/definitionsBank';
+import { SPELL_BLITZ_BANK } from '../data/spellBank';
 
 const GameContext = createContext();
 
@@ -334,6 +335,18 @@ export function GameProvider({ children }) {
       unlockDate: null,
       timeLimit: 120,
       questionBank: DEFINITIONS_BANK
+    },
+    {
+      id: 114,
+      title: "The Spell Forge",
+      description: "Ancient spell runes have been fractured! Decipher the scrambled letters and type the correctly spelled word as fast as you can in 120 seconds!",
+      xp: 15,
+      gold: 5,
+      type: 'blitz',
+      frequency: 'daily',
+      unlockDate: null,
+      timeLimit: 120,
+      questionBank: SPELL_BLITZ_BANK
     },
     {
       id: 107,
@@ -1879,6 +1892,8 @@ export function GameProvider({ children }) {
       updates.cipherQuestsCompleted = (currentUser.cipherQuestsCompleted || 0) + 1; // Feeds Shapeshifters (Track 6)
     } else if (questId === 113) {
       updates.incantationQuestsCompleted = (currentUser.incantationQuestsCompleted || 0) + 1; // Feeds Spectral Scribes (Track 7)
+    } else if (questId === 114) {
+      updates.cipherQuestsCompleted = (currentUser.cipherQuestsCompleted || 0) + 1; // Feeds Shapeshifters (Track 6)
     }
 
     syncUserUpdate(updates);

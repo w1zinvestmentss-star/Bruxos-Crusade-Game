@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, CheckCircle, Coins, Star, Brain, Zap, AlertTriangle, Upload, Clock, BookText, MessageSquare, Swords, Palette, Heart, Wand } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Coins, Star, Brain, Zap, AlertTriangle, Upload, Clock, BookText, MessageSquare, Swords, Palette, Heart, Wand, Flame } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 const VICTORY_QUOTES = [
@@ -400,11 +400,12 @@ const QuestBoard = () => {
                                 quest.id === 104 ? 'bg-gradient-to-r from-yellow-700 to-amber-600 hover:from-yellow-600 hover:to-amber-500' :
                                 quest.id === 103 ? 'bg-gradient-to-r from-stone-800 to-stone-600 border border-stone-500 hover:from-stone-700 hover:to-stone-500' :
                                 quest.id === 113 ? 'bg-gradient-to-r from-purple-800 to-indigo-700 hover:from-purple-700 hover:to-indigo-600' :
+                                quest.id === 114 ? 'bg-gradient-to-r from-red-800 to-red-600 hover:from-red-700 hover:to-red-500 border border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.4)]' :
                                 'bg-gradient-to-r from-blue-700 to-cyan-600 hover:from-blue-600 hover:to-cyan-500'
                               }`}
                             >
-                              {quest.id === 104 ? <Star size={18} /> : quest.id === 113 ? <Wand size={18} /> : <Zap size={18} />} 
-                              {quest.id === 104 ? 'ENTER THE PALACE' : quest.id === 113 ? 'ENTER THE VAULT' : quest.id === 103 ? 'SEEK INSIGHT' : 'ENTER THE LABORATORY'}
+                              {quest.id === 104 ? <Star size={18} /> : quest.id === 113 ? <Wand size={18} /> : quest.id === 114 ? <Flame size={18} /> : <Zap size={18} />} 
+                              {quest.id === 104 ? 'ENTER THE PALACE' : quest.id === 113 ? 'ENTER THE VAULT' : quest.id === 114 ? 'ENTER THE FORGE' : quest.id === 103 ? 'SEEK INSIGHT' : 'ENTER THE LABORATORY'}
                             </button>
                           </div>
                         ) : quest.type === 'quiz' ? (
