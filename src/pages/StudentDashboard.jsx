@@ -325,35 +325,44 @@ const StudentDashboard = () => {
         {/* Scrollable Mobile RPG Hub Ledger (Starts below HUD using pt-24) */}
         <div className="relative z-10 flex flex-col w-full h-full overflow-y-auto px-4 pt-24 pb-24 custom-scrollbar space-y-4">
           
-          {/* 1. HERO SHOWCASE STAGE (PEDESTAL) - Spacious & Fully Un-clipped */}
-          <div className="bg-black/90 border-2 border-yellow-500/60 p-4 rounded-2xl flex items-center gap-4 shadow-[0_0_20px_rgba(234,179,8,0.2)]">
-            <div className="relative w-28 h-36 bg-stone-950 border border-stone-700 rounded-xl flex-shrink-0 flex items-center justify-center p-2 overflow-hidden">
-              {/* Character Sprite */}
+          {/* 1. HERO SHOWCASE STAGE - Open, Spacious & Free-Standing (No Inner Box) */}
+          <div className="bg-black/90 border-2 border-yellow-500/60 p-6 rounded-2xl flex items-center gap-6 shadow-[0_0_25px_rgba(234,179,8,0.2)] min-h-[180px] relative overflow-hidden">
+            
+            {/* Open Character Stage (Free-standing sprite with glowing light beam) */}
+            <div className="relative w-32 h-44 flex-shrink-0 flex items-center justify-center z-10">
+              {/* Volumetric Light Beam Behind Sprite */}
+              <div className="absolute inset-0 bg-gradient-to-b from-yellow-500/20 via-yellow-500/5 to-transparent pointer-events-none z-0 rounded-full blur-md" />
+              
+              {/* Character Sprite - Taller & Fully Un-clipped */}
               <img 
                 src={currentUser?.currentBodySprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'} 
                 alt="Hero Avatar" 
-                className="h-full w-full object-contain z-10"
+                className="h-full w-full object-contain z-10 drop-shadow-[0_6px_12px_rgba(0,0,0,0.9)]"
               />
-              <div className="absolute bottom-0 w-full h-4 bg-yellow-500/20 blur-sm rounded-full" />
+              
+              {/* Pedestal Ground Glow */}
+              <div className="absolute bottom-1 w-24 h-4 bg-yellow-500/35 blur-md rounded-full z-0" />
             </div>
 
-            <div className="flex flex-col justify-center flex-grow">
-              <span className="text-[10px] text-yellow-500 font-['Press_Start_2P'] uppercase tracking-wider mb-1">
+            {/* Stats & Identity Panel */}
+            <div className="flex flex-col justify-center flex-grow z-10 space-y-1.5">
+              <span className="text-xs text-yellow-500 font-['Press_Start_2P'] uppercase tracking-widest mb-0.5">
                 [{currentUser?.heroClass || 'HERO'}]
               </span>
-              <h2 className="text-2xl font-bold text-white font-['VT323'] tracking-wide">
+              <h2 className="text-3xl font-bold text-white font-['VT323'] tracking-wide leading-none">
                 {currentUser?.heroName || 'Unknown Hero'}
               </h2>
-              <p className="text-xs text-stone-300 font-mono mt-1">
+              <p className="text-sm text-stone-300 font-mono pt-1">
                 LEVEL {Math.floor((currentUser?.xp || 0) / 1000) + 1}
               </p>
               
-              <div className="flex flex-wrap gap-2 mt-2">
-                <span className="text-[11px] font-mono text-yellow-400 bg-yellow-950/60 px-2 py-0.5 rounded border border-yellow-500/40">
+              {/* Badges */}
+              <div className="flex flex-wrap gap-2 pt-2">
+                <span className="text-xs font-mono text-yellow-400 bg-yellow-950/80 px-3 py-1 rounded-md border border-yellow-500/40 shadow-sm flex items-center gap-1">
                   🪙 {currentUser?.gold || 0} G
                 </span>
                 {currentUser?.equippedPet && (
-                  <span className="text-[11px] font-mono text-purple-300 bg-purple-950/60 px-2 py-0.5 rounded border border-purple-500/40">
+                  <span className="text-xs font-mono text-purple-300 bg-purple-950/80 px-3 py-1 rounded-md border border-purple-500/40 shadow-sm flex items-center gap-1">
                     🐾 {currentUser.equippedPet}
                   </span>
                 )}
@@ -370,19 +379,19 @@ const StudentDashboard = () => {
             <div className="h-[1px] bg-gradient-to-r from-transparent via-stone-700 to-transparent flex-grow" />
           </div>
 
-          {/* 2. LOCATION CARDS (Clean Titles + Short Subtitles) */}
+          {/* 2. LOCATION CARDS (7-Color Palette Update) */}
 
-          {/* QUEST BOARD */}
+          {/* QUEST BOARD - Arcane Amber */}
           <div 
             onClick={() => navigate('/quests')}
-            className="cursor-pointer bg-black/85 border-2 border-yellow-500/50 active:border-yellow-400 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(234,179,8,0.15)]"
+            className="cursor-pointer bg-black/85 border-2 border-amber-500/50 active:border-amber-400 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(245,158,11,0.12)]"
           >
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <BookText size={18} className="text-yellow-400" />
-                <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400 tracking-wide">[ QUEST BOARD ]</h3>
+                <BookText size={18} className="text-amber-400" />
+                <h3 className="text-xs font-['Press_Start_2P'] text-amber-400 tracking-wide">[ QUEST BOARD ]</h3>
               </div>
-              <span className="text-[9px] font-mono text-yellow-300 bg-yellow-950/80 px-2 py-0.5 rounded border border-yellow-500/40">
+              <span className="text-[9px] font-mono text-amber-300 bg-amber-950/80 px-2 py-0.5 rounded border border-amber-500/40">
                 ⚡ 120S BLITZES
               </span>
             </div>
@@ -391,10 +400,10 @@ const StudentDashboard = () => {
             </p>
           </div>
 
-          {/* TAVERN GROVE GALLERY */}
+          {/* TAVERN GROVE GALLERY - Emerald Green */}
           <div 
             onClick={() => navigate('/tavern-gallery')}
-            className="cursor-pointer bg-black/85 border-2 border-emerald-500/50 active:border-emerald-400 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(16,185,129,0.15)]"
+            className="cursor-pointer bg-black/85 border-2 border-emerald-500/50 active:border-emerald-400 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(16,185,129,0.12)]"
           >
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
@@ -410,17 +419,17 @@ const StudentDashboard = () => {
             </p>
           </div>
 
-          {/* THE BARRACKS */}
+          {/* THE BARRACKS - Sapphire Blue */}
           <div 
             onClick={() => navigate('/barracks')}
-            className="cursor-pointer bg-black/85 border-2 border-yellow-500/50 active:border-yellow-400 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(234,179,8,0.15)]"
+            className="cursor-pointer bg-black/85 border-2 border-blue-500/50 active:border-blue-400 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(59,130,246,0.12)]"
           >
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <User size={18} className="text-yellow-400" />
-                <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400 tracking-wide">[ THE BARRACKS ]</h3>
+                <User size={18} className="text-blue-400" />
+                <h3 className="text-xs font-['Press_Start_2P'] text-blue-400 tracking-wide">[ THE BARRACKS ]</h3>
               </div>
-              <span className="text-[9px] font-mono text-yellow-300 bg-yellow-950/80 px-2 py-0.5 rounded border border-yellow-500/40">
+              <span className="text-[9px] font-mono text-blue-300 bg-blue-950/80 px-2 py-0.5 rounded border border-blue-500/40">
                 🛡️ ARMORY
               </span>
             </div>
@@ -429,10 +438,10 @@ const StudentDashboard = () => {
             </p>
           </div>
 
-          {/* THE DUNGEON */}
+          {/* THE DUNGEON - Crimson Red */}
           <div 
             onClick={() => navigate('/dungeon')}
-            className="cursor-pointer bg-black/85 border-2 border-red-900/80 active:border-red-600 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(220,38,38,0.2)]"
+            className="cursor-pointer bg-black/85 border-2 border-red-600/80 active:border-red-500 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(220,38,38,0.15)]"
           >
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
@@ -448,17 +457,17 @@ const StudentDashboard = () => {
             </p>
           </div>
 
-          {/* HALL OF TRIUMPHS */}
+          {/* HALL OF TRIUMPHS - Amethyst Purple */}
           <div 
             onClick={() => navigate('/trophies')}
-            className="cursor-pointer bg-black/85 border-2 border-yellow-400/80 active:border-yellow-400 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(250,204,21,0.2)]"
+            className="cursor-pointer bg-black/85 border-2 border-purple-500/50 active:border-purple-400 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(168,85,247,0.15)]"
           >
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <Trophy size={18} className="text-yellow-400" />
-                <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400 tracking-wide">[ HALL OF TRIUMPHS ]</h3>
+                <Trophy size={18} className="text-purple-400" />
+                <h3 className="text-xs font-['Press_Start_2P'] text-purple-400 tracking-wide">[ HALL OF TRIUMPHS ]</h3>
               </div>
-              <span className="text-[9px] font-mono text-yellow-300 bg-yellow-950/80 px-2 py-0.5 rounded border border-yellow-500/40">
+              <span className="text-[9px] font-mono text-purple-300 bg-purple-950/80 px-2 py-0.5 rounded border border-purple-500/40">
                 🎁 REAL WORLD PRIZES
               </span>
             </div>
@@ -467,17 +476,17 @@ const StudentDashboard = () => {
             </p>
           </div>
 
-          {/* TOWN SQUARE / TOWN HALL */}
+          {/* TOWN SQUARE / TOWN HALL - Platinum Gold */}
           <div 
             onClick={() => navigate('/leaderboard')}
-            className="cursor-pointer bg-black/85 border-2 border-yellow-500/50 active:border-yellow-400 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(234,179,8,0.15)]"
+            className="cursor-pointer bg-black/85 border-2 border-yellow-400/80 active:border-yellow-300 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(250,204,21,0.15)]"
           >
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <Trophy size={18} className="text-yellow-400" />
-                <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400 tracking-wide">[ TOWN SQUARE ]</h3>
+                <Trophy size={18} className="text-yellow-300" />
+                <h3 className="text-xs font-['Press_Start_2P'] text-yellow-300 tracking-wide">[ TOWN SQUARE ]</h3>
               </div>
-              <span className="text-[9px] font-mono text-yellow-300 bg-yellow-950/80 px-2 py-0.5 rounded border border-yellow-500/40">
+              <span className="text-[9px] font-mono text-yellow-200 bg-yellow-950/80 px-2 py-0.5 rounded border border-yellow-400/40">
                 🏆 LEADERBOARD
               </span>
             </div>
@@ -486,19 +495,19 @@ const StudentDashboard = () => {
             </p>
           </div>
 
-          {/* THE ARCHIVES */}
+          {/* THE ARCHIVES - Arcane Cyan */}
           <div 
             onClick={() => navigate('/archives')}
-            className="cursor-pointer bg-black/85 border-2 border-yellow-500/50 active:border-yellow-400 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(234,179,8,0.15)]"
+            className="cursor-pointer bg-black/85 border-2 border-cyan-500/50 active:border-cyan-400 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(6,182,212,0.15)]"
           >
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <BookText size={18} className="text-yellow-400" />
-                <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400 tracking-wide">[ THE ARCHIVES ]</h3>
+                <BookText size={18} className="text-cyan-400" />
+                <h3 className="text-xs font-['Press_Start_2P'] text-cyan-400 tracking-wide">[ THE ARCHIVES ]</h3>
               </div>
             </div>
             <p className="text-[11px] text-stone-300 font-mono uppercase leading-snug">
-              Your permanent academic record and power level.
+              Your permanent academic record, Intellect, and Wisdom stats.
             </p>
           </div>
 
