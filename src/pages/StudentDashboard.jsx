@@ -361,7 +361,14 @@ const StudentDashboard = () => {
             </div>
           </div>
 
-          <p className="text-stone-400 text-center font-['VT323'] text-xl italic py-1">Select your destination, Hero...</p>
+          {/* GOTHIC RIBBON DIVIDER */}
+          <div className="flex items-center justify-center gap-3 my-2 px-2">
+            <div className="h-[1px] bg-gradient-to-r from-transparent via-stone-700 to-transparent flex-grow" />
+            <span className="font-['Press_Start_2P'] text-[9px] text-yellow-500/90 tracking-[0.2em] uppercase">
+              ✦ SELECT DESTINATION ✦
+            </span>
+            <div className="h-[1px] bg-gradient-to-r from-transparent via-stone-700 to-transparent flex-grow" />
+          </div>
 
           {/* 2. LOCATION CARDS (Clean Titles + Short Subtitles) */}
 
@@ -452,7 +459,7 @@ const StudentDashboard = () => {
                 <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400 tracking-wide">[ HALL OF TRIUMPHS ]</h3>
               </div>
               <span className="text-[9px] font-mono text-yellow-300 bg-yellow-950/80 px-2 py-0.5 rounded border border-yellow-500/40">
-                🎁 $150 CARDS
+                🎁 REAL WORLD PRIZES
               </span>
             </div>
             <p className="text-[11px] text-stone-300 font-mono uppercase leading-snug">
