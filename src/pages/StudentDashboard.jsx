@@ -313,7 +313,7 @@ const StudentDashboard = () => {
       <div className="flex md:hidden flex-col w-full h-screen relative z-10 overflow-hidden">
         
         {/* Fixed Background and Overlay (Exact Duplicate of Login.jsx) */}
-        <div className="absolute inset-0 z-0 h-full w-full overflow-hidden">
+        <div className="fixed inset-0 z-0 h-full w-full overflow-hidden pointer-events-none">
           <img 
             src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png" 
             alt="World Map Background" 
@@ -336,11 +336,25 @@ const StudentDashboard = () => {
             </div>
             <div>
               <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">QUEST BOARD</h3>
-              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Accept daily tasks, quizzes, and spelling runs [10].</p>
+              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Accept daily tasks, quizzes, and spelling runs.</p>
             </div>
           </div>
 
-          {/* 2. TAVERN GROVE GALLERY */}
+          {/* 2. TOWN SQUARE / TOWN HALL (RESTORED) */}
+          <div 
+            onClick={() => navigate('/leaderboard')}
+            className="bg-black/80 border-2 border-yellow-500/30 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(234,179,8,0.1)]"
+          >
+            <div className="w-12 h-12 bg-yellow-950/40 rounded-full border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
+              <Trophy size={24} className="text-yellow-400" />
+            </div>
+            <div>
+              <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">TOWN SQUARE</h3>
+              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">The Hall of Legends. Compare your Mana and rank.</p>
+            </div>
+          </div>
+
+          {/* 3. TAVERN GROVE GALLERY */}
           <div 
             onClick={() => navigate('/tavern-gallery')}
             className="bg-black/80 border-2 border-emerald-500/30 active:border-emerald-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(16,185,129,0.1)]"
@@ -350,11 +364,11 @@ const StudentDashboard = () => {
             </div>
             <div>
               <h3 className="text-xs font-['Press_Start_2P'] text-emerald-400">TAVERN GROVE</h3>
-              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">View approved student artwork in the cave gallery [10].</p>
+              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">View approved student artwork in the cave gallery.</p>
             </div>
           </div>
 
-          {/* 3. THE BARRACKS */}
+          {/* 4. THE BARRACKS */}
           <div 
             onClick={() => navigate('/barracks')}
             className="bg-black/80 border-2 border-yellow-500/30 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(234,179,8,0.1)]"
@@ -368,7 +382,7 @@ const StudentDashboard = () => {
             </div>
           </div>
 
-          {/* 4. THE DUNGEON */}
+          {/* 5. THE DUNGEON */}
           <div 
             onClick={() => navigate('/dungeon')}
             className="bg-black/80 border-2 border-red-900/80 active:border-red-600 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(220,38,38,0.1)]"
@@ -378,11 +392,11 @@ const StudentDashboard = () => {
             </div>
             <div>
               <h3 className="text-xs font-['Press_Start_2P'] text-red-500">THE DUNGEON</h3>
-              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Summon and battle legendary beasts [10].</p>
+              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Summon and battle legendary beasts.</p>
             </div>
           </div>
 
-          {/* 5. HALL OF TRIUMPHS */}
+          {/* 6. HALL OF TRIUMPHS */}
           <div 
             onClick={() => navigate('/trophies')}
             className="bg-black/80 border-2 border-yellow-400/80 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(250,204,21,0.2)]"
@@ -396,7 +410,7 @@ const StudentDashboard = () => {
             </div>
           </div>
 
-          {/* 6. THE ARCHIVES */}
+          {/* 7. THE ARCHIVES */}
           <div 
             onClick={() => navigate('/archives')}
             className="bg-black/80 border-2 border-yellow-500/30 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(234,179,8,0.1)]"
