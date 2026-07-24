@@ -322,107 +322,179 @@ const StudentDashboard = () => {
           <div className="absolute inset-0 bg-black/80"></div>
         </div>
 
-        {/* Scrollable Card Container Ledger (Starts below HUD using pt-24) */}
-        <div className="relative z-10 flex flex-col w-full h-full overflow-y-auto px-4 pt-24 pb-20 custom-scrollbar space-y-4">
-          <p className="text-stone-400 text-center font-['VT323'] text-2xl italic mb-2">Select your destination, Hero...</p>
+        {/* Scrollable Mobile RPG Hub Ledger (Starts below HUD using pt-24) */}
+        <div className="relative z-10 flex flex-col w-full h-full overflow-y-auto px-4 pt-24 pb-24 custom-scrollbar space-y-4">
+          
+          {/* 1. HERO SHOWCASE STAGE (PEDESTAL) - Spacious & Fully Un-clipped */}
+          <div className="bg-black/90 border-2 border-yellow-500/60 p-4 rounded-2xl flex items-center gap-4 shadow-[0_0_20px_rgba(234,179,8,0.2)]">
+            <div className="relative w-28 h-36 bg-stone-950 border border-stone-700 rounded-xl flex-shrink-0 flex items-center justify-center p-2 overflow-hidden">
+              {/* Character Sprite */}
+              <img 
+                src={currentUser?.currentBodySprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'} 
+                alt="Hero Avatar" 
+                className="h-full w-full object-contain z-10"
+              />
+              <div className="absolute bottom-0 w-full h-4 bg-yellow-500/20 blur-sm rounded-full" />
+            </div>
 
-          {/* 1. QUEST BOARD */}
+            <div className="flex flex-col justify-center flex-grow">
+              <span className="text-[10px] text-yellow-500 font-['Press_Start_2P'] uppercase tracking-wider mb-1">
+                [{currentUser?.heroClass || 'HERO'}]
+              </span>
+              <h2 className="text-2xl font-bold text-white font-['VT323'] tracking-wide">
+                {currentUser?.heroName || 'Unknown Hero'}
+              </h2>
+              <p className="text-xs text-stone-300 font-mono mt-1">
+                LEVEL {Math.floor((currentUser?.xp || 0) / 1000) + 1}
+              </p>
+              
+              <div className="flex flex-wrap gap-2 mt-2">
+                <span className="text-[11px] font-mono text-yellow-400 bg-yellow-950/60 px-2 py-0.5 rounded border border-yellow-500/40">
+                  🪙 {currentUser?.gold || 0} G
+                </span>
+                {currentUser?.equippedPet && (
+                  <span className="text-[11px] font-mono text-purple-300 bg-purple-950/60 px-2 py-0.5 rounded border border-purple-500/40">
+                    🐾 {currentUser.equippedPet}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <p className="text-stone-400 text-center font-['VT323'] text-xl italic py-1">Select your destination, Hero...</p>
+
+          {/* 2. LOCATION CARDS (Clean Titles + Short Subtitles) */}
+
+          {/* QUEST BOARD */}
           <div 
             onClick={() => navigate('/quests')}
-            className="bg-black/80 border-2 border-yellow-500/30 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(234,179,8,0.1)]"
+            className="cursor-pointer bg-black/85 border-2 border-yellow-500/50 active:border-yellow-400 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(234,179,8,0.15)]"
           >
-            <div className="w-12 h-12 bg-yellow-950/40 rounded-full border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
-              <BookText size={24} className="text-yellow-400" />
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <BookText size={18} className="text-yellow-400" />
+                <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400 tracking-wide">[ QUEST BOARD ]</h3>
+              </div>
+              <span className="text-[9px] font-mono text-yellow-300 bg-yellow-950/80 px-2 py-0.5 rounded border border-yellow-500/40">
+                ⚡ 120S BLITZES
+              </span>
             </div>
-            <div>
-              <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">QUEST BOARD</h3>
-              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Accept daily tasks, quizzes, and spelling runs.</p>
-            </div>
+            <p className="text-[11px] text-stone-300 font-mono uppercase leading-snug">
+              Accept daily tasks, quizzes, and 2-minute speed runs.
+            </p>
           </div>
 
-          {/* 2. TOWN SQUARE / TOWN HALL (RESTORED) */}
-          <div 
-            onClick={() => navigate('/leaderboard')}
-            className="bg-black/80 border-2 border-yellow-500/30 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(234,179,8,0.1)]"
-          >
-            <div className="w-12 h-12 bg-yellow-950/40 rounded-full border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
-              <Trophy size={24} className="text-yellow-400" />
-            </div>
-            <div>
-              <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">TOWN SQUARE</h3>
-              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">The Hall of Legends. Compare your Mana and rank.</p>
-            </div>
-          </div>
-
-          {/* 3. TAVERN GROVE GALLERY */}
+          {/* TAVERN GROVE GALLERY */}
           <div 
             onClick={() => navigate('/tavern-gallery')}
-            className="bg-black/80 border-2 border-emerald-500/30 active:border-emerald-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(16,185,129,0.1)]"
+            className="cursor-pointer bg-black/85 border-2 border-emerald-500/50 active:border-emerald-400 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(16,185,129,0.15)]"
           >
-            <div className="w-12 h-12 bg-emerald-950/40 rounded-full border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
-              <Palette size={24} className="text-emerald-400" />
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Palette size={18} className="text-emerald-400" />
+                <h3 className="text-xs font-['Press_Start_2P'] text-emerald-400 tracking-wide">[ TAVERN GROVE ]</h3>
+              </div>
+              <span className="text-[9px] font-mono text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/40">
+                🎨 ART EXHIBIT
+              </span>
             </div>
-            <div>
-              <h3 className="text-xs font-['Press_Start_2P'] text-emerald-400">TAVERN GROVE</h3>
-              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">View approved student artwork in the cave gallery.</p>
-            </div>
+            <p className="text-[11px] text-stone-300 font-mono uppercase leading-snug">
+              View approved student artwork in the cave gallery.
+            </p>
           </div>
 
-          {/* 4. THE BARRACKS */}
+          {/* THE BARRACKS */}
           <div 
             onClick={() => navigate('/barracks')}
-            className="bg-black/80 border-2 border-yellow-500/30 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(234,179,8,0.1)]"
+            className="cursor-pointer bg-black/85 border-2 border-yellow-500/50 active:border-yellow-400 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(234,179,8,0.15)]"
           >
-            <div className="w-12 h-12 bg-yellow-950/40 rounded-full border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
-              <User size={24} className="text-yellow-400" />
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <User size={18} className="text-yellow-400" />
+                <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400 tracking-wide">[ THE BARRACKS ]</h3>
+              </div>
+              <span className="text-[9px] font-mono text-yellow-300 bg-yellow-950/80 px-2 py-0.5 rounded border border-yellow-500/40">
+                🛡️ ARMORY
+              </span>
             </div>
-            <div>
-              <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">THE BARRACKS</h3>
-              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Spend gold on rare outfits and magic spells.</p>
-            </div>
+            <p className="text-[11px] text-stone-300 font-mono uppercase leading-snug">
+              Spend gold on rare outfits, pets, and magic spells.
+            </p>
           </div>
 
-          {/* 5. THE DUNGEON */}
+          {/* THE DUNGEON */}
           <div 
             onClick={() => navigate('/dungeon')}
-            className="bg-black/80 border-2 border-red-900/80 active:border-red-600 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(220,38,38,0.1)]"
+            className="cursor-pointer bg-black/85 border-2 border-red-900/80 active:border-red-600 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(220,38,38,0.2)]"
           >
-            <div className="w-12 h-12 bg-red-950/40 rounded-full border border-red-900/50 flex items-center justify-center flex-shrink-0">
-              <Swords size={24} className="text-red-500" />
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Swords size={18} className="text-red-500" />
+                <h3 className="text-xs font-['Press_Start_2P'] text-red-500 tracking-wide">[ THE DUNGEON ]</h3>
+              </div>
+              <span className="text-[9px] font-mono text-red-300 bg-red-950/80 px-2 py-0.5 rounded border border-red-500/40">
+                ⚔️ 44 BOSSES
+              </span>
             </div>
-            <div>
-              <h3 className="text-xs font-['Press_Start_2P'] text-red-500">THE DUNGEON</h3>
-              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Summon and battle legendary beasts.</p>
-            </div>
+            <p className="text-[11px] text-stone-300 font-mono uppercase leading-snug">
+              Summon and battle legendary monsters for spoils.
+            </p>
           </div>
 
-          {/* 6. HALL OF TRIUMPHS */}
+          {/* HALL OF TRIUMPHS */}
           <div 
             onClick={() => navigate('/trophies')}
-            className="bg-black/80 border-2 border-yellow-400/80 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(250,204,21,0.2)]"
+            className="cursor-pointer bg-black/85 border-2 border-yellow-400/80 active:border-yellow-400 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(250,204,21,0.2)]"
           >
-            <div className="w-12 h-12 bg-yellow-950/20 rounded-full border border-yellow-400/50 flex items-center justify-center flex-shrink-0">
-              <Trophy size={24} className="text-yellow-400" />
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Trophy size={18} className="text-yellow-400" />
+                <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400 tracking-wide">[ HALL OF TRIUMPHS ]</h3>
+              </div>
+              <span className="text-[9px] font-mono text-yellow-300 bg-yellow-950/80 px-2 py-0.5 rounded border border-yellow-500/40">
+                🎁 $150 CARDS
+              </span>
             </div>
-            <div>
-              <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">HALL OF TRIUMPHS</h3>
-              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Claim real-world prizes and view achievements.</p>
-            </div>
+            <p className="text-[11px] text-stone-300 font-mono uppercase leading-snug">
+              Claim real-world STC gift cards and enter the raffle.
+            </p>
           </div>
 
-          {/* 7. THE ARCHIVES */}
+          {/* TOWN SQUARE / TOWN HALL */}
+          <div 
+            onClick={() => navigate('/leaderboard')}
+            className="cursor-pointer bg-black/85 border-2 border-yellow-500/50 active:border-yellow-400 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(234,179,8,0.15)]"
+          >
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Trophy size={18} className="text-yellow-400" />
+                <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400 tracking-wide">[ TOWN SQUARE ]</h3>
+              </div>
+              <span className="text-[9px] font-mono text-yellow-300 bg-yellow-950/80 px-2 py-0.5 rounded border border-yellow-500/40">
+                🏆 LEADERBOARD
+              </span>
+            </div>
+            <p className="text-[11px] text-stone-300 font-mono uppercase leading-snug">
+              The Hall of Legends. Compare your Mana and rank.
+            </p>
+          </div>
+
+          {/* THE ARCHIVES */}
           <div 
             onClick={() => navigate('/archives')}
-            className="bg-black/80 border-2 border-yellow-500/30 active:border-yellow-400 p-4 rounded-xl flex items-center gap-4 transition-all shadow-[0_0_10px_rgba(234,179,8,0.1)]"
+            className="cursor-pointer bg-black/85 border-2 border-yellow-500/50 active:border-yellow-400 p-4 rounded-2xl flex flex-col gap-2 transition-all shadow-[0_0_12px_rgba(234,179,8,0.15)]"
           >
-            <div className="w-12 h-12 bg-yellow-950/40 rounded-full border border-yellow-500/30 flex items-center justify-center flex-shrink-0">
-              <BookText size={24} className="text-yellow-400" />
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <BookText size={18} className="text-yellow-400" />
+                <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400 tracking-wide">[ THE ARCHIVES ]</h3>
+              </div>
             </div>
-            <div>
-              <h3 className="text-xs font-['Press_Start_2P'] text-yellow-400">THE ARCHIVES</h3>
-              <p className="text-[10px] text-stone-400 font-mono uppercase mt-1 leading-normal">Your permanent academic record and power level.</p>
-            </div>
+            <p className="text-[11px] text-stone-300 font-mono uppercase leading-snug">
+              Your permanent academic record and power level.
+            </p>
           </div>
+
         </div>
       </div>
     </div>
