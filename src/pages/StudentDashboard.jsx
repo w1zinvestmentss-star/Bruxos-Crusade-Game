@@ -370,14 +370,12 @@ const StudentDashboard = () => {
             </span>
           </div>
 
-          {/* 2. LOCATION CARDS (Forced 110px Un-squeezed Height + Restored Elemental Hover Glows) */}
-
-          {/* 1. QUEST BOARD - Amber Hover Glow */}
+          {/* 2. LOCATION CARDS (Forced 110px Un-squeezed Height + Restored Elemental Hover Glows)          {/* 1. QUEST BOARD - Amber Hover Glow */}
           <div 
             onClick={() => navigate('/quests')}
             className="cursor-pointer relative overflow-hidden bg-black/90 border border-slate-600/70 rounded-xl py-4 px-5 flex flex-col justify-center min-h-[110px] flex-shrink-0 transition-all shadow-lg hover:border-amber-400 hover:shadow-[0_0_20px_rgba(245,158,11,0.3)] group"
           >
-            <img src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/journal.briefingroom.png" alt="Quest Board" className="absolute right-2 top-1 bottom-1 w-2/5 h-[90%] object-contain object-right opacity-60 pointer-events-none z-0 group-hover:scale-105 transition-transform duration-500" />
+            <img src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Cover.Quest.Board.jpg" alt="Quest Board" className="absolute right-0 top-0 bottom-0 w-2/5 h-full object-cover object-right opacity-60 pointer-events-none z-0 group-hover:scale-105 transition-transform duration-500" />
             <div className="absolute inset-0 bg-gradient-to-r from-black via-black/85 to-transparent pointer-events-none z-0" />
             <div className="relative z-10 flex justify-between items-center mb-1.5">
               <div className="flex items-center gap-2">
@@ -398,7 +396,7 @@ const StudentDashboard = () => {
             onClick={() => navigate('/tavern-gallery')}
             className="cursor-pointer relative overflow-hidden bg-black/90 border border-slate-600/70 rounded-xl py-4 px-5 flex flex-col justify-center min-h-[110px] flex-shrink-0 transition-all shadow-lg hover:border-emerald-400 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] group"
           >
-            <img src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Tavern.Grove.Gallery.png" alt="Tavern Grove" className="absolute right-2 top-1 bottom-1 w-2/5 h-[90%] object-contain object-right opacity-60 pointer-events-none z-0 group-hover:scale-105 transition-transform duration-500" />
+            <img src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Cover.Tavern.Grove.jpg" alt="Tavern Grove" className="absolute right-0 top-0 bottom-0 w-2/5 h-full object-cover object-right opacity-60 pointer-events-none z-0 group-hover:scale-105 transition-transform duration-500" />
             <div className="absolute inset-0 bg-gradient-to-r from-black via-black/85 to-transparent pointer-events-none z-0" />
             <div className="relative z-10 flex justify-between items-center mb-1.5">
               <div className="flex items-center gap-2">
@@ -419,7 +417,7 @@ const StudentDashboard = () => {
             onClick={() => navigate('/barracks')}
             className="cursor-pointer relative overflow-hidden bg-black/90 border border-slate-600/70 rounded-xl py-4 px-5 flex flex-col justify-center min-h-[110px] flex-shrink-0 transition-all shadow-lg hover:border-blue-400 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] group"
           >
-            <img src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ivory.Leviathan.Armor.png" alt="Barracks" className="absolute right-2 top-1 bottom-1 w-2/5 h-[90%] object-contain object-right opacity-70 pointer-events-none z-0 group-hover:scale-105 transition-transform duration-500" />
+            <img src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Cover.The.Barracks.jpg" alt="Barracks" className="absolute right-0 top-0 bottom-0 w-2/5 h-full object-cover object-right opacity-70 pointer-events-none z-0 group-hover:scale-105 transition-transform duration-500" />
             <div className="absolute inset-0 bg-gradient-to-r from-black via-black/85 to-transparent pointer-events-none z-0" />
             <div className="relative z-10 flex justify-between items-center mb-1.5">
               <div className="flex items-center gap-2">
@@ -440,7 +438,7 @@ const StudentDashboard = () => {
             onClick={() => navigate('/dungeon')}
             className="cursor-pointer relative overflow-hidden bg-black/90 border border-slate-600/70 rounded-xl py-4 px-5 flex flex-col justify-center min-h-[110px] flex-shrink-0 transition-all shadow-lg hover:border-red-500 hover:shadow-[0_0_20px_rgba(220,38,38,0.3)] group"
           >
-            <img src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ivory.Leviathan.png" alt="Dungeon" className="absolute right-2 top-1 bottom-1 w-2/5 h-[90%] object-contain object-right opacity-70 pointer-events-none z-0 group-hover:scale-105 transition-transform duration-500" />
+            <img src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Cover.The.Dungeon.jpg" alt="Dungeon" className="absolute right-0 top-0 bottom-0 w-2/5 h-full object-cover object-right opacity-70 pointer-events-none z-0 group-hover:scale-105 transition-transform duration-500" />
             <div className="absolute inset-0 bg-gradient-to-r from-black via-black/85 to-transparent pointer-events-none z-0" />
             <div className="relative z-10 flex justify-between items-center mb-1.5">
               <div className="flex items-center gap-2">
@@ -461,14 +459,14 @@ const StudentDashboard = () => {
             onClick={() => navigate('/trophies')}
             className="cursor-pointer relative overflow-hidden bg-black/90 border border-slate-600/70 rounded-xl py-4 px-5 flex flex-col justify-center min-h-[110px] flex-shrink-0 transition-all shadow-lg hover:border-purple-400 hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] group"
           >
-            <img src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png" alt="Hall of Triumphs" className="absolute right-2 top-1 bottom-1 w-2/5 h-[90%] object-contain object-right opacity-50 pointer-events-none z-0 group-hover:scale-105 transition-transform duration-500" />
+            <img src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Cover.Hall.of.Triumphs.jpg" alt="Hall of Triumphs" className="absolute right-0 top-0 bottom-0 w-2/5 h-full object-cover object-right opacity-50 pointer-events-none z-0 group-hover:scale-105 transition-transform duration-500" />
             <div className="absolute inset-0 bg-gradient-to-r from-black via-black/85 to-transparent pointer-events-none z-0" />
             <div className="relative z-10 flex justify-between items-center mb-1.5">
               <div className="flex items-center gap-2">
                 <Trophy size={18} className="text-purple-400" />
                 <h3 className="text-xs font-['Press_Start_2P'] text-purple-400 tracking-wide">[ HALL OF TRIUMPHS ]</h3>
               </div>
-              <span className="text-[9px] font-mono text-purple-300 bg-purple-950/90 px-2 py-0.5 rounded border border-purple-500/40">
+              <span className="text-[9px] font-mono text-purple-200 bg-purple-950/90 px-2 py-0.5 rounded border border-purple-500/40">
                 🎁 REAL WORLD PRIZES
               </span>
             </div>
@@ -482,7 +480,7 @@ const StudentDashboard = () => {
             onClick={() => navigate('/leaderboard')}
             className="cursor-pointer relative overflow-hidden bg-black/90 border border-slate-600/70 rounded-xl py-4 px-5 flex flex-col justify-center min-h-[110px] flex-shrink-0 transition-all shadow-lg hover:border-yellow-300 hover:shadow-[0_0_20px_rgba(250,204,21,0.3)] group"
           >
-            <img src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png" alt="Town Square" className="absolute right-2 top-1 bottom-1 w-2/5 h-[90%] object-contain object-right opacity-50 pointer-events-none z-0 group-hover:scale-105 transition-transform duration-500" />
+            <img src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Cover.Town.Square.jpg" alt="Town Square" className="absolute right-0 top-0 bottom-0 w-2/5 h-full object-cover object-right opacity-50 pointer-events-none z-0 group-hover:scale-105 transition-transform duration-500" />
             <div className="absolute inset-0 bg-gradient-to-r from-black via-black/85 to-transparent pointer-events-none z-0" />
             <div className="relative z-10 flex justify-between items-center mb-1.5">
               <div className="flex items-center gap-2">
@@ -503,7 +501,7 @@ const StudentDashboard = () => {
             onClick={() => navigate('/archives')}
             className="cursor-pointer relative overflow-hidden bg-black/90 border border-slate-600/70 rounded-xl py-4 px-5 flex flex-col justify-center min-h-[110px] flex-shrink-0 transition-all shadow-lg hover:border-cyan-400 hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] group"
           >
-            <img src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Hunters.Archives.png" alt="The Archives" className="absolute right-0 top-0 bottom-0 w-2/5 h-full object-cover object-right opacity-50 pointer-events-none z-0 group-hover:scale-105 transition-transform duration-500" />
+            <img src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Cover.The.Archives.jpg" alt="The Archives" className="absolute right-0 top-0 bottom-0 w-2/5 h-full object-cover object-right opacity-50 pointer-events-none z-0 group-hover:scale-105 transition-transform duration-500" />
             <div className="absolute inset-0 bg-gradient-to-r from-black via-black/85 to-transparent pointer-events-none z-0" />
             <div className="relative z-10 flex justify-between items-center mb-1.5">
               <div className="flex items-center gap-2">
