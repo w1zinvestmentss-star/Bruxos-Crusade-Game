@@ -121,7 +121,7 @@ const Archives = () => {
               <div className="bg-blue-950/10 border border-blue-500/20 rounded-xl p-5 flex items-center justify-between shadow-[0_0_15px_rgba(59,130,246,0.05)] transition-all duration-300">
                 <div className="flex flex-col">
                   <span className="text-blue-400 font-['Press_Start_2P'] text-[10px] tracking-widest mb-1">[ INTELLECT ]</span>
-                  <span className="text-xs text-stone-500 font-mono uppercase tracking-wider">Midterm Score</span>
+                  <span className="text-xs text-stone-500 font-mono uppercase tracking-wider">Strategy Points</span>
                 </div>
                 <span className="text-4xl font-bold text-blue-300 font-['VT323'] tracking-wide">
                   {currentUser.midtermGPA || 0}
@@ -132,7 +132,7 @@ const Archives = () => {
               <div className="bg-purple-950/10 border border-purple-500/20 rounded-xl p-5 flex items-center justify-between shadow-[0_0_15px_rgba(168,85,247,0.05)] transition-all duration-300">
                 <div className="flex flex-col">
                   <span className="text-purple-400 font-['Press_Start_2P'] text-[10px] tracking-widest mb-1">[ WISDOM ]</span>
-                  <span className="text-xs text-stone-500 font-mono uppercase tracking-wider">Final Score</span>
+                  <span className="text-xs text-stone-500 font-mono uppercase tracking-wider">Execution Points</span>
                 </div>
                 <span className="text-4xl font-bold text-purple-300 font-['VT323'] tracking-wide">
                   {currentUser.finalGPA !== null ? currentUser.finalGPA : '---'}

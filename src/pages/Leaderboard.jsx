@@ -86,7 +86,7 @@ const Leaderboard = () => {
     scholar: { title: "Path of the Scholar", desc: "Measures true mastery. Heavily weighs your Academic Attributes (Intellect & Wisdom) with your overall in-game performance. Grow your power to secure your spot!" },
     slayer: { title: "Path of the Slayer", desc: "Honors the greatest monster hunters. Earn points by defeating Bosses in the Dungeon. Higher tier bosses grant more points. XP breaks ties!" },
     grinder: { title: "Path of the Grinder", desc: "Rewards pure, unrelenting effort. Ranks heroes strictly by Total XP. Complete daily quests, reports, and bounties to climb to the top!" },
-    comeback: { title: "Path of the Comeback", desc: "Celebrates resilience and growth. Ranks heroes by the greatest improvement from their Midterm (Intellect) to their Final (Wisdom). Never give up!" }
+    comeback: { title: "Path of the Comeback", desc: "Celebrates resilience and growth. Ranks heroes by the greatest improvement from Strategy to Execution Points. Never give up!" }
   };
 
   const sortedStudents = useMemo(() => {
