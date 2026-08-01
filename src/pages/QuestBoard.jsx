@@ -24,6 +24,14 @@ const QuestBoard = () => {
   const [stepTracker, setStepTracker] = useState({});
 
   const [activeMultiSteps, setActiveMultiSteps] = useState({});
+  const [activeSector, setActiveSector] = useState('all');
+
+  const dailyQuests = quests.filter(q => q.frequency === 'daily');
+  const completedDailyCount = dailyQuests.filter(q => {
+    const status = getQuestStatus(q.id);
+    return status === 'approved' || status === 'pending';
+  }).length;
+  const dailyProgressPercent = Math.min(100, Math.round((completedDailyCount / Math.max(1, dailyQuests.length)) * 100));
 
   const [showVictoryModal, setShowVictoryModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
@@ -273,6 +281,47 @@ const QuestBoard = () => {
             Welcome to the Bounty Board, Hero. Choose your path, complete tasks to earn Gold and Experience, and awaken the bosses lurking in the Dungeon.
           </p>
 
+          {/* DAILY BOUNTY PROGRESS RIBBON */}
+          <div className="bg-black/75 backdrop-blur-md border border-yellow-500/40 p-4 rounded-xl max-w-3xl mx-auto mb-8 shadow-lg">
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-['Press_Start_2P'] text-[10px] text-yellow-400 uppercase tracking-wider">
+                🎯 TODAY'S PROGRESS
+              </span>
+              <span className="font-mono text-xs text-stone-300 font-bold">
+                {completedDailyCount} / {dailyQuests.length} COMPLETED ({dailyProgressPercent}%)
+              </span>
+            </div>
+            <div className="w-full bg-stone-900 h-2 rounded-full overflow-hidden border border-stone-700">
+              <div 
+                className="bg-gradient-to-r from-yellow-500 to-amber-400 h-full rounded-full transition-all duration-500" 
+                style={{ width: `${dailyProgressPercent}%` }}
+              />
+            </div>
+          </div>
+
+          {/* SECTOR FILTER TABS */}
+          <div className="flex overflow-x-auto justify-center gap-2 mb-10 pb-2 custom-scrollbar no-scrollbar max-w-3xl mx-auto">
+            {[
+              { id: 'all', label: 'ALL BOUNTIES' },
+              { id: 'speed', label: '⚡ SPEED RUNS' },
+              { id: 'academics', label: '📖 ACADEMICS' },
+              { id: 'scout', label: '🎨 SCOUT REPORTS' },
+              { id: 'sanctuary', label: '🌿 SANCTUARY' }
+            ].map(sector => (
+              <button
+                key={sector.id}
+                onClick={() => setActiveSector(sector.id)}
+                className={`px-4 py-2.5 rounded-lg font-['Press_Start_2P'] text-[9px] whitespace-nowrap transition-all flex items-center gap-2 ${
+                  activeSector === sector.id 
+                    ? 'bg-yellow-500 text-stone-950 font-bold border-2 border-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.4)]' 
+                    : 'bg-black/60 text-stone-400 border border-stone-700 hover:text-white hover:bg-stone-800'
+                }`}
+              >
+                <span>{sector.label}</span>
+              </button>
+            ))}
+          </div>
+
           {isLocked ? (
             <div className="bg-purple-900/80 border-4 border-purple-500 p-8 rounded-xl max-w-2xl mx-auto text-center shadow-[0_0_50px_rgba(168,85,247,0.5)]">
               <h1 className="text-4xl text-white font-['Press_Start_2P'] mb-6 animate-pulse">VOID BREACH DETECTED</h1>
@@ -306,14 +355,20 @@ const QuestBoard = () => {
           ) : (
             <div>
               {Object.keys(QUEST_CATEGORIES).map(categoryKey => {
-              const categoryQuests = quests.filter(q => q.type === categoryKey);
-              if (categoryQuests.length === 0) return null;
+                // Sector Filtering Guard
+                if (activeSector === 'speed' && !['blitz', 'gauntlet', 'incantation'].includes(categoryKey)) return null;
+                if (activeSector === 'academics' && !['upload', 'multi-step', 'quiz'].includes(categoryKey)) return null;
+                if (activeSector === 'scout' && !['scout-sports', 'scout-arts'].includes(categoryKey)) return null;
+                if (activeSector === 'sanctuary' && !['wellness', 'journal'].includes(categoryKey)) return null;
 
-              const categoryInfo = QUEST_CATEGORIES[categoryKey];
-              return (
-                <div key={categoryKey} className="mb-12">
-                  <h2 className="text-2xl text-yellow-500 font-['Press_Start_2P'] border-b border-stone-700 pb-2 mb-2 mt-12">{categoryInfo.title}</h2>
-<p className="text-stone-400 mb-6 font-['VT323'] text-xl">{categoryInfo.desc}</p>
+                const categoryQuests = quests.filter(q => q.type === categoryKey);
+                if (categoryQuests.length === 0) return null;
+
+                const categoryInfo = QUEST_CATEGORIES[categoryKey];
+                return (
+                  <div key={categoryKey} className="mb-12">
+                    <h2 className="text-2xl text-yellow-500 font-['Press_Start_2P'] border-b border-stone-700 pb-2 mb-2 mt-12">{categoryInfo.title}</h2>
+                    <p className="text-stone-400 mb-6 font-['VT323'] text-xl">{categoryInfo.desc}</p>
                     <div className="grid gap-4">
                       {categoryQuests.map((quest) => {
                         const status = getQuestStatus(quest.id);
@@ -326,30 +381,59 @@ const QuestBoard = () => {
                         const activeSession = activeMultiSteps[quest.id];
 
                         const getBorderColor = () => {
-                if (status === 'approved' || status === 'read_only') return 'border-l-green-500 bg-green-900/40';
-                if (status === 'failed') return 'border-l-red-800 bg-red-950/40';
-                if (isGauntlet) return 'border-l-red-600 bg-red-950/40';
-                if (isMultiStep) return 'border-l-purple-500';
-                if (isScenario) return 'border-l-orange-500';
-                if (quest.type === 'incantation') return 'border-l-cyan-500';
-                if (quest.type === 'scout-sports') return 'border-l-orange-400';
-                if (quest.type === 'scout-arts') return 'border-l-pink-500';
-                if (isWellness) return 'border-l-red-500';
-                return 'border-l-blue-500';
-              };
+                          if (status === 'approved' || status === 'read_only') return 'border-l-green-500 bg-green-900/40';
+                          if (status === 'failed') return 'border-l-red-800 bg-red-950/40';
+                          if (isGauntlet) return 'border-l-red-600 bg-red-950/40';
+                          if (isMultiStep) return 'border-l-purple-500';
+                          if (isScenario) return 'border-l-orange-500';
+                          if (quest.type === 'incantation') return 'border-l-cyan-500';
+                          if (quest.type === 'scout-sports') return 'border-l-orange-400';
+                          if (quest.type === 'scout-arts') return 'border-l-pink-500';
+                          if (isWellness) return 'border-l-red-500';
+                          return 'border-l-blue-500';
+                        };
 
-              return (
-                <motion.div key={quest.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className={`p-6 rounded-xl relative transition-all bg-black/70 backdrop-blur-sm border-y border-r border-white/10 border-l-4 ${getBorderColor()}`}>
-                  <div className="flex justify-between items-start">
-                    <div className="font-['VT323'] text-xl flex-grow">
-                      <h3 className="text-2xl mb-2 flex items-center gap-2 text-white">
-                        {getQuestIcon(quest)}
-                        {quest.title}
-                      </h3>
-                      <p className="text-stone-300 mb-4 text-lg">{quest.description}</p>
-                      <div className="flex gap-3 text-base"><span className="px-2 py-1 bg-blue-900/50 text-blue-300 rounded border border-blue-800">+{quest.xp} XP</span><span className="px-2 py-1 bg-yellow-900/50 text-yellow-300 rounded border border-yellow-800">+{quest.gold} Gold</span></div>
-                    </div>
-                    <div className="flex-shrink-0 w-1/2 ml-4">
+                        return (
+                          <motion.div key={quest.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className={`p-6 rounded-xl relative overflow-hidden transition-all bg-black/85 backdrop-blur-sm border-y border-r border-white/10 border-l-4 ${getBorderColor()}`}>
+                            
+                            {/* PEEKING ARTWORK LAYER */}
+                            {(() => {
+                              let bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
+                              if (quest.type === 'upload' || quest.type === 'journal') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/journal.briefingroom.png";
+                              else if (quest.id === 104) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Sunken.Palace.png";
+                              else if (quest.id === 112) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Alchemists.Lab.png";
+                              else if (quest.id === 113) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Lexicon.Vault.jpg";
+                              else if (quest.id === 114) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Spell.Forge.png";
+                              else if (quest.type === 'multi-step') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Sunken.Lagoon.png";
+                              else if (quest.type === 'incantation') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Haunted.Scriptorium.png";
+                              else if (quest.type === 'scout-sports') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Proving.Grounds.png";
+                              else if (quest.type === 'scout-arts') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Grand.Studio.png";
+                              else if (quest.type === 'gauntlet') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shadow.Dojo.png";
+
+                              return (
+                                <>
+                                  <img src={bgArt} alt={quest.title} className="absolute right-0 top-0 bottom-0 w-1/2 h-full object-cover object-right opacity-35 pointer-events-none z-0" />
+                                  <div className="absolute inset-0 bg-gradient-to-r from-black via-black/85 to-transparent pointer-events-none z-0" />
+                                </>
+                              );
+                            })()}
+
+                            {/* FOREGROUND CARD CONTENT */}
+                            <div className="flex justify-between items-start relative z-10">
+                              <div className="font-['VT323'] text-xl flex-grow max-w-[65%]">
+                                <h3 className="text-2xl mb-2 flex items-center gap-2 text-white">
+                                  {getQuestIcon(quest)}
+                                  {quest.title}
+                                </h3>
+                                <p className="text-stone-300 mb-4 text-lg leading-relaxed">{quest.description}</p>
+                                <div className="flex gap-3 text-base">
+                                  <span className="px-2 py-1 bg-blue-900/50 text-blue-300 rounded border border-blue-800">+{quest.xp} XP</span>
+                                  <span className="px-2 py-1 bg-yellow-900/50 text-yellow-300 rounded border border-yellow-800">+{quest.gold} Gold</span>
+                                </div>
+                              </div>
+
+                              {/* LAUNCHPAD / ACTIONS CONTAINER */}
+                              <div className="flex-shrink-0 w-1/2 md:w-1/3 ml-4 relative z-10">
                       {status === 'available' ? (
                         quest.type === 'incantation' && quest.questionBank?.length > 0 ? (
                           <button onClick={() => navigate('/briefing/' + quest.id)} className="w-full px-4 py-3 bg-gradient-to-r from-cyan-900 to-blue-900 text-cyan-200 border-2 border-cyan-700 rounded-lg shadow-[0_0_15px_rgba(6,182,212,0.4)] font-['Press_Start_2P'] text-xs hover:bg-cyan-900 transition-colors flex items-center justify-center gap-2">
