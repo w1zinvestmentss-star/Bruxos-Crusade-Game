@@ -26,13 +26,24 @@ const LandingPage = () => {
         <video
           ref={videoRef}
           autoPlay
-          muted={true} // Hardcoded to true, global audio player handles sound
+          muted={true}
           playsInline
+          onEnded={(e) => e.currentTarget.pause()}
           className="w-full h-full object-cover"
           crossOrigin="anonymous"
           style={{ pointerEvents: 'none' }} 
         >
-          <source src={VIDEO_URL} type="video/mp4" key={VIDEO_URL} />
+          {/* Mobile Portrait Video (< 768px) */}
+          <source 
+            src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Final.mobile.scene2.mp4" 
+            type="video/mp4" 
+            media="(max-width: 767px)" 
+          />
+          {/* Desktop Widescreen Video Fallback (>= 768px) */}
+          <source 
+            src={VIDEO_URL} 
+            type="video/mp4" 
+          />
         </video>
       </div>
 
