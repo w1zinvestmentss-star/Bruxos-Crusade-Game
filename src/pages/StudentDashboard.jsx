@@ -191,24 +191,10 @@ const StudentDashboard = () => {
       </div>
 
       {/* 2. Top HUD (Heads Up Display) */}
-      <div className="absolute top-0 left-0 w-full p-4 flex justify-between items-start z-50">
-        <div className="flex items-center gap-4 bg-black/60 p-3 rounded-xl border-2 border-stone-600 backdrop-blur-md">
-          <div className="w-12 h-12 bg-indigo-600 rounded-full border-2 border-yellow-400 flex items-center justify-center">
-            <User className="text-white" />
-          </div>
-          <div>
-            <h2 className="text-yellow-400 font-bold font-mono text-sm uppercase">
-              {currentUser ? currentUser.heroName : "Unknown Hero"}
-            </h2>
-           <div className="text-xs text-stone-300 font-mono">
-             Lvl {Math.floor((currentUser?.xp || 0) / 1000) + 1} • {currentUser?.xp || 0} XP
-           </div>
-          </div>
-        </div>
-
+      <div className="absolute top-0 left-0 w-full p-4 flex justify-end items-start z-50 pointer-events-none">
         <button 
           onClick={handleLogout}
-          className="p-2 bg-red-900/80 rounded-lg border border-red-500 text-white hover:bg-red-700 transition-colors cursor-pointer"
+          className="p-2 bg-red-900/80 rounded-lg border border-red-500 text-white hover:bg-red-700 transition-colors cursor-pointer pointer-events-auto"
         >
           <LogOut size={20} />
         </button>
