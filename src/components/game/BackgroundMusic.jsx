@@ -100,7 +100,7 @@ const BackgroundMusic = () => {
   };
 
   return (
-    <div className="fixed bottom-4 left-4 z-50">
+    <div className="fixed bottom-4 right-4 z-50">
       <button
         onClick={toggleMute}
         className="bg-black/50 text-white p-3 rounded-full border border-stone-500"
