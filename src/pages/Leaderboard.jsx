@@ -182,19 +182,26 @@ const Leaderboard = () => {
 
       <div className="max-w-5xl mx-auto bg-black/70 backdrop-blur-md border-2 border-white/10 rounded-xl shadow-2xl overflow-hidden">
 
-        <div className="flex font-['Press_Start_2P'] text-xs sm:text-sm">
-          {TABS.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 py-4 px-1 flex items-center justify-center gap-2 transition-all duration-300 border-b-4 ${activeTab === tab.id
-                  ? 'bg-yellow-600/80 text-white border-yellow-400'
-                  : 'bg-black/40 text-stone-400 hover:bg-white/10 border-transparent'
+        {/* Tab Navigation - Single Line Unwrapped Mobile Bar */}
+        <div className="flex overflow-x-auto border-b border-amber-500/30 mb-6 md:mb-8 pb-1 md:pb-0 custom-scrollbar scrollbar-none whitespace-nowrap">
+          {TABS.map(tab => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-1 min-w-[80px] sm:min-w-0 py-3 px-1.5 sm:px-4 flex items-center justify-center gap-1 sm:gap-1.5 font-['Press_Start_2P'] text-[8px] xs:text-[9px] sm:text-xs md:text-sm whitespace-nowrap transition-all flex-shrink-0 ${
+                  isActive 
+                    ? 'bg-amber-500 text-stone-900 font-bold border-t-2 border-x-2 border-amber-400' 
+                    : 'text-stone-400 hover:text-white hover:bg-stone-800/50'
                 }`}
-            >
-              <tab.icon size={16} /> {tab.label}
-            </button>
-          ))}
+              >
+                <Icon size={14} className="flex-shrink-0 hidden xs:inline sm:inline" />
+                <span className="whitespace-nowrap">{tab.label}</span>
+              </button>
+            );
+          })}
         </div>
 
         <div className="bg-blue-900/20 border border-blue-500/50 rounded-lg p-4 mb-6 mx-4 mt-4 flex items-start gap-4">
