@@ -394,16 +394,17 @@ const QuestBoard = () => {
                         };
 
                         return (
-                          <motion.div key={quest.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className={`p-6 rounded-xl relative overflow-hidden transition-all bg-black/85 backdrop-blur-sm border-y border-r border-white/10 border-l-4 ${getBorderColor()}`}>
+                          <motion.div key={quest.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className={`p-6 rounded-xl relative overflow-hidden transition-all bg-black/70 backdrop-blur-md border-y border-r border-white/10 border-l-4 ${getBorderColor()}`}>
                             
                             {/* PEEKING ARTWORK LAYER */}
                             {(() => {
                               let bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
                               if (quest.type === 'upload' || quest.type === 'journal') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/journal.briefingroom.png";
+                              else if (quest.id === 103) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Hunters.Archives.png"; // Synced to Hunter's Archives
                               else if (quest.id === 104) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Sunken.Palace.png";
                               else if (quest.id === 112) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Alchemists.Lab.png";
                               else if (quest.id === 113) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Lexicon.Vault.jpg";
-                              else if (quest.id === 114) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Spell.Forge.png";
+                              else if (quest.id === 114) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Decipherers.Study.jpg"; // Fixed Spell Forge link
                               else if (quest.type === 'multi-step') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Sunken.Lagoon.png";
                               else if (quest.type === 'incantation') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Haunted.Scriptorium.png";
                               else if (quest.type === 'scout-sports') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Proving.Grounds.png";
@@ -412,7 +413,7 @@ const QuestBoard = () => {
 
                               return (
                                 <>
-                                  <img src={bgArt} alt={quest.title} className="absolute right-0 top-0 bottom-0 w-1/2 h-full object-cover object-right opacity-35 pointer-events-none z-0" />
+                                  <img src={bgArt} alt={quest.title} className="absolute right-0 top-0 bottom-0 w-1/2 h-full object-cover object-right opacity-40 pointer-events-none z-0" />
                                   <div className="absolute inset-0 bg-gradient-to-r from-black via-black/85 to-transparent pointer-events-none z-0" />
                                 </>
                               );
