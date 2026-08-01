@@ -339,6 +339,9 @@ const StudentDashboard = () => {
                 <span className="text-[11px] font-mono text-amber-400 bg-amber-950/80 px-2.5 py-0.5 rounded border border-amber-600/50 shadow-sm flex items-center gap-1">
                   🪙 {currentUser?.gold || 0} G
                 </span>
+                <span className="text-[11px] font-mono text-cyan-300 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/40 flex items-center gap-1">
+                  ⭐ {currentUser?.xp || 0} XP
+                </span>
                 {currentUser?.equippedPet && (
                   <span className="text-[11px] font-mono text-purple-300 bg-purple-950/80 px-2.5 py-0.5 rounded border border-purple-500/40 shadow-sm flex items-center gap-1">
                     🐾 {currentUser.equippedPet}
