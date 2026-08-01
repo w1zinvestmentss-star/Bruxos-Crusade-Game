@@ -299,19 +299,18 @@ const QuestBoard = () => {
             </div>
           </div>
 
-          {/* SECTOR FILTER TABS */}
-          <div className="flex overflow-x-auto justify-center gap-2 mb-10 pb-2 custom-scrollbar no-scrollbar max-w-3xl mx-auto">
+          {/* SECTOR FILTER TABS (Consolidated 4-Tab Navigation) */}
+          <div className="flex overflow-x-auto justify-center gap-2 sm:gap-3 mb-10 pb-2 custom-scrollbar no-scrollbar max-w-3xl mx-auto">
             {[
-              { id: 'all', label: 'ALL BOUNTIES' },
+              { id: 'all', label: 'ALL QUESTS' },
               { id: 'speed', label: '⚡ SPEED RUNS' },
-              { id: 'academics', label: '📖 ACADEMICS' },
-              { id: 'scout', label: '🎨 SCOUT REPORTS' },
+              { id: 'uploads', label: '📋 UPLOADS & REPORTS' },
               { id: 'sanctuary', label: '🌿 SANCTUARY' }
             ].map(sector => (
               <button
                 key={sector.id}
                 onClick={() => setActiveSector(sector.id)}
-                className={`px-4 py-2.5 rounded-lg font-['Press_Start_2P'] text-[9px] whitespace-nowrap transition-all flex items-center gap-2 ${
+                className={`px-4 py-2.5 rounded-lg font-['Press_Start_2P'] text-[9px] sm:text-[10px] whitespace-nowrap transition-all flex items-center gap-2 ${
                   activeSector === sector.id 
                     ? 'bg-yellow-500 text-stone-950 font-bold border-2 border-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.4)]' 
                     : 'bg-black/60 text-stone-400 border border-stone-700 hover:text-white hover:bg-stone-800'
@@ -355,10 +354,9 @@ const QuestBoard = () => {
           ) : (
             <div>
               {Object.keys(QUEST_CATEGORIES).map(categoryKey => {
-                // Sector Filtering Guard
-                if (activeSector === 'speed' && !['blitz', 'gauntlet', 'incantation'].includes(categoryKey)) return null;
-                if (activeSector === 'academics' && !['upload', 'multi-step', 'quiz'].includes(categoryKey)) return null;
-                if (activeSector === 'scout' && !['scout-sports', 'scout-arts'].includes(categoryKey)) return null;
+                // Sector Filtering Guard (Consolidated 4-Tab System)
+                if (activeSector === 'speed' && !['blitz', 'gauntlet', 'incantation', 'multi-step'].includes(categoryKey)) return null;
+                if (activeSector === 'uploads' && !['upload', 'quiz', 'scout-sports', 'scout-arts'].includes(categoryKey)) return null; // Combined Uploads & Scout Reports
                 if (activeSector === 'sanctuary' && !['wellness', 'journal'].includes(categoryKey)) return null;
 
                 const categoryQuests = quests.filter(q => q.type === categoryKey);

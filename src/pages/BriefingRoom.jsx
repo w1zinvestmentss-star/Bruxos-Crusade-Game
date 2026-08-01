@@ -8,7 +8,7 @@ const THEMES = {
     bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/journal.briefingroom.png',
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/scribe_npc.png',
     title: 'Journal Briefing',
-    dialogue: 'Welcome, Hero. To grow your power, we must chronicle your journey. Record your thoughts in your journal.'
+    dialogue: 'Welcome, Hero. Do not rely on mechanical brains or artificial magic here! Speak freely from your own heart—the King wants to hear your true human voice.'
   },
   incantation: { 
     bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Haunted.Scriptorium.png', 
@@ -629,17 +629,50 @@ const BriefingRoom = () => {
                 Record Your Journey
               </h1>
               <p className="font-['VT323'] text-xl text-stone-300 mb-6">
-                Write your reflection, then submit it for Game Master review.
+                Write your daily reflection below (minimum 100 characters). Express what is on your mind today!
               </p>
+              
+              {/* GAME MASTER'S HUMAN-WRITING DECREE */}
+              <div className="bg-yellow-950/30 border border-yellow-500/40 rounded-lg p-3 text-center mb-4">
+                <p className="text-xs font-mono text-yellow-300 italic leading-relaxed">
+                  ✦ GAME MASTER'S DECREE: Do not use AI or machines to write for you! Express your own real, human thoughts freely—your genuine voice is what matters most.
+                </p>
+              </div>
+
               <textarea
                 value={journalText}
                 onChange={(event) => setJournalText(event.target.value)}
-                placeholder="Write your journal entry here..."
+                onPaste={(e) => {
+                  e.preventDefault();
+                  alert("Pasting text is disabled! Please type out your reflection to practice your writing.");
+                }}
+                placeholder="Write your daily reflection here (minimum 100 characters)..."
                 className="w-full h-56 bg-stone-950/90 border-2 border-yellow-500/40 rounded-lg p-4 text-stone-100 font-['VT323'] text-xl focus:outline-none focus:border-yellow-300 resize-none"
               />
-              <button onClick={handleSubmit} className="mt-6 w-full px-8 py-4 bg-gradient-to-r from-red-800 to-yellow-600 text-white rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base hover:from-red-700 hover:to-yellow-500 transition-colors">
-                SUBMIT ENTRY
-              </button>
+              
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4">
+                <span className={`text-base font-mono font-bold ${journalText.trim().length < 100 ? 'text-red-400' : 'text-green-400'}`}>
+                  {journalText.trim().length} / 100 Characters Required
+                </span>
+                
+                <button 
+                  onClick={() => {
+                    if (journalText.trim().length < 100) {
+                      alert(`Your reflection must be at least 100 characters long! Current length: ${journalText.trim().length} / 100`);
+                      return;
+                    }
+                    handleSubmit();
+                  }} 
+                  disabled={journalText.trim().length < 100}
+                  className={`w-full sm:w-auto px-8 py-4 rounded-lg shadow-lg font-['Press_Start_2P'] text-sm md:text-base transition-all ${
+                    journalText.trim().length < 100 
+                      ? 'bg-stone-800 text-stone-500 border border-stone-700 cursor-not-allowed' 
+                      : 'bg-gradient-to-r from-red-800 to-yellow-600 hover:from-red-700 hover:to-yellow-500 text-white border-2 border-yellow-400 cursor-pointer shadow-[0_0_15px_rgba(202,138,4,0.4)]'
+                  }`}
+                >
+                  SUBMIT ENTRY
+                </button>
+              </div>
             </div>
           )}
         </div>

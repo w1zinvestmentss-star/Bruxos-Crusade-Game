@@ -359,7 +359,16 @@ export function GameProvider({ children }) {
       timeLimit: 120,
       questionBank: INCANTATION_BANK
     },
-    { id: 106, title: "Weekly Reflection", description: "Write a short paragraph about what you learned this week.", xp: 30, gold: 10, type: 'journal', frequency: 'weekly', unlockDate: '2025-01-01' },
+    { 
+      id: 106, 
+      title: "Daily Reflection", 
+      description: "Write a short paragraph about what you learned or experienced today. Express your thoughts freely!", 
+      xp: 20, 
+      gold: 10, 
+      type: 'journal', 
+      frequency: 'daily', 
+      unlockDate: null 
+    },
     {
       id: 111,
       title: "Trial of the Hydra",
