@@ -57,7 +57,7 @@ const QuestBoard = () => {
   const [sessionAnswers, setSessionAnswers] = useState({});
   const [activeScenarios, setActiveScenarios] = useState({});
 
-  const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
+  const QUESTBOARD_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/questboard.background3.jpg";
 
   const triggerVictory = (message) => {
     const randomQuote = VICTORY_QUOTES[Math.floor(Math.random() * VICTORY_QUOTES.length)];
@@ -264,8 +264,15 @@ const QuestBoard = () => {
 
   return (
     <div className="min-h-screen text-stone-200 p-6 relative">
-      <img src={MAP_BG} alt="Background Map" className="absolute inset-0 w-full h-full object-cover" />
-      <div className="absolute inset-0 bg-black/80"></div>
+      {/* Fixed Viewport Background (Prevents stretching/wrapping on long pages) */}
+      <div className="fixed inset-0 z-0 h-full w-full overflow-hidden pointer-events-none">
+        <img 
+          src={QUESTBOARD_BG} 
+          alt="Quest Board Background" 
+          className="w-full h-full object-cover" 
+        />
+        <div className="absolute inset-0 bg-black/80"></div>
+      </div>
 
       <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileSelect}/>
 
