@@ -8,7 +8,7 @@ const Barracks = () => {
 const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equipPet, unequipPet, applyVoidGrasp, quests, students, globalEffects } = useGame();
    const [selectedGraspTarget, setSelectedGraspTarget] = React.useState('');
 
-  const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
+  const BARRACKS_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Barracks.background1.jpg";
 
   const shopItems =[
     // LEVEL 1: The Survivor Collection (Cost: 50, Level Req: 1)
@@ -107,8 +107,15 @@ const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equi
 
   return (
     <div className="min-h-screen p-4 md:p-8 relative">
-      <img src={MAP_BG} alt="Background Map" className="absolute inset-0 w-full h-full object-cover" />
-      <div className="absolute inset-0 bg-black/50"></div>
+      {/* Fixed Viewport Background (Prevents stretching/warping on long pages) */}
+      <div className="fixed inset-0 z-0 h-full w-full overflow-hidden pointer-events-none">
+        <img 
+          src={BARRACKS_BG} 
+          alt="Barracks Background" 
+          className="w-full h-full object-cover" 
+        />
+        <div className="absolute inset-0 bg-black/60"></div>
+      </div>
 
       <div className="relative z-10">
         <div className="mb-6 flex items-center gap-4">
