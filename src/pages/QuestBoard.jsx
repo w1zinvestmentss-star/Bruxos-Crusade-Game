@@ -399,17 +399,22 @@ const QuestBoard = () => {
                         };
 
                         return (
-                          <motion.div key={quest.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className={`p-6 rounded-xl relative overflow-hidden transition-all bg-black/70 backdrop-blur-md border-y border-r border-white/10 border-l-4 ${getBorderColor()}`}>
+                          <motion.div 
+                            key={quest.id} 
+                            initial={{ opacity: 0, y: 20 }} 
+                            animate={{ opacity: 1, y: 0 }} 
+                            className={`p-6 rounded-xl relative overflow-hidden transition-all bg-stone-950/85 backdrop-blur-md border-t border-t-white/25 border-r border-b border-white/10 border-l-4 ${getBorderColor()} shadow-[0_10px_30px_rgba(0,0,0,0.9)]`}
+                          >
                             
-                            {/* PEEKING ARTWORK LAYER */}
+                            {/* PEEKING ARTWORK LAYER - Boosted Opacity */}
                             {(() => {
                               let bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
                               if (quest.type === 'upload' || quest.type === 'journal') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/journal.briefingroom.png";
-                              else if (quest.id === 103) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Hunters.Archives.png"; // Synced to Hunter's Archives
+                              else if (quest.id === 103) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Hunters.Archives.png";
                               else if (quest.id === 104) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Sunken.Palace.png";
                               else if (quest.id === 112) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Alchemists.Lab.png";
                               else if (quest.id === 113) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Lexicon.Vault.jpg";
-                              else if (quest.id === 114) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Decipherers.Study.jpg"; // Fixed Spell Forge link
+                              else if (quest.id === 114) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Decipherers.Study.jpg";
                               else if (quest.type === 'multi-step') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Sunken.Lagoon.png";
                               else if (quest.type === 'incantation') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Haunted.Scriptorium.png";
                               else if (quest.type === 'scout-sports') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Proving.Grounds.png";
@@ -418,8 +423,8 @@ const QuestBoard = () => {
 
                               return (
                                 <>
-                                  <img src={bgArt} alt={quest.title} className="absolute right-0 top-0 bottom-0 w-1/2 h-full object-cover object-right opacity-40 pointer-events-none z-0" />
-                                  <div className="absolute inset-0 bg-gradient-to-r from-black via-black/85 to-transparent pointer-events-none z-0" />
+                                  <img src={bgArt} alt={quest.title} className="absolute right-0 top-0 bottom-0 w-1/2 h-full object-cover object-right opacity-55 pointer-events-none z-0" />
+                                  <div className="absolute inset-0 bg-gradient-to-r from-stone-950 via-stone-950/90 to-transparent pointer-events-none z-0" />
                                 </>
                               );
                             })()}
@@ -427,14 +432,14 @@ const QuestBoard = () => {
                             {/* FOREGROUND CARD CONTENT */}
                             <div className="flex justify-between items-start relative z-10">
                               <div className="font-['VT323'] text-xl flex-grow max-w-[65%]">
-                                <h3 className="text-2xl mb-2 flex items-center gap-2 text-white">
+                                <h3 className="text-2xl mb-2 flex items-center gap-2 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                                   {getQuestIcon(quest)}
                                   {quest.title}
                                 </h3>
-                                <p className="text-stone-300 mb-4 text-lg leading-relaxed">{quest.description}</p>
+                                <p className="text-stone-200 mb-4 text-lg leading-relaxed drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{quest.description}</p>
                                 <div className="flex gap-3 text-base">
-                                  <span className="px-2 py-1 bg-blue-900/50 text-blue-300 rounded border border-blue-800">+{quest.xp} XP</span>
-                                  <span className="px-2 py-1 bg-yellow-900/50 text-yellow-300 rounded border border-yellow-800">+{quest.gold} Gold</span>
+                                  <span className="px-2 py-1 bg-blue-900/60 text-blue-300 rounded border border-blue-700/80 shadow-sm">+{quest.xp} XP</span>
+                                  <span className="px-2 py-1 bg-yellow-900/60 text-yellow-300 rounded border border-yellow-700/80 shadow-sm">+{quest.gold} Gold</span>
                                 </div>
                               </div>
 
