@@ -7,6 +7,7 @@ const Barracks = () => {
   const navigate = useNavigate();
 const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equipPet, unequipPet, applyVoidGrasp, quests, students, globalEffects } = useGame();
    const [selectedGraspTarget, setSelectedGraspTarget] = React.useState('');
+   const [activeCategory, setActiveCategory] = React.useState('all');
 
   const BARRACKS_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Barracks.background1.jpg";
 
@@ -294,204 +295,250 @@ const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equi
           {/* Armory Glass Container */}
           <div className="md:col-span-2 bg-black/75 backdrop-blur-md border border-white/10 shadow-2xl rounded-xl p-6">
             <h2 className="text-2xl text-yellow-400 font-['Press_Start_2P'] mb-4">THE ARMORY</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {shopItems.filter(item => item.type === 'outfit').map((item) => {
-                const alreadyOwned = ownsItem(item.id);
-                const isLevelLocked = currentLevel < item.reqLevel;
-                const isBossLoot = !!item.reqBoss;
-                
-                return (
-                  <div key={item.id} className="bg-white/5 border border-white/10 rounded-lg p-4 hover:border-yellow-400/50 transition-colors flex flex-col justify-between">
-                    <div className="flex flex-col items-center text-center mb-3">
-                      <div className="w-full h-32 mb-2 rounded-lg bg-black/80 flex items-center justify-center overflow-hidden">
-                         <img src={item.imageLink} alt={item.name} className="h-full w-full object-contain"/>
-                      </div>
-                      <h3 className="text-xl font-bold text-white font-['VT323'] mb-1">{item.name}</h3>
-                      {item.type === 'pet' && item.buff && (<div className="text-green-400 font-mono text-xs mb-1 min-h-[1rem] leading-tight px-1">{item.buff}</div>)}
-                      {isBossLoot ? (
-                        <div className="text-purple-400 font-mono text-sm font-bold">BOSS LOOT</div>
-                      ) : (
-                        <div className="text-yellow-400 font-['VT323'] text-xl">{item.cost} G</div>
-                      )}
-                    </div>
-                    {isBossLoot ? (
-                      <button
-                        disabled={true}
-                        className={`w-full py-2 px-4 rounded-lg font-bold font-mono transition-colors ${
-                          alreadyOwned ? 'bg-stone-600 text-stone-400 cursor-not-allowed text-sm' : 'bg-purple-900/50 text-purple-300 border border-purple-700 cursor-not-allowed text-xs'
-                        }`}
-                      >
-                        {alreadyOwned ? 'OWNED' : `Defeat ${item.reqBoss}`}
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleBuyItem(item)}
-                        disabled={alreadyOwned || currentUser.gold < item.cost || isLevelLocked}
-                        className={`w-full py-2 px-4 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
-                          isLevelLocked ? 'bg-stone-800 text-stone-500 cursor-not-allowed' : alreadyOwned ? 'bg-stone-600 text-stone-400 cursor-not-allowed' : currentUser.gold < item.cost ? 'bg-red-900/50 text-red-300 cursor-not-allowed' : 'bg-yellow-600 hover:bg-yellow-500 text-white'
-                        }`}
-                      >
-                        {isLevelLocked ? `Lvl ${item.reqLevel} Req` : alreadyOwned ? 'OWNED' : 'BUY'}
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
+            
+            {/* ARMORY CATEGORY FILTER TABS */}
+            <div className="flex overflow-x-auto gap-2 mb-6 pb-2 custom-scrollbar no-scrollbar">
+              {[
+                { id: 'all', label: 'ALL ITEMS' },
+                { id: 'outfits', label: '🛡️ OUTFITS' },
+                { id: 'pets', label: '🐾 COMPANIONS' },
+                { id: 'spells', label: '🔮 MAGIC SPELLS' }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveCategory(tab.id)}
+                  className={`px-4 py-2 rounded-lg font-['Press_Start_2P'] text-[9px] sm:text-[10px] whitespace-nowrap transition-all flex items-center gap-2 ${
+                    activeCategory === tab.id 
+                      ? 'bg-yellow-500 text-stone-950 font-bold border-2 border-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.4)]' 
+                      : 'bg-black/60 text-stone-400 border border-stone-700 hover:text-white hover:bg-stone-800'
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                </button>
+              ))}
             </div>
 
-            {/* Companions Section */}
-            <div className="mt-12">
-              <h2 className="text-2xl text-yellow-400 font-['Press_Start_2P'] mb-2 uppercase">COMPANIONS</h2>
-              <p className="text-stone-400 font-['VT323'] text-xl mb-6">Loyal familiars that grant passive bonuses to your quests.</p>
+            {/* Outfits Section Guard */}
+            {(activeCategory === 'all' || activeCategory === 'outfits') && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {shopItems.filter(item => item.type === 'pet').map((item) => {
+                {shopItems.filter(item => item.type === 'outfit').map((item) => {
                   const alreadyOwned = ownsItem(item.id);
+                  const isLevelLocked = currentLevel < item.reqLevel;
+                  const isBossLoot = !!item.reqBoss;
+                  const isEquipped = currentUser?.currentBodySprite === item.imageLink;
+                  
                   return (
                     <div key={item.id} className="bg-white/5 border border-white/10 rounded-lg p-4 hover:border-yellow-400/50 transition-colors flex flex-col justify-between">
                       <div className="flex flex-col items-center text-center mb-3">
                         <div className="w-full h-32 mb-2 rounded-lg bg-black/80 flex items-center justify-center overflow-hidden">
-                           <img src={item.imageLink} alt={item.name} className="h-full w-full object-contain mix-blend-normal"/>
+                           <img src={item.imageLink} alt={item.name} className="h-full w-full object-contain"/>
                         </div>
                         <h3 className="text-xl font-bold text-white font-['VT323'] mb-1">{item.name}</h3>
-                        {item.buff && <div className="text-green-400 font-mono text-xs mb-1 leading-tight">{item.buff}</div>}
-                        <div className="text-yellow-400 font-['VT323'] text-xl mt-1">{item.cost} G</div>
+                        {item.type === 'pet' && item.buff && (<div className="text-green-400 font-mono text-xs mb-1 min-h-[1rem] leading-tight px-1">{item.buff}</div>)}
+                        {isBossLoot ? (
+                          <div className="text-purple-400 font-mono text-sm font-bold">BOSS LOOT</div>
+                        ) : (
+                          <div className="text-yellow-400 font-['VT323'] text-xl">{item.cost} G</div>
+                        )}
                       </div>
-                      <button
-                        onClick={() => handleBuyItem(item)}
-                        disabled={alreadyOwned || currentUser.gold < item.cost}
-                        className={`w-full py-2 px-4 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
-                          alreadyOwned ? 'bg-stone-600 text-stone-400 cursor-not-allowed' : currentUser.gold < item.cost ? 'bg-red-900/50 text-red-300 cursor-not-allowed' : 'bg-yellow-600 hover:bg-yellow-500 text-white'
-                        }`}
-                      >
-                        {alreadyOwned ? 'OWNED' : 'BUY'}
-                      </button>
+                      {isBossLoot ? (
+                        <button
+                          disabled={true}
+                          className={`w-full py-2 px-4 rounded-lg font-bold font-mono transition-colors ${
+                            isEquipped
+                              ? 'bg-green-600/30 text-green-400 border border-green-500/80 shadow-[0_0_10px_rgba(34,197,94,0.3)] cursor-default text-xs'
+                              : alreadyOwned 
+                              ? 'bg-stone-600 text-stone-400 cursor-not-allowed text-sm' 
+                              : 'bg-purple-900/50 text-purple-300 border border-purple-700 cursor-not-allowed text-xs'
+                          }`}
+                        >
+                          {isEquipped ? '✅ EQUIPPED' : alreadyOwned ? 'OWNED' : `Defeat ${item.reqBoss}`}
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleBuyItem(item)}
+                          disabled={alreadyOwned || currentUser.gold < item.cost || isLevelLocked}
+                          className={`w-full py-2 px-4 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
+                            isLevelLocked 
+                              ? 'bg-stone-800 text-stone-500 cursor-not-allowed' 
+                              : isEquipped 
+                              ? 'bg-green-600/30 text-green-400 border border-green-500/80 shadow-[0_0_10px_rgba(34,197,94,0.3)] cursor-default' 
+                              : alreadyOwned 
+                              ? 'bg-stone-600 text-stone-400 cursor-not-allowed' 
+                              : currentUser.gold < item.cost 
+                              ? 'bg-red-900/50 text-red-300 cursor-not-allowed' 
+                              : 'bg-yellow-600 hover:bg-yellow-500 text-white'
+                          }`}
+                        >
+                          {isLevelLocked ? `Lvl ${item.reqLevel} Req` : isEquipped ? '✅ EQUIPPED' : alreadyOwned ? 'OWNED' : 'BUY'}
+                        </button>
+                      )}
                     </div>
                   );
                 })}
               </div>
-            </div>
+            )}
 
-            {/* Magic Spells Section */}
-            <div className="mt-12 bg-black/75 backdrop-blur-md border border-white/10 shadow-2xl rounded-xl p-6">
-              <h2 className="text-2xl text-purple-400 font-['Press_Start_2P'] mb-4">MAGIC SPELLS</h2>
-              <p className="text-stone-400 font-['VT323'] text-lg mb-4">Consumable enchantments that grant powerful, one-time effects during your quests.</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {shopItems.filter(item => item.type === 'consumable').map((item) => {
-                  const alreadyOwned = false;
-                  return (
-                    <div key={item.id} className="bg-white/5 border border-white/10 rounded-lg p-4 hover:border-purple-400/50 transition-colors flex flex-col justify-between">
-                      <div className="flex flex-col items-center text-center mb-3">
-                        <div className="w-full h-32 mb-2 rounded-lg bg-black/80 flex items-center justify-center overflow-hidden">
-                          <img src={item.imageLink} alt={item.name} className="h-full w-full object-contain"/>
+            {/* Companions Section */}
+            {(activeCategory === 'all' || activeCategory === 'pets') && (
+              <div className="mt-12">
+                <h2 className="text-2xl text-yellow-400 font-['Press_Start_2P'] mb-2 uppercase">COMPANIONS</h2>
+                <p className="text-stone-400 font-['VT323'] text-xl mb-6">Loyal familiars that grant passive bonuses to your quests.</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {shopItems.filter(item => item.type === 'pet').map((item) => {
+                    const alreadyOwned = ownsItem(item.id);
+                    return (
+                      <div key={item.id} className="bg-white/5 border border-white/10 rounded-lg p-4 hover:border-yellow-400/50 transition-colors flex flex-col justify-between">
+                        <div className="flex flex-col items-center text-center mb-3">
+                          <div className="w-full h-32 mb-2 rounded-lg bg-black/80 flex items-center justify-center overflow-hidden">
+                             <img src={item.imageLink} alt={item.name} className="h-full w-full object-contain mix-blend-normal"/>
+                          </div>
+                          <h3 className="text-xl font-bold text-white font-['VT323'] mb-1">{item.name}</h3>
+                          {item.buff && <div className="text-green-400 font-mono text-xs mb-1 leading-tight">{item.buff}</div>}
+                          <div className="text-yellow-400 font-['VT323'] text-xl mt-1">{item.cost} G</div>
                         </div>
-                        <h3 className="text-xl font-bold text-white font-['VT323'] mb-1">{item.name}</h3>
-                        <div className="text-purple-400 font-['VT323'] text-sm mb-1">
-                          {item.buffType === 'ember' ? '2x XP for 24 Hours' : '4x XP/Gold on next success'}
-                        </div>
-                        {item.buffType === 'ember' && (
-                          <div className="text-red-400 font-['VT323'] text-xs italic">"Only use if you have fallen behind!"</div>
-                        )}
-                        <div className="text-yellow-400 font-['VT323'] text-xl">{item.cost} G</div>
-                      </div>
-                      {(() => {
-                        const limitKey = item.buffType === 'oath' ? 'spellOathCount' : 'spellEmberCount';
-                        const remainingCasts = 10 - (currentUser[limitKey] || 0);
-                        const isLimitReached = remainingCasts <= 0;
-                        const isButtonDisabled = currentUser.gold < item.cost || isLimitReached;
-
-                        return (
-                          <button
-                            onClick={() => {
-                              if (isLimitReached) return alert(`You have exhausted all 10 ${item.name} charges!`);
-                              handleBuyItem(item);
-                            }}
-                            disabled={isButtonDisabled}
-                            className={`w-full py-2 px-4 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
-                              isButtonDisabled 
-                                ? 'bg-stone-800 text-stone-500 cursor-not-allowed' 
-                                : 'bg-purple-600 hover:bg-purple-500 text-white'
-                            }`}
-                          >
-                            {isLimitReached 
-                              ? 'DEPLETED (0/10 Left)' 
-                              : `CAST SPELL (${item.cost} G) [${remainingCasts}/10 Left]`
-                            }
-                          </button>
-                        );
-                      })()}
+                        <button
+                          onClick={() => handleBuyItem(item)}
+                          disabled={alreadyOwned || currentUser.gold < item.cost}
+                          className={`w-full py-2 px-4 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
+                            alreadyOwned ? 'bg-stone-600 text-stone-400 cursor-not-allowed' : currentUser.gold < item.cost ? 'bg-red-900/50 text-red-300 cursor-not-allowed' : 'bg-yellow-600 hover:bg-yellow-500 text-white'
+                          }`}
+                        >
+                          {alreadyOwned ? 'OWNED' : 'BUY'}
+                        </button>
                       </div>
                     );
                   })}
                 </div>
               </div>
+            )}
 
-            {/* Dark Magic (PvP) Section */}
-            <div className="mt-12 bg-black/75 backdrop-blur-md border border-red-900/50 shadow-2xl rounded-xl p-6">
-               <h2 className="text-2xl text-red-500 font-['Press_Start_2P'] mb-4">DARK MAGIC</h2>
-               <p className="text-stone-400 font-['VT323'] text-lg mb-4">Dangerous spells that affect other students.</p>
-               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
-                 {shopItems.filter(item => item.type === 'pvp').map((item) => {
-                   return (
-                     <div key={item.id} className="bg-white/5 border border-white/10 rounded-lg p-4 hover:border-red-500/50 transition-colors flex flex-col justify-between">
-                       <div className="flex flex-col items-center text-center mb-3">
-                         <div className="w-full h-32 mb-2 rounded-lg bg-black/80 flex items-center justify-center overflow-hidden">
-                           <img src={item.imageLink} alt={item.name} className="h-full w-full object-contain"/>
-                         </div>
-                         <h3 className="text-xl font-bold text-red-500 font-['VT323'] mb-1">{item.name}</h3>
-                         <div className="text-red-400 font-['VT323'] text-sm mb-1">
-                           Lock the Leaderboard Top 3 out of Quests!
-                         </div>
-                         <div className="text-yellow-400 font-['VT323'] text-xl mb-4">{item.cost} G</div>
-                       </div>
-
-                        <div className="flex flex-col gap-2">
-                          <select
-                            value={selectedGraspTarget}
-                            onChange={(e) => setSelectedGraspTarget(e.target.value)}
-                            className="bg-black/80 text-stone-300 border border-stone-600 rounded p-2 font-['VT323'] text-lg w-full"
-                          >
-                            <option value="">Select a Target...</option>
-                            {[...students]
-                              .sort((a, b) => b.xp - a.xp)
-                              .slice(0, 3)
-                              .filter(s => s.id !== currentUser.id)
-                              .map(s => (
-                                <option key={s.id} value={s.id}>{s.heroName || s.name}</option>
-                              ))}
-                          </select>
+            {/* Magic Spells & Dark Magic Section Guard */}
+            {(activeCategory === 'all' || activeCategory === 'spells') && (
+              <>
+                {/* Magic Spells Section */}
+                <div className="mt-12 bg-black/75 backdrop-blur-md border border-white/10 shadow-2xl rounded-xl p-6">
+                  <h2 className="text-2xl text-purple-400 font-['Press_Start_2P'] mb-4">MAGIC SPELLS</h2>
+                  <p className="text-stone-400 font-['VT323'] text-lg mb-4">Consumable enchantments that grant powerful, one-time effects during your quests.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {shopItems.filter(item => item.type === 'consumable').map((item) => {
+                      const alreadyOwned = false;
+                      return (
+                        <div key={item.id} className="bg-white/5 border border-white/10 rounded-lg p-4 hover:border-purple-400/50 transition-colors flex flex-col justify-between">
+                          <div className="flex flex-col items-center text-center mb-3">
+                            <div className="w-full h-32 mb-2 rounded-lg bg-black/80 flex items-center justify-center overflow-hidden">
+                              <img src={item.imageLink} alt={item.name} className="h-full w-full object-contain"/>
+                            </div>
+                            <h3 className="text-xl font-bold text-white font-['VT323'] mb-1">{item.name}</h3>
+                            <div className="text-purple-400 font-['VT323'] text-sm mb-1">
+                              {item.buffType === 'ember' ? '2x XP for 24 Hours' : '4x XP/Gold on next success'}
+                            </div>
+                            {item.buffType === 'ember' && (
+                              <div className="text-red-400 font-['VT323'] text-xs italic">"Only use if you have fallen behind!"</div>
+                            )}
+                            <div className="text-yellow-400 font-['VT323'] text-xl">{item.cost} G</div>
+                          </div>
                           {(() => {
-                            const remainingCasts = 10 - (currentUser.voidGraspCount || 0);
+                            const limitKey = item.buffType === 'oath' ? 'spellOathCount' : 'spellEmberCount';
+                            const remainingCasts = 10 - (currentUser[limitKey] || 0);
                             const isLimitReached = remainingCasts <= 0;
-                            const isButtonDisabled = currentUser.gold < item.cost || !selectedGraspTarget || isLimitReached;
+                            const isButtonDisabled = currentUser.gold < item.cost || isLimitReached;
 
                             return (
                               <button
-                                onClick={async () => {
-                                  if (isLimitReached) return alert("You have exhausted all 10 Voidwalker's Grasp charges!");
-                                  if (!selectedGraspTarget) return alert('Select a target first!');
-                                  const res = await applyVoidGrasp(selectedGraspTarget);
-                                  alert(res.message);
+                                onClick={() => {
+                                  if (isLimitReached) return alert(`You have exhausted all 10 ${item.name} charges!`);
+                                  handleBuyItem(item);
                                 }}
                                 disabled={isButtonDisabled}
                                 className={`w-full py-2 px-4 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
-                                  isButtonDisabled
-                                    ? 'bg-stone-800 text-stone-500 cursor-not-allowed'
-                                    : 'bg-red-700 hover:bg-red-600 text-white'
+                                  isButtonDisabled 
+                                    ? 'bg-stone-800 text-stone-500 cursor-not-allowed' 
+                                    : 'bg-purple-600 hover:bg-purple-500 text-white'
                                 }`}
                               >
-                                {isLimitReached
-                                  ? 'DEPLETED (0/10 Left)'
-                                  : `CAST (${item.cost} G) [${remainingCasts}/10 Left]`
+                                {isLimitReached 
+                                  ? 'DEPLETED (0/10 Left)' 
+                                  : `CAST SPELL (${item.cost} G) [${remainingCasts}/10 Left]`
                                 }
                               </button>
                             );
                           })()}
-                        </div>
-                     </div>
-                   );
-                 })}
-               </div>
-             </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                {/* Dark Magic (PvP) Section */}
+                <div className="mt-12 bg-black/75 backdrop-blur-md border border-red-900/50 shadow-2xl rounded-xl p-6">
+                   <h2 className="text-2xl text-red-500 font-['Press_Start_2P'] mb-4">DARK MAGIC</h2>
+                   <p className="text-stone-400 font-['VT323'] text-lg mb-4">Dangerous spells that affect other students.</p>
+                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
+                     {shopItems.filter(item => item.type === 'pvp').map((item) => {
+                       return (
+                         <div key={item.id} className="bg-white/5 border border-white/10 rounded-lg p-4 hover:border-red-500/50 transition-colors flex flex-col justify-between">
+                           <div className="flex flex-col items-center text-center mb-3">
+                             <div className="w-full h-32 mb-2 rounded-lg bg-black/80 flex items-center justify-center overflow-hidden">
+                               <img src={item.imageLink} alt={item.name} className="h-full w-full object-contain"/>
+                             </div>
+                             <h3 className="text-xl font-bold text-red-500 font-['VT323'] mb-1">{item.name}</h3>
+                             <div className="text-red-400 font-['VT323'] text-sm mb-1">
+                               Lock the Leaderboard Top 3 out of Quests!
+                             </div>
+                             <div className="text-yellow-400 font-['VT323'] text-xl mb-4">{item.cost} G</div>
+                           </div>
+
+                            <div className="flex flex-col gap-2">
+                              <select
+                                value={selectedGraspTarget}
+                                onChange={(e) => setSelectedGraspTarget(e.target.value)}
+                                className="bg-black/80 text-stone-300 border border-stone-600 rounded p-2 font-['VT323'] text-lg w-full"
+                              >
+                                <option value="">Select a Target...</option>
+                                {[...students]
+                                  .sort((a, b) => b.xp - a.xp)
+                                  .slice(0, 3)
+                                  .filter(s => s.id !== currentUser.id)
+                                  .map(s => (
+                                    <option key={s.id} value={s.id}>{s.heroName || s.name}</option>
+                                  ))}
+                              </select>
+                              {(() => {
+                                const remainingCasts = 10 - (currentUser.voidGraspCount || 0);
+                                const isLimitReached = remainingCasts <= 0;
+                                const isButtonDisabled = currentUser.gold < item.cost || !selectedGraspTarget || isLimitReached;
+
+                                return (
+                                  <button
+                                    onClick={async () => {
+                                      if (isLimitReached) return alert("You have exhausted all 10 Voidwalker's Grasp charges!");
+                                      if (!selectedGraspTarget) return alert('Select a target first!');
+                                      const res = await applyVoidGrasp(selectedGraspTarget);
+                                      alert(res.message);
+                                    }}
+                                    disabled={isButtonDisabled}
+                                    className={`w-full py-2 px-4 rounded-lg font-bold font-['VT323'] text-xl transition-colors ${
+                                      isButtonDisabled
+                                        ? 'bg-stone-800 text-stone-500 cursor-not-allowed'
+                                        : 'bg-red-700 hover:bg-red-600 text-white'
+                                    }`}
+                                  >
+                                    {isLimitReached
+                                      ? 'DEPLETED (0/10 Left)'
+                                      : `CAST (${item.cost} G) [${remainingCasts}/10 Left]`
+                                    }
+                                  </button>
+                                );
+                              })()}
+                            </div>
+                         </div>
+                       );
+                     })}
+                   </div>
+                 </div>
+              </>
+            )}
 
           </div>
         </div>
