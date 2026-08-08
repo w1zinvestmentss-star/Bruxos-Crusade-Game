@@ -9,12 +9,12 @@ const TrophyRoom = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [claimingId, setClaimingId] = useState(null);
 
-  const MAP_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
+  const TROPHYROOM_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Halloftriumphs.background.png";
 
   if (!currentUser) {
     return (
       <div className="min-h-screen flex items-center justify-center text-stone-200 font-['VT323'] relative">
-        <img src={MAP_BG} alt="Background Map" className="absolute inset-0 w-full h-full object-cover" />
+        <img src={TROPHYROOM_BG} alt="Hall of Triumphs Background" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-black/80"></div>
         <div className="relative z-10 text-center bg-black/70 p-8 rounded-xl border border-white/10">
           <p className="text-2xl">The Hall of Triumphs awaits, but you must be logged in.</p>
@@ -94,8 +94,15 @@ const TrophyRoom = () => {
 
   return (
     <div className="min-h-screen text-stone-200 p-4 sm:p-6 md:p-8 relative">
-      <img src={MAP_BG} alt="Background Map" className="absolute inset-0 w-full h-full object-cover" />
-      <div className="absolute inset-0 bg-black/80"></div>
+      {/* Fixed Viewport Background (Prevents stretching/wrapping on long pages) */}
+      <div className="fixed inset-0 z-0 h-full w-full overflow-hidden pointer-events-none">
+        <img 
+          src={TROPHYROOM_BG} 
+          alt="Hall of Triumphs Background" 
+          className="w-full h-full object-cover" 
+        />
+        <div className="absolute inset-0 bg-black/80"></div>
+      </div>
 
       <div className="max-w-6xl mx-auto relative z-10">
         <button onClick={() => navigate(-1)} className="mb-8 flex items-center gap-2 text-stone-300 hover:text-white transition-colors font-['Press_Start_2P'] text-xs">
