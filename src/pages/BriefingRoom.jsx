@@ -47,10 +47,10 @@ const THEMES = {
     dialogue: 'Time is of the essence! Answer quickly and accurately to synthesize the ultimate reward. You have 60 seconds.'
   },
   112: {
-    bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Alchemists.Lab.png',
+    bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/science.quiz.room.bg.png',
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mad.Alchemist.png',
     title: 'The Grand Observatory',
-    dialogue: 'The laws of nature await your discovery. Answer swiftly to uncover the truth of the realm. You have 60 seconds.'
+    dialogue: 'The laws of nature await your discovery. Answer swiftly to uncover the truth of the realm. You have 120 seconds.'
   },
   113: {
     bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Lexicon.Vault.jpg',
