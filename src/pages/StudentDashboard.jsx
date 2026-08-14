@@ -200,130 +200,127 @@ const StudentDashboard = () => {
         </button>
       </div>
 
-      {/* Map Canvas Wrapper */}
-      {/* DESKTOP & TABLET MAP VIEW (Hidden on Mobile, Visible on Tablet/Desktop) */}
-      <div className="hidden md:block w-full h-screen overflow-x-auto overflow-y-hidden custom-scrollbar flex items-center justify-center p-2 sm:p-4">
-        <div className="relative z-10 min-w-[900px] lg:min-w-0 w-full max-w-[1400px] aspect-video mx-auto overflow-hidden rounded-2xl border-4 border-stone-700/80 shadow-[0_0_80px_rgba(0,0,0,1)] flex-shrink-0">
-          
-          {/* 1. Background Map Layer (Fixed 16:9 Object-Fill guarantees zero pin drift) */}
-          <div className="absolute inset-0 bg-black/20 z-0" />
-          <img 
-            src={MAP_BG} 
-            alt="Kingdom Map" 
-            className="absolute inset-0 w-full h-full object-fill opacity-85 pointer-events-none"
-          />
+      {/* DESKTOP & TABLET MAP VIEW (Edge-to-Edge Fullscreen on Tablet & Desktop) */}
+      <div className="hidden md:block fixed inset-0 w-full h-full overflow-hidden bg-black z-10">
+        
+        {/* 1. Full-Screen Background Map Layer */}
+        <img 
+          src={MAP_BG} 
+          alt="Kingdom Map" 
+          className="absolute inset-0 w-full h-full object-cover opacity-85 pointer-events-none"
+        />
+        <div className="absolute inset-0 bg-black/20 pointer-events-none" />
 
-          {/* 2. Interactive Map Locations (Locked to the 16:9 Grid) */}
-          
-          {/* QUEST BOARD */}
-          <MapLocation 
-            label="Quest Board" 
-            description="Accept daily tasks, quizzes, and missions to earn Gold and XP."
-            x="18%" 
-            y="45%" 
-            delay={0.2}
-            onClick={() => navigate('/quests')} 
-          />
+        {/* 2. Interactive Map Locations (Anchored directly to full screen) */}
+        
+        {/* QUEST BOARD */}
+        <MapLocation 
+          label="Quest Board" 
+          description="Accept daily tasks, quizzes, and missions to earn Gold and XP."
+          x="18%" 
+          y="45%" 
+          delay={0.2}
+          onClick={() => navigate('/quests')} 
+        />
 
-          {/* TOWN SQUARE / LEADERBOARD */}
-          <MapLocation 
-            label="Town Square" 
-            description="The Hall of Legends. See how your rank and Boss Kills stack up against the realm."
-            x="43%" 
-            y="24%" 
-            delay={0.4}
-            onClick={() => navigate('/leaderboard')} 
-          />
+        {/* TOWN SQUARE / LEADERBOARD */}
+        <MapLocation 
+          label="Town Square" 
+          description="The Hall of Legends. See how your rank and Boss Kills stack up against the realm."
+          x="43%" 
+          y="24%" 
+          delay={0.4}
+          onClick={() => navigate('/leaderboard')} 
+        />
 
-          {/* THE ARCHIVES */}
-          <MapLocation 
-            label="The Archives" 
-            description="Your permanent record. Track your Intellect, Wisdom, and overall power level."
-            x="17%" 
-            y="15%" 
-            delay={0.6}
-            onClick={() => navigate('/archives')} 
-          />
+        {/* THE ARCHIVES */}
+        <MapLocation 
+          label="The Archives" 
+          description="Your permanent record. Track your Intellect, Wisdom, and overall power level."
+          x="17%" 
+          y="15%" 
+          delay={0.6}
+          onClick={() => navigate('/archives')} 
+        />
 
-          {/* THE BARRACKS */}
-          <MapLocation 
-            label="The Barracks" 
-            description="Spend your hard-earned gold on legendary outfits and gear."
-            x="68%" 
-            y="41%" 
-            delay={0.8}
-            onClick={() => navigate('/barracks')} 
-          />
+        {/* THE BARRACKS */}
+        <MapLocation 
+          label="The Barracks" 
+          description="Spend your hard-earned gold on legendary outfits and gear."
+          x="68%" 
+          y="41%" 
+          delay={0.8}
+          onClick={() => navigate('/barracks')} 
+        />
 
-          {/* THE DUNGEON */}
-          <MapLocation 
-            label="The Dungeon"
-            description="Face terrifying bosses. Unlocked by logging in regularly and completing specific quests!"
-            x="50%" 
-            y="65%" 
-            delay={1.0}
-            onClick={() => navigate('/dungeon')}
-            variant="danger"
-          />
+        {/* THE DUNGEON */}
+        <MapLocation 
+          label="The Dungeon"
+          description="Face terrifying bosses. Unlocked by logging in regularly and completing specific quests!"
+          x="50%" 
+          y="65%" 
+          delay={1.0}
+          onClick={() => navigate('/dungeon')}
+          variant="danger"
+        />
 
-          {/* HALL OF TRIUMPHS */}
-          <MapLocation 
-            label="Hall of Triumphs"
-            description="View your unlocked Achievements and claim real-world rewards!"
-            icon={Trophy}
-            x="70%" 
-            y="13%" 
-            delay={1.2}
-            onClick={() => navigate('/trophies')}
-            variant="gold"
-          />
+        {/* HALL OF TRIUMPHS */}
+        <MapLocation 
+          label="Hall of Triumphs"
+          description="View your unlocked Achievements and claim real-world rewards!"
+          icon={Trophy}
+          x="70%" 
+          y="13%" 
+          delay={1.2}
+          onClick={() => navigate('/trophies')}
+          variant="gold"
+        />
 
-          {/* TAVERN GROVE GALLERY */}
-          <MapLocation 
-            label="Tavern Grove" 
-            description="View approved student art projects and creative masterpieces pinned to the wall!"
-            icon={Palette}
-            x="35%" 
-            y="78%" 
-            delay={1.4}
-            onClick={() => navigate('/tavern-gallery')}
-            variant="emerald"
-          />
+        {/* TAVERN GROVE GALLERY */}
+        <MapLocation 
+          label="Tavern Grove" 
+          description="View approved student art projects and creative masterpieces pinned to the wall!"
+          icon={Palette}
+          x="35%" 
+          y="78%" 
+          delay={1.4}
+          onClick={() => navigate('/tavern-gallery')}
+          variant="emerald"
+        />
 
-          {/* DESKTOP HERO SHOWCASE CARD (Water-Anchored, Bottom-Left) */}
-          <div className="absolute bottom-3 left-3 z-20 bg-black/55 backdrop-blur-md border border-stone-600/60 p-2.5 rounded-xl flex items-center gap-2.5 shadow-[0_0_25px_rgba(0,0,0,0.8)] max-w-[215px] pointer-events-auto">
-            <div className="relative w-16 h-22 bg-stone-950/80 border border-slate-700/80 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden shadow-inner">
-              <img 
-                src={currentUser?.currentBodySprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'} 
-                alt="Hero Portrait" 
-                className="w-full h-auto object-cover scale-[1.9] translate-y-4 drop-shadow-[0_4px_6px_rgba(0,0,0,0.9)]"
-              />
-              <div className="absolute bottom-0 w-full h-2 bg-purple-500/20 blur-sm rounded-full z-0" />
-            </div>
-            <div className="flex flex-col justify-center flex-grow overflow-hidden">
-              <span className="text-[8px] text-amber-500 font-['Press_Start_2P'] uppercase tracking-wider mb-0.5 truncate">
-                [{currentUser?.heroClass || 'HERO'}]
+        {/* DESKTOP/TABLET HERO SHOWCASE CARD (Water-Anchored, Bottom-Left) */}
+        <div className="absolute bottom-4 left-4 z-20 bg-black/55 backdrop-blur-md border border-stone-600/60 p-2.5 rounded-xl flex items-center gap-2.5 shadow-[0_0_25px_rgba(0,0,0,0.8)] max-w-[215px] pointer-events-auto">
+          <div className="relative w-16 h-22 bg-stone-950/80 border border-slate-700/80 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden shadow-inner">
+            <img 
+              src={currentUser?.currentBodySprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'} 
+              alt="Hero Portrait" 
+              className="w-full h-auto object-cover scale-[1.9] translate-y-4 drop-shadow-[0_4px_6px_rgba(0,0,0,0.9)]"
+            />
+            <div className="absolute bottom-0 w-full h-2 bg-purple-500/20 blur-sm rounded-full z-0" />
+          </div>
+          <div className="flex flex-col justify-center flex-grow overflow-hidden">
+            <span className="text-[8px] text-amber-500 font-['Press_Start_2P'] uppercase tracking-wider mb-0.5 truncate">
+              [{currentUser?.heroClass || 'HERO'}]
+            </span>
+            <h2 className="text-xl font-bold text-white font-['VT323'] tracking-wide leading-none mb-1 truncate">
+              {currentUser?.heroName || 'Unknown Hero'}
+            </h2>
+            <p className="text-[10px] text-stone-300 font-mono mb-1">
+              LVL {Math.floor((currentUser?.xp || 0) / 1000) + 1}
+            </p>
+            <div className="flex flex-col gap-1">
+              <span className="text-[9px] font-mono text-amber-400 bg-amber-950/80 px-1.5 py-0.5 rounded border border-amber-600/40 w-fit">
+                🪙 {currentUser?.gold || 0} G
               </span>
-              <h2 className="text-xl font-bold text-white font-['VT323'] tracking-wide leading-none mb-1 truncate">
-                {currentUser?.heroName || 'Unknown Hero'}
-              </h2>
-              <p className="text-[10px] text-stone-300 font-mono mb-1">
-                LVL {Math.floor((currentUser?.xp || 0) / 1000) + 1}
-              </p>
-              <div className="flex flex-col gap-1">
-                <span className="text-[9px] font-mono text-amber-400 bg-amber-950/80 px-1.5 py-0.5 rounded border border-amber-600/40 w-fit">
-                  🪙 {currentUser?.gold || 0} G
-                </span>
-                <span className="text-[9px] font-mono text-cyan-300 bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-500/40 w-fit">
-                  ⭐ {currentUser?.xp || 0} XP
-                </span>
-              </div>
+              <span className="text-[9px] font-mono text-cyan-300 bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-500/40 w-fit">
+                ⭐ {currentUser?.xp || 0} XP
+              </span>
             </div>
           </div>
+        </div>
 
-          <div className="absolute bottom-3 right-4 text-white/30 font-mono text-[10px] z-10">
-            Map v1.3
-          </div>
+        <div className="absolute bottom-3 right-4 text-white/30 font-mono text-[10px] z-10">
+          Map v1.3
         </div>
       </div>
       {/* MOBILE MAP VIEW (Visible on Mobile, Hidden on Desktop) */}
