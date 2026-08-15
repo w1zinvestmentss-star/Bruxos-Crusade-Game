@@ -118,15 +118,20 @@ const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equi
         <div className="absolute inset-0 bg-black/60"></div>
       </div>
 
+      {/* Fixed Floating Return to Map Button */}
+      <button 
+        onClick={() => navigate('/student-dashboard')} 
+        className="fixed top-4 left-4 z-50 bg-black/80 backdrop-blur-md border-2 border-yellow-500/50 hover:border-yellow-400 text-yellow-400 font-['Press_Start_2P'] text-[10px] py-2.5 px-4 rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.8)] flex items-center gap-2 transition-all cursor-pointer"
+      >
+        <ArrowLeft size={16} /> RETURN TO MAP
+      </button>
+
       <div className="relative z-10">
-        <div className="mb-6 flex items-center gap-4">
-          <button
-            onClick={() => navigate('/student-dashboard')}
-            className="p-2 bg-black/70 hover:bg-white/10 rounded-lg border border-white/10 text-white transition-colors"
-          >
-            <ArrowLeft size={24} />
-          </button>
-          <h1 className="text-4xl text-yellow-400 font-['Press_Start_2P']">THE BARRACKS</h1>
+        {/* Centered Page Title (Clearance for floating back button) */}
+        <div className="text-center mb-8 pt-4 md:pt-6">
+          <h1 className="text-3xl md:text-5xl text-yellow-400 font-['Press_Start_2P'] drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
+            THE BARRACKS
+          </h1>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto">

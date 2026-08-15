@@ -276,9 +276,16 @@ const QuestBoard = () => {
 
       <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileSelect}/>
 
-      <div className="relative z-10">
-        <div className="flex justify-between items-center mb-8 max-w-4xl mx-auto">
-          <button onClick={() => navigate('/student-dashboard')} className="flex items-center gap-2 text-stone-300 hover:text-white font-['Press_Start_2P'] text-xs"><ArrowLeft size={16} /> BACK</button>
+      {/* Fixed Floating Return to Map Button */}
+      <button 
+        onClick={() => navigate('/student-dashboard')} 
+        className="fixed top-4 left-4 z-50 bg-black/80 backdrop-blur-md border-2 border-yellow-500/50 hover:border-yellow-400 text-yellow-400 font-['Press_Start_2P'] text-[10px] py-2.5 px-4 rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.8)] flex items-center gap-2 transition-all cursor-pointer"
+      >
+        <ArrowLeft size={16} /> RETURN TO MAP
+      </button>
+
+      <div className="relative z-10 pt-12 sm:pt-14 md:pt-4">
+        <div className="flex justify-end items-center mb-8 max-w-4xl mx-auto">
           <div className="flex gap-4 bg-black/60 backdrop-blur-sm p-2 rounded-lg border border-white/10"><div className="flex items-center gap-2 text-yellow-400 font-['VT323'] text-xl"><Coins size={16} /> {currentUser?.gold} G</div><div className="flex items-center gap-2 text-blue-400 font-['VT323'] text-xl"><Star size={16} /> {currentUser?.xp} XP</div></div>
         </div>
 

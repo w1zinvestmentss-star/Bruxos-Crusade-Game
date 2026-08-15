@@ -134,10 +134,15 @@ const CATEGORIES = {
         <div className="absolute inset-0 bg-black/80"></div>
       </div>
 
-      <div className="max-w-6xl mx-auto relative z-10">
-        <button onClick={() => navigate(-1)} className="mb-8 flex items-center gap-2 text-stone-300 hover:text-white transition-colors font-['Press_Start_2P'] text-xs">
-          <ArrowLeft size={16} /> Back
-        </button>
+      {/* Fixed Floating Return to Map Button */}
+      <button 
+        onClick={() => navigate('/student-dashboard')} 
+        className="fixed top-4 left-4 z-50 bg-black/80 backdrop-blur-md border-2 border-yellow-500/50 hover:border-yellow-400 text-yellow-400 font-['Press_Start_2P'] text-[10px] py-2.5 px-4 rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.8)] flex items-center gap-2 transition-all cursor-pointer"
+      >
+        <ArrowLeft size={16} /> RETURN TO MAP
+      </button>
+
+      <div className="max-w-6xl mx-auto relative z-10 pt-12 sm:pt-14 md:pt-6">
 
         <header className="text-center mb-10">
           <h1 className="text-4xl sm:text-5xl text-red-600 font-['Press_Start_2P']">THE DUNGEON</h1>
