@@ -42,6 +42,8 @@ const BackgroundMusic = () => {
           targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Father%20gascoigne%20freestyle.mp3';
         } else if (questId === 104) {
           targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.LegendofFahad.mp3';
+        } else if (questId === 106) {
+          targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/I%20cant%20believe%20they%20switched%20on%20me.mp3';
         } else if (questId === 112) {
           targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Requiem.for.a.Dream(Theyaretryingtoendme).mp3';
         } else if (questId === 113) {
@@ -50,6 +52,10 @@ const BackgroundMusic = () => {
           targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Please%20dont%20say%20my%20name%20out%20of%20context.mp3';
         } else {
           switch (quest.type) {
+            case '106':
+            case 'journal':
+              targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/I%20cant%20believe%20they%20switched%20on%20me.mp3';
+              break;
             case 'incantation':
               targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Ice.in.my.veins.mp3';
               break;
