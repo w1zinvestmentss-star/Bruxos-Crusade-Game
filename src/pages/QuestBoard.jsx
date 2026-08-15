@@ -306,8 +306,8 @@ const QuestBoard = () => {
             </div>
           </div>
 
-          {/* SECTOR FILTER TABS (Consolidated 4-Tab Navigation) */}
-          <div className="flex overflow-x-auto justify-center gap-2 sm:gap-3 mb-10 pb-2 custom-scrollbar no-scrollbar max-w-3xl mx-auto">
+          {/* SECTOR FILTER TABS (2-Row Grid on Mobile, Single Row on Desktop) */}
+          <div className="grid grid-cols-2 sm:flex sm:flex-row sm:justify-center gap-2 sm:gap-3 mb-8 md:mb-10 max-w-3xl mx-auto px-1 sm:px-0">
             {[
               { id: 'all', label: 'ALL QUESTS' },
               { id: 'speed', label: '⚡ SPEED RUNS' },
@@ -317,13 +317,13 @@ const QuestBoard = () => {
               <button
                 key={sector.id}
                 onClick={() => setActiveSector(sector.id)}
-                className={`px-4 py-2.5 rounded-lg font-['Press_Start_2P'] text-[9px] sm:text-[10px] whitespace-nowrap transition-all flex items-center gap-2 ${
+                className={`w-full sm:w-auto px-2 sm:px-4 py-2.5 rounded-lg font-['Press_Start_2P'] text-[8px] xs:text-[9px] sm:text-[10px] text-center justify-center transition-all flex items-center gap-1.5 ${
                   activeSector === sector.id 
                     ? 'bg-yellow-500 text-stone-950 font-bold border-2 border-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.4)]' 
-                    : 'bg-black/60 text-stone-400 border border-stone-700 hover:text-white hover:bg-stone-800'
+                    : 'bg-black/70 text-stone-400 border border-stone-700 hover:text-white hover:bg-stone-800'
                 }`}
               >
-                <span>{sector.label}</span>
+                <span className="truncate">{sector.label}</span>
               </button>
             ))}
           </div>
