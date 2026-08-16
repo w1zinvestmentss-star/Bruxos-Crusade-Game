@@ -237,48 +237,63 @@ const QuestBoard = () => {
     }
   };
 
-  const getSectorStyles = (type) => {
+  const getSectorTheme = (type) => {
     switch (type) {
       case 'upload':
         return {
-          accentBorder: 'border-l-amber-500 shadow-[inset_2px_0_12px_rgba(245,158,11,0.15)]',
-          badgeBorder: 'border-amber-500/40',
-          badgeBg: 'bg-amber-950/40',
-          badgeText: 'text-amber-300',
+          tag: '📜 DISPATCH BOUNTY',
+          tagColor: 'text-amber-400/90 border-amber-500/30 bg-amber-950/40',
+          titleColor: 'text-amber-100 group-hover:text-amber-300',
+          titleGlow: 'drop-shadow-[0_2px_8px_rgba(245,158,11,0.3)]',
+          lineGradient: 'from-amber-500/50 via-amber-500/10 to-transparent',
+          frameBorder: 'border-[#382f23] hover:border-amber-500/50',
+          cornerColor: 'text-amber-500/60',
           buttonBg: 'bg-gradient-to-b from-amber-700 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-amber-100 border-t border-amber-400/30 shadow-[0_3px_0_#451a03,0_6px_12px_rgba(0,0,0,0.6)]',
         };
       case 'wellness':
         return {
-          accentBorder: 'border-l-emerald-500 shadow-[inset_2px_0_12px_rgba(16,185,129,0.15)]',
-          badgeBorder: 'border-emerald-500/40',
-          badgeBg: 'bg-emerald-950/40',
-          badgeText: 'text-emerald-300',
+          tag: '🌿 SANCTUARY REST',
+          tagColor: 'text-emerald-400/90 border-emerald-500/30 bg-emerald-950/40',
+          titleColor: 'text-emerald-100 group-hover:text-emerald-300',
+          titleGlow: 'drop-shadow-[0_2px_8px_rgba(16,185,129,0.3)]',
+          lineGradient: 'from-emerald-500/50 via-emerald-500/10 to-transparent',
+          frameBorder: 'border-[#22352a] hover:border-emerald-500/50',
+          cornerColor: 'text-emerald-500/60',
           buttonBg: 'bg-gradient-to-b from-emerald-700 to-emerald-900 hover:from-emerald-600 hover:to-emerald-800 text-emerald-100 border-t border-emerald-400/30 shadow-[0_3px_0_#064e3b,0_6px_12px_rgba(0,0,0,0.6)]',
         };
       case 'gauntlet':
       case 'scout-sports':
         return {
-          accentBorder: 'border-l-red-500 shadow-[inset_2px_0_12px_rgba(239,68,68,0.15)]',
-          badgeBorder: 'border-red-500/40',
-          badgeBg: 'bg-red-950/40',
-          badgeText: 'text-red-300',
+          tag: '⚔ COMBAT TRIAL',
+          tagColor: 'text-red-400/90 border-red-500/30 bg-red-950/40',
+          titleColor: 'text-red-100 group-hover:text-red-300',
+          titleGlow: 'drop-shadow-[0_2px_8px_rgba(239,68,68,0.3)]',
+          lineGradient: 'from-red-500/50 via-red-500/10 to-transparent',
+          frameBorder: 'border-[#3d2325] hover:border-red-500/50',
+          cornerColor: 'text-red-500/60',
           buttonBg: 'bg-gradient-to-b from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 text-red-100 border-t border-red-400/30 shadow-[0_3px_0_#450a0a,0_6px_12px_rgba(0,0,0,0.6)]',
         };
       case 'multi-step':
       case 'scout-arts':
         return {
-          accentBorder: 'border-l-purple-500 shadow-[inset_2px_0_12px_rgba(168,85,247,0.15)]',
-          badgeBorder: 'border-purple-500/40',
-          badgeBg: 'bg-purple-950/40',
-          badgeText: 'text-purple-300',
+          tag: '🔮 ARCANE ENIGMA',
+          tagColor: 'text-purple-400/90 border-purple-500/30 bg-purple-950/40',
+          titleColor: 'text-purple-100 group-hover:text-purple-300',
+          titleGlow: 'drop-shadow-[0_2px_8px_rgba(168,85,247,0.3)]',
+          lineGradient: 'from-purple-500/50 via-purple-500/10 to-transparent',
+          frameBorder: 'border-[#33243d] hover:border-purple-500/50',
+          cornerColor: 'text-purple-500/60',
           buttonBg: 'bg-gradient-to-b from-purple-700 to-purple-900 hover:from-purple-600 hover:to-purple-800 text-purple-100 border-t border-purple-400/30 shadow-[0_3px_0_#3b0764,0_6px_12px_rgba(0,0,0,0.6)]',
         };
       default: // quizzes, blitzes, ciphers, journal, incantations
         return {
-          accentBorder: 'border-l-cyan-500 shadow-[inset_2px_0_12px_rgba(6,182,212,0.15)]',
-          badgeBorder: 'border-cyan-500/40',
-          badgeBg: 'bg-cyan-950/40',
-          badgeText: 'text-cyan-300',
+          tag: '⚡ SPEED RUN',
+          tagColor: 'text-cyan-400/90 border-cyan-500/30 bg-cyan-950/40',
+          titleColor: 'text-cyan-100 group-hover:text-cyan-300',
+          titleGlow: 'drop-shadow-[0_2px_8px_rgba(6,182,212,0.3)]',
+          lineGradient: 'from-cyan-500/50 via-cyan-500/10 to-transparent',
+          frameBorder: 'border-[#23313d] hover:border-cyan-500/50',
+          cornerColor: 'text-cyan-500/60',
           buttonBg: 'bg-gradient-to-b from-cyan-800 to-cyan-950 hover:from-cyan-700 hover:to-cyan-900 text-cyan-100 border-t border-cyan-400/30 shadow-[0_3px_0_#083344,0_6px_12px_rgba(0,0,0,0.6)]',
         };
     }
@@ -438,15 +453,24 @@ const QuestBoard = () => {
                         const isGauntlet = quest.type === 'gauntlet';
                         const currentScenario = activeScenarios[quest.id];
                         const activeSession = activeMultiSteps[quest.id];
-                        const sector = getSectorStyles(quest.type);
+                        const theme = getSectorTheme(quest.type);
+                        const sector = theme;
 
                         return (
                           <motion.div 
                             key={quest.id} 
                             initial={{ opacity: 0, y: 20 }} 
                             animate={{ opacity: 1, y: 0 }} 
-                            className={`p-6 rounded-xl relative overflow-hidden transition-all bg-gradient-to-r from-[#111218]/95 via-[#0e0f14]/90 to-transparent backdrop-blur-md border border-white/10 border-t-white/20 border-l-4 ${status === 'approved' || status === 'read_only' ? 'border-l-green-500' : status === 'failed' ? 'border-l-red-800' : sector.accentBorder} shadow-[0_12px_32px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.08)]`}
+                            className={`relative group overflow-hidden rounded-lg border-2 ${status === 'approved' || status === 'read_only' ? 'border-green-600' : status === 'failed' ? 'border-red-800' : theme.frameBorder} 
+                              bg-gradient-to-br from-[#1b1d28] via-[#12131c] to-[#0a0b10] 
+                              shadow-[0_8px_30px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.12),inset_0_0_20px_rgba(0,0,0,0.6)] 
+                              transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_36px_rgba(0,0,0,0.95)]`}
                           >
+                            {/* 4 Ornamental Corner Rivets */}
+                            <span className={`absolute top-1 left-1.5 text-[8px] select-none ${theme.cornerColor} pointer-events-none z-20`}>✦</span>
+                            <span className={`absolute top-1 right-1.5 text-[8px] select-none ${theme.cornerColor} pointer-events-none z-20`}>✦</span>
+                            <span className={`absolute bottom-1 left-1.5 text-[8px] select-none ${theme.cornerColor} pointer-events-none z-20`}>✦</span>
+                            <span className={`absolute bottom-1 right-1.5 text-[8px] select-none ${theme.cornerColor} pointer-events-none z-20`}>✦</span>
                             
                             {/* PEEKING ARTWORK LAYER - Boosted Opacity */}
                             {(() => {
@@ -474,13 +498,28 @@ const QuestBoard = () => {
                             })()}
 
                             {/* FOREGROUND CARD CONTENT */}
-                            <div className="flex justify-between items-start relative z-10">
-                              <div className="font-['VT323'] text-xl flex-grow max-w-[65%]">
-                                <h3 className="text-2xl mb-2 flex items-center gap-2 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                                  {getQuestIcon(quest)}
-                                  {quest.title}
-                                </h3>
-                                <p className="text-stone-200 mb-4 text-lg leading-relaxed drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{quest.description}</p>
+                            <div className="relative z-10 p-5 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 h-full">
+                              <div className="font-['VT323'] flex-grow max-w-full md:max-w-[65%]">
+                                {/* Structured Header */}
+                                <div className="mb-3">
+                                  {/* Miniature Category Tag */}
+                                  <div className="flex items-center gap-2 mb-1.5">
+                                    <span className={`px-2 py-0.5 text-[9px] font-['Press_Start_2P'] uppercase tracking-wider rounded border ${theme.tagColor}`}>
+                                      {theme.tag}
+                                    </span>
+                                  </div>
+
+                                  {/* Glowing RPG Title */}
+                                  <h3 className={`font-['Press_Start_2P'] text-base md:text-lg tracking-wide uppercase transition-colors duration-150 flex items-center gap-2.5 ${theme.titleColor} ${theme.titleGlow}`}>
+                                    {getQuestIcon(quest)}
+                                    {quest.title}
+                                  </h3>
+
+                                  {/* 1px Gradient Divider Line */}
+                                  <div className={`h-[1px] w-48 mt-2 bg-gradient-to-r ${theme.lineGradient}`} />
+                                </div>
+
+                                <p className="text-stone-200 mb-3 text-lg leading-relaxed drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{quest.description}</p>
                                 
                                 {/* Jeweled Reward Badges */}
                                 <div className="flex flex-wrap gap-2.5 text-base mt-2">
@@ -496,7 +535,7 @@ const QuestBoard = () => {
                               </div>
 
                               {/* LAUNCHPAD / ACTIONS CONTAINER */}
-                              <div className="flex-shrink-0 w-1/2 md:w-1/3 ml-4 relative z-10">
+                              <div className="flex-shrink-0 w-full md:w-1/3 relative z-10">
                       {status === 'available' ? (
                         quest.type === 'incantation' && quest.questionBank?.length > 0 ? (
                           <button onClick={() => navigate('/briefing/' + quest.id)} className={`w-full px-5 py-3 rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] flex items-center justify-center gap-2 ${sector.buttonBg}`}>
