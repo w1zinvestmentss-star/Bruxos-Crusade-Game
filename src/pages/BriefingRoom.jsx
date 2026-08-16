@@ -516,19 +516,49 @@ const BriefingRoom = () => {
               </div>
             </div>
           ) : quest.type === 'blitz' && activeBlitz ? (
-            <div className="relative p-6 w-full bg-black/90 rounded-lg border-2 border-cyan-600 shadow-[0_0_30px_rgba(6,182,212,0.6)]">
-              <div className="flex justify-between items-center mb-4">
-                <div className={`text-5xl font-mono font-bold ${activeBlitz.timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-cyan-400'}`}>{activeBlitz.timeLeft}s</div>
-                <div className="text-yellow-400 font-['Press_Start_2P'] text-xl">Score: {activeBlitz.score}</div>
+            <div className="relative w-full max-w-xl mx-auto p-6 md:p-8 rounded-xl border-2 border-[#2b2e42] 
+              bg-gradient-to-br from-[#1c1e2b] via-[#12131e] to-[#0a0b12] 
+              shadow-[0_16px_48px_rgba(0,0,0,0.95),inset_0_1px_0_rgba(255,255,255,0.15),inset_0_0_30px_rgba(0,0,0,0.7)]">
+              
+              {/* Corner Rivets */}
+              <span className="absolute top-2 left-2 text-[9px] text-cyan-500/60 select-none pointer-events-none">✦</span>
+              <span className="absolute top-2 right-2 text-[9px] text-cyan-500/60 select-none pointer-events-none">✦</span>
+              <span className="absolute bottom-2 left-2 text-[9px] text-cyan-500/60 select-none pointer-events-none">✦</span>
+              <span className="absolute bottom-2 right-2 text-[9px] text-cyan-500/60 select-none pointer-events-none">✦</span>
+
+              {/* Top HUD */}
+              <div className="flex items-center justify-between gap-4 mb-6">
+                {/* Timer Badge (flashes red when under 15s) */}
+                <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg border font-['Press_Start_2P'] text-xs md:text-sm tracking-wider shadow-inner transition-colors duration-200 ${
+                  activeBlitz.timeLeft <= 15 
+                    ? 'bg-red-950/60 border-red-500/60 text-red-300 animate-pulse' 
+                    : 'bg-cyan-950/60 border-cyan-500/40 text-cyan-300'
+                }`}>
+                  <span>⏳</span>
+                  <span>{activeBlitz.timeLeft}s</span>
+                </div>
+
+                {/* Score / Streak Badge */}
+                <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-amber-950/60 border border-amber-500/40 font-['Press_Start_2P'] text-xs md:text-sm text-amber-300 tracking-wider shadow-inner">
+                  <span>🏆</span>
+                  <span>SCORE: <strong className="text-amber-200">{activeBlitz.score}</strong></span>
+                </div>
               </div>
-              <p className="text-3xl text-white text-center font-mono mb-6 bg-stone-900 p-4 rounded-lg border border-stone-700">{activeBlitz.currentQ?.q}</p>
+
+              {/* Question Tablet */}
+              <div className="mb-5 p-5 rounded-lg border border-white/10 bg-[#090a0f]/90 shadow-inner text-center">
+                <h2 className="font-['Press_Start_2P'] text-sm md:text-base text-zinc-100 tracking-wide leading-relaxed drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                  {activeBlitz.currentQ?.q || activeBlitz.currentQ?.question || activeBlitz.currentQ?.prompt}
+                </h2>
+              </div>
+
               {activeBlitz.currentQ?.options ? (
                 <div className="flex flex-col gap-3 mb-4 w-full">
                   {activeBlitz.currentQ.options.map((opt, idx) => (
                     <button 
                       key={idx} 
                       onClick={() => handleBlitzSubmit(opt)}
-                      className="w-full text-left p-4 bg-black/80 border-2 border-cyan-700 rounded hover:bg-stone-700 hover:border-cyan-400 transition-colors text-white font-mono text-xl md:text-2xl"
+                      className="w-full text-left p-4 bg-[#07080c] border-2 border-cyan-700/60 rounded-lg hover:bg-stone-800 hover:border-cyan-400 transition-colors text-cyan-100 font-mono text-lg md:text-xl active:translate-y-[2px]"
                     >
                       {opt}
                     </button>
@@ -536,15 +566,53 @@ const BriefingRoom = () => {
                 </div>
               ) : (
                 <>
-                  <input type="text" value={blitzInput} onChange={(e) => setBlitzInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleBlitzSubmit(); }} autoFocus className="w-full bg-black border-2 border-cyan-500 text-cyan-400 font-mono text-3xl p-4 rounded text-center focus:outline-none focus:ring-4 focus:ring-cyan-600 mb-4" placeholder="> Enter answer..." />
-                  <div className="bg-amber-950/20 border border-amber-500/30 rounded-lg p-3 text-center mb-4 transition-all duration-300">
-                    <p className="font-['VT323'] text-lg text-amber-300 leading-normal tracking-wide animate-pulse">
-                      {getMathTip(activeBlitz.currentQ?.q)}
-                    </p>
+                  {/* Answer Input */}
+                  <div className="relative mb-4">
+                    <input
+                      type="text"
+                      value={blitzInput}
+                      onChange={(e) => setBlitzInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handleBlitzSubmit(); }}
+                      placeholder="> Enter answer..."
+                      autoFocus
+                      className="w-full px-5 py-3.5 rounded-lg border-2 border-cyan-500/40 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 
+                        bg-[#07080c] font-mono text-base md:text-lg text-cyan-200 placeholder-zinc-600 tracking-wider shadow-[inset_0_2px_8px_rgba(0,0,0,0.9)] transition-all duration-150 text-center"
+                    />
                   </div>
-                  <div className="flex gap-4">
-                    <button onClick={() => handleBlitzSubmit()} className="flex-1 px-4 py-4 bg-cyan-700 text-white font-bold font-['Press_Start_2P'] text-sm rounded hover:bg-cyan-600 transition-colors">SUBMIT</button>
-                    <button onClick={handleBlitzPass} className="flex-1 px-4 py-4 bg-stone-700 text-white font-bold font-['Press_Start_2P'] text-sm rounded hover:bg-stone-600 transition-colors">PASS</button>
+
+                  {/* Scroll Tip Ribbon */}
+                  {getMathTip(activeBlitz.currentQ?.q) && (
+                    <div className="flex items-center gap-2 mb-6 px-3.5 py-2 rounded-md border border-amber-500/30 bg-amber-950/30 text-amber-200/90 font-['Press_Start_2P'] text-[9px] md:text-[10px] leading-relaxed shadow-inner">
+                      <span className="text-amber-400 text-xs select-none">💡</span>
+                      <span>{getMathTip(activeBlitz.currentQ?.q)}</span>
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="grid grid-cols-2 gap-4 pt-2">
+                    {/* Submit Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleBlitzSubmit()}
+                      className="w-full py-3 rounded-lg font-['Press_Start_2P'] text-xs tracking-wider uppercase transition-all duration-100
+                        bg-gradient-to-b from-cyan-600 to-cyan-800 hover:from-cyan-500 hover:to-cyan-700 text-cyan-50 
+                        border-t border-cyan-400/40 shadow-[0_3px_0_#0e4554,0_6px_12px_rgba(0,0,0,0.6)] 
+                        active:translate-y-[2px] active:shadow-[0_1px_0_#0e4554]"
+                    >
+                      SUBMIT
+                    </button>
+
+                    {/* Pass Button */}
+                    <button
+                      type="button"
+                      onClick={handleBlitzPass}
+                      className="w-full py-3 rounded-lg font-['Press_Start_2P'] text-xs tracking-wider uppercase transition-all duration-100
+                        bg-gradient-to-b from-zinc-700 to-zinc-900 hover:from-zinc-600 hover:to-zinc-800 text-zinc-300 hover:text-zinc-100 
+                        border-t border-zinc-500/30 shadow-[0_3px_0_#18181b,0_6px_12px_rgba(0,0,0,0.6)] 
+                        active:translate-y-[2px] active:shadow-[0_1px_0_#18181b]"
+                    >
+                      PASS
+                    </button>
                   </div>
                 </>
               )}
