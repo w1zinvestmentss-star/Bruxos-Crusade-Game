@@ -417,7 +417,7 @@ const QuestBoard = () => {
                             {(() => {
                               let bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/worldmap4.png";
                               if (quest.type === 'upload') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/herald.post.banner.png";
-                              else if (quest.id === 103) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Hunters.Archives.banner.png";
+                              else if (quest.id === 103) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Hunters.Archives.banner2.png";
                               else if (quest.id === 104) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Sunken.Palace.png";
                               else if (quest.id === 112) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Science.quiz.banner.png";
                               else if (quest.id === 113) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/scribeglossary.banner.png";
