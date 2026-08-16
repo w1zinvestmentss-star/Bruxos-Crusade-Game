@@ -5,7 +5,13 @@ import { useGame } from '../context/GameContext';
 
 const THEMES = {
   journal: {
-    bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/journal.briefingroom.png',
+    bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/daily.journal.banner.bg.png',
+    npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/scribe_npc.png',
+    title: 'Journal Briefing',
+    dialogue: 'Welcome, Hero. Do not rely on mechanical brains or artificial magic here! Speak freely from your own heart—the King wants to hear your true human voice.'
+  },
+  106: {
+    bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/daily.journal.banner.bg.png',
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/scribe_npc.png',
     title: 'Journal Briefing',
     dialogue: 'Welcome, Hero. Do not rely on mechanical brains or artificial magic here! Speak freely from your own heart—the King wants to hear your true human voice.'

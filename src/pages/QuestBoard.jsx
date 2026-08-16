@@ -419,9 +419,11 @@ const QuestBoard = () => {
                               if (quest.type === 'upload') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/herald.post.banner.png";
                               else if (quest.id === 103) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Hunters.Archives.banner2.png";
                               else if (quest.id === 104) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Sunken.Palace.png";
-                              else if (quest.id === 112) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Science.quiz.banner.png";
+                              else if (quest.id === 106 || quest.type === 'journal') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/daily.journal.banner.png";
+                              else if (quest.id === 110 || quest.type === 'wellness') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Tavern.rest.background.png";
+                              else if (quest.id === 112) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Science.quiz.banner2.png";
                               else if (quest.id === 113) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Scribe.gloss.banner.png";
-                              else if (quest.id === 114) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Decipherers.Study.jpg";
+                              else if (quest.id === 114) bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Spellforge.banner2.png";
                               else if (quest.type === 'multi-step') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Sunken.Lagoon.png";
                               else if (quest.type === 'incantation') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Haunted.Scriptorium.png";
                               else if (quest.type === 'scout-sports') bgArt = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Proving.Grounds.png";
