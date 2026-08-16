@@ -499,10 +499,10 @@ const QuestBoard = () => {
 
                             {/* FOREGROUND CARD CONTENT */}
                             <div className="relative z-10 p-5 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 h-full">
-                              <div className="font-['VT323'] flex-grow max-w-full md:max-w-[65%]">
+                              <div className="font-['VT323'] flex-grow pr-0 md:pr-4">
                                 {/* Structured Header */}
                                 <div className="mb-3">
-                                  {/* Miniature Category Tag */}
+                                  {/* Top Tag */}
                                   <div className="flex items-center gap-2 mb-1.5">
                                     <span className={`px-2 py-0.5 text-[9px] font-['Press_Start_2P'] uppercase tracking-wider rounded border ${theme.tagColor}`}>
                                       {theme.tag}
@@ -521,37 +521,57 @@ const QuestBoard = () => {
 
                                 <p className="text-stone-200 mb-3 text-lg leading-relaxed drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{quest.description}</p>
                                 
-                                {/* Jeweled Reward Badges */}
-                                <div className="flex flex-wrap gap-2.5 text-base mt-2">
-                                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-950/50 border border-blue-500/40 shadow-inner">
-                                    <span className="text-cyan-400 text-xs">✧</span>
-                                    <span className="font-['Press_Start_2P'] text-[9px] text-cyan-300 font-bold">+{quest.xpReward || quest.xp} XP</span>
-                                  </div>
-                                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-950/50 border border-amber-500/40 shadow-inner">
-                                    <span className="text-amber-400 text-xs">🪙</span>
-                                    <span className="font-['Press_Start_2P'] text-[9px] text-amber-300 font-bold">+{quest.goldReward || quest.gold} Gold</span>
-                                  </div>
-                                </div>
+                                {/* Bottom Metrics: XP + Gold + Realm Record */}
+                                {(() => {
+                                  const hs = getHighScore(quest.id);
+                                  return (
+                                    <div className="flex flex-wrap items-center gap-2 mt-4">
+                                      {/* XP Badge */}
+                                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-950/50 border border-blue-500/40 shadow-inner">
+                                        <span className="text-cyan-400 text-xs">✧</span>
+                                        <span className="font-['Press_Start_2P'] text-[10px] text-cyan-300 font-bold">+{quest.xpReward || quest.xp} XP</span>
+                                      </div>
+
+                                      {/* Gold Badge */}
+                                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-950/50 border border-amber-500/40 shadow-inner">
+                                        <span className="text-amber-400 text-xs">🪙</span>
+                                        <span className="font-['Press_Start_2P'] text-[10px] text-amber-300 font-bold">+{quest.goldReward || quest.gold} Gold</span>
+                                      </div>
+
+                                      {/* High Score / Realm Record Badge */}
+                                      {hs && (
+                                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-amber-500/30 bg-amber-950/40 text-amber-300 font-['Press_Start_2P'] text-[10px] tracking-wider shadow-inner">
+                                          <span>👑</span>
+                                          <span>
+                                            RECORD: <strong className="text-amber-200">{hs.score}</strong>
+                                            <span className="text-zinc-400 font-normal text-[9px]"> by </span>
+                                            <span className="text-zinc-200">{hs.player || hs.player_name}</span>
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
                               </div>
 
                               {/* LAUNCHPAD / ACTIONS CONTAINER */}
-                              <div className="flex-shrink-0 w-full md:w-1/3 relative z-10">
+                              <div className="relative z-10 flex items-center md:items-end justify-end flex-shrink-0 w-full md:w-auto mt-4 md:mt-0">
                       {status === 'available' ? (
                         quest.type === 'incantation' && quest.questionBank?.length > 0 ? (
-                          <button onClick={() => navigate('/briefing/' + quest.id)} className={`w-full px-5 py-3 rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] flex items-center justify-center gap-2 ${sector.buttonBg}`}>
+                          <button onClick={() => navigate('/briefing/' + quest.id)} className={`inline-flex items-center justify-center gap-2 px-5 py-3 w-auto min-w-fit rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase whitespace-nowrap transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] ${sector.buttonBg}`}>
                             ENTER SCRIPTORIUM
                           </button>
                         ) : isGauntlet ? (
-                          <button onClick={() => navigate('/briefing/' + quest.id)} className={`w-full px-5 py-3.5 rounded-lg font-['Press_Start_2P'] text-xs tracking-wider uppercase transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] flex items-center justify-center gap-2 ${sector.buttonBg}`}>
+                          <button onClick={() => navigate('/briefing/' + quest.id)} className={`inline-flex items-center justify-center gap-2 px-5 py-3.5 w-auto min-w-fit rounded-lg font-['Press_Start_2P'] text-xs tracking-wider uppercase whitespace-nowrap transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] ${sector.buttonBg}`}>
                             <AlertTriangle size={18} /> ENTER THE DOJO
                           </button>
                         ) : isMultiStep ? (
-                          <button onClick={() => navigate('/briefing/' + quest.id)} className={`w-full px-5 py-3 rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] flex items-center justify-center gap-2 ${sector.buttonBg}`}>
+                          <button onClick={() => navigate('/briefing/' + quest.id)} className={`inline-flex items-center justify-center gap-2 px-5 py-3 w-auto min-w-fit rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase whitespace-nowrap transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] ${sector.buttonBg}`}>
                             <BookText size={18} /> ENTER THE LAGOON
                           </button>
                         ) : quest.type === 'scenario' ? (
                             !currentScenario ? (
-                                <button onClick={() => rollScenario(quest)} className={`w-full px-5 py-3 rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] flex items-center justify-center gap-2 ${sector.buttonBg}`}>Face a Scenario</button>
+                                <button onClick={() => rollScenario(quest)} className={`inline-flex items-center justify-center gap-2 px-5 py-3 w-auto min-w-fit rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase whitespace-nowrap transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] ${sector.buttonBg}`}>Face a Scenario</button>
                               ) : (
                                 <div>
                                     <p className="text-lg text-white mb-3">{currentScenario?.q}</p>
@@ -567,33 +587,19 @@ const QuestBoard = () => {
                                 </div>
                               )
 ) : quest.type === 'blitz' ? (
-                          <div className="w-full flex flex-col gap-2">
-                            {(() => {
-                              const hs = getHighScore(quest.id);
-                              return hs ? (
-                                <div className="text-center text-yellow-400 font-['VT323'] text-lg bg-yellow-900/30 rounded py-1 border border-yellow-500/30">
-                                  👑 HIGH SCORE: {hs.score} by {hs.player}
-                                </div>
-                              ) : (
-                                <div className="text-center text-stone-500 font-['VT323'] text-lg bg-stone-900/50 rounded py-1 border border-stone-700">
-                                  No high score yet. Be the first!
-                                </div>
-                              );
-                            })()}
-                            <button 
-                              onClick={() => navigate('/briefing/' + quest.id)} 
-                              className={`w-full px-5 py-3 rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] flex items-center justify-center gap-2 ${sector.buttonBg}`}
-                            >
-                              {quest.id === 104 ? <Star size={18} /> : quest.id === 113 ? <Wand size={18} /> : quest.id === 114 ? <Flame size={18} /> : <Zap size={18} />} 
-                              {quest.id === 104 ? 'ENTER THE PALACE' : quest.id === 113 ? 'ENTER THE VAULT' : quest.id === 114 ? 'ENTER THE FORGE' : quest.id === 103 ? 'SEEK INSIGHT' : 'ENTER THE LABORATORY'}
-                            </button>
-                          </div>
+                          <button 
+                            onClick={() => navigate('/briefing/' + quest.id)} 
+                            className={`inline-flex items-center justify-center gap-2 px-5 py-3 w-auto min-w-fit rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase whitespace-nowrap transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] ${sector.buttonBg}`}
+                          >
+                            {quest.id === 104 ? <Star size={18} /> : quest.id === 113 ? <Wand size={18} /> : quest.id === 114 ? <Flame size={18} /> : <Zap size={18} />} 
+                            {quest.id === 104 ? 'ENTER THE PALACE' : quest.id === 113 ? 'ENTER THE VAULT' : quest.id === 114 ? 'ENTER THE FORGE' : quest.id === 103 ? 'SEEK INSIGHT' : 'ENTER THE LABORATORY'}
+                          </button>
                         ) : quest.type === 'quiz' ? (
                           !activeQuizzes[quest.id] ? (
                             quest.questionBank?.length > 0 ? (
 <button
                                  onClick={() => startActiveQuiz(quest)}
-                                 className={`w-full px-5 py-3 rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] flex items-center justify-center gap-2 ${sector.buttonBg}`}
+                                 className={`inline-flex items-center justify-center gap-2 px-5 py-3 w-auto min-w-fit rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase whitespace-nowrap transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] ${sector.buttonBg}`}
                                >
                                  <Brain size={18} /> {quest.id === 104 ? 'ENTER THE PALACE' : 'START QUIZ'}
                                </button>
@@ -634,22 +640,22 @@ const QuestBoard = () => {
                             </div>
                         ) : isJournal ? (
                           quest.id === 106 ? (
-                            <button onClick={() => navigate('/briefing/106')} className={`w-full px-5 py-3 rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] flex items-center justify-center gap-2 ${sector.buttonBg}`}>
+                            <button onClick={() => navigate('/briefing/106')} className={`inline-flex items-center justify-center gap-2 px-5 py-3 w-auto min-w-fit rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase whitespace-nowrap transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] ${sector.buttonBg}`}>
                               <BookText size={18} /> SPEAK TO SCRIBE
                             </button>
                           ) : (
                             <div className="flex flex-col items-end gap-2"><textarea placeholder="Write your reflection..." value={journalTexts[quest.id] || ''} onChange={(e) => handleJournalTextChange(quest.id, e.target.value)} className="bg-black/80 border border-stone-600 rounded-md p-2 w-full h-24 text-stone-200 font-mono focus:ring-1 focus:ring-blue-500" /><button onClick={() => handleJournalSubmit(quest.id)} className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2 font-['VT323'] text-xl"><Upload size={18} /> SUBMIT</button></div>
                           )
                         ) : quest.type === 'upload' ? (
-                          <button onClick={() => navigate('/briefing/' + quest.id)} className={`w-full px-5 py-3 rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] flex items-center justify-center gap-2 ${sector.buttonBg}`}>
+                          <button onClick={() => navigate('/briefing/' + quest.id)} className={`inline-flex items-center justify-center gap-2 px-5 py-3 w-auto min-w-fit rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase whitespace-nowrap transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] ${sector.buttonBg}`}>
                             <Upload size={18} /> DISPATCH RAVEN
                           </button>
                         ) : quest.type === 'scout-arts' ? (
-                          <button onClick={() => navigate('/briefing/' + quest.id)} className={`w-full px-5 py-3 rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] flex items-center justify-center gap-2 ${sector.buttonBg}`}>
+                          <button onClick={() => navigate('/briefing/' + quest.id)} className={`inline-flex items-center justify-center gap-2 px-5 py-3 w-auto min-w-fit rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase whitespace-nowrap transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] ${sector.buttonBg}`}>
                             <Palette size={18} /> ENTER THE STUDIO
                           </button>
                         ) : quest.type === 'scout-sports' ? (
-                          <button onClick={() => navigate('/briefing/' + quest.id)} className={`w-full px-5 py-3 rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] flex items-center justify-center gap-2 ${sector.buttonBg}`}>
+                          <button onClick={() => navigate('/briefing/' + quest.id)} className={`inline-flex items-center justify-center gap-2 px-5 py-3 w-auto min-w-fit rounded-lg font-['Press_Start_2P'] text-[10px] tracking-wider uppercase whitespace-nowrap transition-all duration-100 active:translate-y-[2px] active:shadow-[0_1px_0_#000] ${sector.buttonBg}`}>
                             <Swords size={18} /> ENTER THE PROVING GROUNDS
                           </button>
                         ) : null
