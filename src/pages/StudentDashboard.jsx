@@ -200,18 +200,27 @@ const StudentDashboard = () => {
         </button>
       </div>
 
-      {/* DESKTOP & TABLET MAP VIEW (Classic Framed Stone-Border Canvas) */}
-      <div className="hidden md:flex w-full h-screen items-center justify-center p-2 sm:p-4 z-10 relative">
+      {/* Desktop / Tablet Container (Locked to 100dvh with rich slate/grey background) */}
+      <div className="hidden md:flex fixed inset-0 w-full h-[100dvh] overflow-hidden bg-gradient-to-br from-[#1a1c26] via-[#11121a] to-[#0a0b10] items-center justify-center select-none p-0 m-0 z-10">
         
-        {/* 16:9 Framed Map Canvas */}
-        <div className="relative z-10 h-[94vh] w-auto max-w-[96vw] aspect-video mx-auto overflow-hidden rounded-2xl border-4 border-stone-700/80 shadow-[0_0_80px_rgba(0,0,0,1)] bg-black">
+        {/* 16:9 Aspect-Clamped Canvas Container with Outer Drop Shadow & Bevel */}
+        <div 
+          className="relative flex items-center justify-center overflow-hidden rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.95),0_0_40px_rgba(0,0,0,0.8)] bg-black"
+          style={{
+            width: 'min(100vw, calc(100dvh * (16 / 9)))',
+            height: 'min(100dvh, calc(100vw * (9 / 16)))',
+            maxWidth: '100vw',
+            maxHeight: '100dvh',
+            aspectRatio: '16 / 9',
+          }}
+        >
           
           {/* 1. Background Map Layer */}
           <div className="absolute inset-0 bg-black/20 z-0" />
           <img 
             src={MAP_BG} 
             alt="Kingdom Map" 
-            className="absolute inset-0 w-full h-full object-cover opacity-85 pointer-events-none"
+            className="absolute inset-0 w-full h-full object-fill opacity-85 pointer-events-none select-none"
           />
 
           {/* 2. Interactive Map Locations */}
@@ -291,38 +300,38 @@ const StudentDashboard = () => {
             variant="emerald"
           />
 
-          {/* DESKTOP HERO SHOWCASE CARD (Water-Anchored, Bottom-Left) */}
-          <div className="absolute bottom-3 left-3 z-20 bg-black/55 backdrop-blur-md border border-stone-600/60 p-2.5 rounded-xl flex items-center gap-2.5 shadow-[0_0_25px_rgba(0,0,0,0.8)] max-w-[215px] pointer-events-auto">
-            <div className="relative w-16 h-22 bg-stone-950/80 border border-slate-700/80 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden shadow-inner">
+          {/* DESKTOP / TABLET HERO SHOWCASE CARD (Water-Anchored, Bottom-Left) */}
+          <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 z-20 bg-black/55 backdrop-blur-md border border-stone-600/60 p-2 sm:p-2.5 rounded-xl flex items-center gap-2 sm:gap-2.5 shadow-[0_0_25px_rgba(0,0,0,0.8)] max-w-[170px] sm:max-w-[215px] pointer-events-auto">
+            <div className="relative w-12 h-16 sm:w-16 sm:h-22 bg-stone-950/80 border border-slate-700/80 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden shadow-inner">
               <img 
                 src={currentUser?.currentBodySprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'} 
                 alt="Hero Portrait" 
-                className="w-full h-auto object-cover scale-[1.9] translate-y-4 drop-shadow-[0_4px_6px_rgba(0,0,0,0.9)]"
+                className="w-full h-auto object-cover scale-[1.9] translate-y-3 sm:translate-y-4 drop-shadow-[0_4px_6px_rgba(0,0,0,0.9)]"
               />
               <div className="absolute bottom-0 w-full h-2 bg-purple-500/20 blur-sm rounded-full z-0" />
             </div>
             <div className="flex flex-col justify-center flex-grow overflow-hidden">
-              <span className="text-[8px] text-amber-500 font-['Press_Start_2P'] uppercase tracking-wider mb-0.5 truncate">
+              <span className="text-[7px] sm:text-[8px] text-amber-500 font-['Press_Start_2P'] uppercase tracking-wider mb-0.5 truncate">
                 [{currentUser?.heroClass || 'HERO'}]
               </span>
-              <h2 className="text-xl font-bold text-white font-['VT323'] tracking-wide leading-none mb-1 truncate">
+              <h2 className="text-lg sm:text-xl font-bold text-white font-['VT323'] tracking-wide leading-none mb-0.5 sm:mb-1 truncate">
                 {currentUser?.heroName || 'Unknown Hero'}
               </h2>
-              <p className="text-[10px] text-stone-300 font-mono mb-1">
+              <p className="text-[9px] sm:text-[10px] text-stone-300 font-mono mb-0.5 sm:mb-1">
                 LVL {Math.floor((currentUser?.xp || 0) / 1000) + 1}
               </p>
-              <div className="flex flex-col gap-1">
-                <span className="text-[9px] font-mono text-amber-400 bg-amber-950/80 px-1.5 py-0.5 rounded border border-amber-600/40 w-fit">
+              <div className="flex flex-col gap-0.5 sm:gap-1">
+                <span className="text-[8px] sm:text-[9px] font-mono text-amber-400 bg-amber-950/80 px-1.5 py-0.5 rounded border border-amber-600/40 w-fit">
                   🪙 {currentUser?.gold || 0} G
                 </span>
-                <span className="text-[9px] font-mono text-cyan-300 bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-500/40 w-fit">
+                <span className="text-[8px] sm:text-[9px] font-mono text-cyan-300 bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-500/40 w-fit">
                   ⭐ {currentUser?.xp || 0} XP
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="absolute bottom-3 right-4 text-white/30 font-mono text-[10px] z-10">
+          <div className="absolute bottom-2 right-3 sm:bottom-3 sm:right-4 text-white/30 font-mono text-[9px] sm:text-[10px] z-10">
             Map v1.3
           </div>
         </div>
