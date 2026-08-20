@@ -203,166 +203,112 @@ const StudentDashboard = () => {
       {/* Desktop / Tablet Container (Locked to 100dvh with rich slate/grey background) */}
       <div className="hidden md:flex fixed inset-0 w-full h-[100dvh] overflow-hidden bg-gradient-to-br from-[#1a1c26] via-[#11121a] to-[#0a0b10] items-center justify-center select-none p-0 m-0 z-10">
         
-        {/* 16:9 Aspect Canvas with Container Query Context */}
+        {/* 16:9 Aspect-Clamped Canvas Container with Adaptive Tablet Scaling */}
         <div 
-          className="@container relative flex items-center justify-center overflow-hidden rounded-xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.95),0_0_40px_rgba(0,0,0,0.8)] bg-black"
+          className="relative flex items-center justify-center overflow-hidden rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.95),0_0_40px_rgba(0,0,0,0.8)] bg-black transition-transform duration-300 [@media(max-aspect-ratio:16/10)]:scale-[1.05] [@media(max-aspect-ratio:4/3)]:scale-[1.08] max-[1600px]:[aspect-ratio:4/3]:scale-[1.08] max-[1600px]:[aspect-ratio:16/10]:scale-[1.05]"
           style={{
             width: 'min(100vw, calc(100dvh * (16 / 9)))',
             height: 'min(100dvh, calc(100vw * (9 / 16)))',
             maxWidth: '100vw',
             maxHeight: '100dvh',
             aspectRatio: '16 / 9',
-            containerType: 'size', // Enables cqw and cqh for all child elements
           }}
         >
           
-          {/* 1. Map Graphic Background */}
+          {/* 1. Background Map Layer */}
+          <div className="absolute inset-0 bg-black/20 z-0" />
           <img 
             src={MAP_BG} 
-            alt="Realm Map" 
-            className="w-full h-full object-fill pointer-events-none select-none"
+            alt="Kingdom Map" 
+            className="absolute inset-0 w-full h-full object-fill opacity-85 pointer-events-none select-none"
           />
 
-          {/* 2. PINS & LANDMARKS (Scale-locked via cqw & cqh) */}
+          {/* 2. Interactive Map Locations */}
           
-          {/* 1. THE ARCHIVES */}
-          <button
-            onClick={() => navigate('/archives')}
-            className="group absolute flex items-center justify-center gap-1.5 font-pixel tracking-wider uppercase rounded-md backdrop-blur-md cursor-pointer transition-all duration-150 active:translate-y-0.5 hover:scale-105 shadow-xl select-none z-20 bg-black/75 border border-amber-400/80 text-amber-100 hover:border-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.3)]"
-            style={{
-              left: '19cqw',
-              top: '22cqh',
-              fontSize: 'clamp(8px, 1.1cqw, 13px)',
-              padding: '0.3cqw 0.75cqw',
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            <span>THE ARCHIVES</span>
-            <div className="absolute top-full mt-2 w-48 p-2 bg-black/95 border border-yellow-500/50 rounded-lg shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 text-stone-300 text-[10px] font-mono text-left leading-relaxed">
-              Your permanent record. Track your Intellect, Wisdom, and overall power level.
-            </div>
-          </button>
+          {/* QUEST BOARD */}
+          <MapLocation 
+            label="Quest Board" 
+            description="Accept daily tasks, quizzes, and missions to earn Gold and XP."
+            x="18%" 
+            y="45%" 
+            delay={0.2}
+            onClick={() => navigate('/quests')} 
+          />
 
-          {/* 2. TOWN SQUARE */}
-          <button
-            onClick={() => navigate('/leaderboard')}
-            className="group absolute flex items-center justify-center gap-1.5 font-pixel tracking-wider uppercase rounded-md backdrop-blur-md cursor-pointer transition-all duration-150 active:translate-y-0.5 hover:scale-105 shadow-xl select-none z-20 bg-black/75 border border-amber-400/80 text-amber-100 hover:border-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.3)]"
-            style={{
-              left: '48cqw',
-              top: '26cqh',
-              fontSize: 'clamp(8px, 1.1cqw, 13px)',
-              padding: '0.3cqw 0.75cqw',
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            <span>TOWN SQUARE</span>
-            <div className="absolute top-full mt-2 w-48 p-2 bg-black/95 border border-yellow-500/50 rounded-lg shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 text-stone-300 text-[10px] font-mono text-left leading-relaxed">
-              The Hall of Legends. See how your rank and Boss Kills stack up against the realm.
-            </div>
-          </button>
+          {/* TOWN SQUARE / LEADERBOARD */}
+          <MapLocation 
+            label="Town Square" 
+            description="The Hall of Legends. See how your rank and Boss Kills stack up against the realm."
+            x="43%" 
+            y="24%" 
+            delay={0.4}
+            onClick={() => navigate('/leaderboard')} 
+          />
 
-          {/* 3. HALL OF TRIUMPHS */}
-          <button
-            onClick={() => navigate('/trophies')}
-            className="group absolute flex items-center justify-center gap-1.5 font-pixel tracking-wider uppercase rounded-md backdrop-blur-md cursor-pointer transition-all duration-150 active:translate-y-0.5 hover:scale-105 shadow-xl select-none z-20 bg-black/75 border border-yellow-400/80 text-yellow-100 hover:border-yellow-300 shadow-[0_0_12px_rgba(234,179,8,0.4)]"
-            style={{
-              left: '78cqw',
-              top: '18cqh',
-              fontSize: 'clamp(8px, 1.1cqw, 13px)',
-              padding: '0.3cqw 0.75cqw',
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            <Trophy size={14} className="text-yellow-400" />
-            <span>HALL OF TRIUMPHS</span>
-            <div className="absolute top-full mt-2 w-48 p-2 bg-black/95 border border-yellow-500/50 rounded-lg shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 text-stone-300 text-[10px] font-mono text-left leading-relaxed">
-              View your unlocked Achievements and claim real-world rewards!
-            </div>
-          </button>
+          {/* THE ARCHIVES */}
+          <MapLocation 
+            label="The Archives" 
+            description="Your permanent record. Track your Intellect, Wisdom, and overall power level."
+            x="17%" 
+            y="15%" 
+            delay={0.6}
+            onClick={() => navigate('/archives')} 
+          />
 
-          {/* 4. QUEST BOARD */}
-          <button
-            onClick={() => navigate('/quests')}
-            className="group absolute flex items-center justify-center gap-1.5 font-pixel tracking-wider uppercase rounded-md backdrop-blur-md cursor-pointer transition-all duration-150 active:translate-y-0.5 hover:scale-105 shadow-xl select-none z-20 bg-black/75 border border-amber-400/80 text-amber-100 hover:border-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.3)]"
-            style={{
-              left: '23cqw',
-              top: '55cqh',
-              fontSize: 'clamp(8px, 1.1cqw, 13px)',
-              padding: '0.3cqw 0.75cqw',
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            <span>QUEST BOARD</span>
-            <div className="absolute top-full mt-2 w-48 p-2 bg-black/95 border border-yellow-500/50 rounded-lg shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 text-stone-300 text-[10px] font-mono text-left leading-relaxed">
-              Accept daily tasks, quizzes, and missions to earn Gold and XP.
-            </div>
-          </button>
+          {/* THE BARRACKS */}
+          <MapLocation 
+            label="The Barracks" 
+            description="Spend your hard-earned gold on legendary outfits and gear."
+            x="68%" 
+            y="41%" 
+            delay={0.8}
+            onClick={() => navigate('/barracks')} 
+          />
 
-          {/* 5. THE BARRACKS */}
-          <button
-            onClick={() => navigate('/barracks')}
-            className="group absolute flex items-center justify-center gap-1.5 font-pixel tracking-wider uppercase rounded-md backdrop-blur-md cursor-pointer transition-all duration-150 active:translate-y-0.5 hover:scale-105 shadow-xl select-none z-20 bg-black/75 border border-amber-400/80 text-amber-100 hover:border-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.3)]"
-            style={{
-              left: '71cqw',
-              top: '50cqh',
-              fontSize: 'clamp(8px, 1.1cqw, 13px)',
-              padding: '0.3cqw 0.75cqw',
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            <span>THE BARRACKS</span>
-            <div className="absolute top-full mt-2 w-48 p-2 bg-black/95 border border-yellow-500/50 rounded-lg shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 text-stone-300 text-[10px] font-mono text-left leading-relaxed">
-              Spend your hard-earned gold on legendary outfits and gear.
-            </div>
-          </button>
-
-          {/* 6. THE DUNGEON */}
-          <button
+          {/* THE DUNGEON */}
+          <MapLocation 
+            label="The Dungeon"
+            description="Face terrifying bosses. Unlocked by logging in regularly and completing specific quests!"
+            x="50%" 
+            y="65%" 
+            delay={1.0}
             onClick={() => navigate('/dungeon')}
-            className="group absolute flex items-center justify-center gap-1.5 font-pixel tracking-wider uppercase rounded-md backdrop-blur-md cursor-pointer transition-all duration-150 active:translate-y-0.5 hover:scale-105 shadow-xl select-none z-20 bg-black/80 border border-red-500/80 text-red-100 hover:border-red-400 shadow-[0_0_12px_rgba(239,68,68,0.4)]"
-            style={{
-              left: '54cqw',
-              top: '73cqh',
-              fontSize: 'clamp(8px, 1.1cqw, 13px)',
-              padding: '0.3cqw 0.75cqw',
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            <span>THE DUNGEON</span>
-            <div className="absolute top-full mt-2 w-48 p-2 bg-black/95 border border-red-500/50 rounded-lg shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 text-stone-300 text-[10px] font-mono text-left leading-relaxed">
-              Face terrifying bosses. Unlocked by logging in regularly and completing specific quests!
-            </div>
-          </button>
+            variant="danger"
+          />
 
-          {/* 7. TAVERN GROVE */}
-          <button
+          {/* HALL OF TRIUMPHS */}
+          <MapLocation 
+            label="Hall of Triumphs"
+            description="View your unlocked Achievements and claim real-world rewards!"
+            icon={Trophy}
+            x="70%" 
+            y="13%" 
+            delay={1.2}
+            onClick={() => navigate('/trophies')}
+            variant="gold"
+          />
+
+          {/* TAVERN GROVE GALLERY */}
+          <MapLocation 
+            label="Tavern Grove" 
+            description="View approved student art projects and creative masterpieces pinned to the wall!"
+            icon={Palette}
+            x="35%" 
+            y="78%" 
+            delay={1.4}
             onClick={() => navigate('/tavern-gallery')}
-            className="group absolute flex items-center justify-center gap-1.5 font-pixel tracking-wider uppercase rounded-md backdrop-blur-md cursor-pointer transition-all duration-150 active:translate-y-0.5 hover:scale-105 shadow-xl select-none z-20 bg-black/80 border border-emerald-500/80 text-emerald-100 hover:border-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.4)]"
-            style={{
-              left: '41cqw',
-              top: '85cqh',
-              fontSize: 'clamp(8px, 1.1cqw, 13px)',
-              padding: '0.3cqw 0.75cqw',
-              transform: 'translate(-50%, -50%)',
-            }}
-          >
-            <Palette size={14} className="text-emerald-400" />
-            <span>TAVERN GROVE</span>
-            <div className="absolute top-full mt-2 w-48 p-2 bg-black/95 border border-emerald-500/50 rounded-lg shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 text-stone-300 text-[10px] font-mono text-left leading-relaxed">
-              View approved student art projects and creative masterpieces pinned to the wall!
-            </div>
-          </button>
+            variant="emerald"
+          />
 
-          {/* 3. HERO CARD (Anchored in shoreline with container-scaled width) */}
+          {/* Hero Profile Card - Positioned up and right toward the shoreline */}
           <div 
-            className="absolute z-30 bg-black/60 backdrop-blur-md border border-stone-600/60 p-2 sm:p-2.5 rounded-xl flex items-center gap-2 sm:gap-2.5 shadow-[0_0_25px_rgba(0,0,0,0.8)] pointer-events-auto transition-all"
+            className="absolute z-30 bg-black/55 backdrop-blur-md border border-stone-600/60 p-2 sm:p-2.5 rounded-xl flex items-center gap-2 sm:gap-2.5 shadow-[0_0_25px_rgba(0,0,0,0.8)] max-w-[175px] sm:max-w-[210px] pointer-events-auto transition-all"
             style={{
-              bottom: '7cqh',
-              left: '5cqw',
-              width: 'clamp(145px, 14.5cqw, 220px)',
+              bottom: '7%',
+              left: '5%',
             }}
           >
-            <div className="relative w-12 h-16 sm:w-14 sm:h-20 bg-stone-950/80 border border-slate-700/80 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden shadow-inner">
+            <div className="relative w-12 h-16 sm:w-16 sm:h-22 bg-stone-950/80 border border-slate-700/80 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden shadow-inner">
               <img 
                 src={currentUser?.currentBodySprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'} 
                 alt="Hero Portrait" 
@@ -371,7 +317,7 @@ const StudentDashboard = () => {
               <div className="absolute bottom-0 w-full h-2 bg-purple-500/20 blur-sm rounded-full z-0" />
             </div>
             <div className="flex flex-col justify-center flex-grow overflow-hidden">
-              <span className="text-[7px] sm:text-[8px] text-amber-500 font-pixel uppercase tracking-wider mb-0.5 truncate">
+              <span className="text-[7px] sm:text-[8px] text-amber-500 font-['Press_Start_2P'] uppercase tracking-wider mb-0.5 truncate">
                 [{currentUser?.heroClass || 'HERO'}]
               </span>
               <h2 className="text-lg sm:text-xl font-bold text-white font-['VT323'] tracking-wide leading-none mb-0.5 sm:mb-1 truncate">
@@ -391,15 +337,8 @@ const StudentDashboard = () => {
             </div>
           </div>
 
-          {/* 4. MAP VERSION WATERMARK */}
-          <div 
-            className="absolute text-white/30 font-mono text-[9px] sm:text-[10px] z-10 select-none"
-            style={{
-              bottom: '3cqh',
-              right: '3cqw',
-            }}
-          >
-            Map v1.4
+          <div className="absolute bottom-2 right-3 sm:bottom-3 sm:right-4 text-white/30 font-mono text-[9px] sm:text-[10px] z-10">
+            Map v1.3
           </div>
         </div>
       </div>
