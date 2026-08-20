@@ -300,8 +300,14 @@ const StudentDashboard = () => {
             variant="emerald"
           />
 
-          {/* DESKTOP / TABLET HERO SHOWCASE CARD (Water-Anchored, Bottom-Left) */}
-          <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 z-20 bg-black/55 backdrop-blur-md border border-stone-600/60 p-2 sm:p-2.5 rounded-xl flex items-center gap-2 sm:gap-2.5 shadow-[0_0_25px_rgba(0,0,0,0.8)] max-w-[170px] sm:max-w-[215px] pointer-events-auto">
+          {/* Hero Profile Card - Positioned up and right toward the shoreline */}
+          <div 
+            className="absolute z-30 bg-black/55 backdrop-blur-md border border-stone-600/60 p-2 sm:p-2.5 rounded-xl flex items-center gap-2 sm:gap-2.5 shadow-[0_0_25px_rgba(0,0,0,0.8)] max-w-[175px] sm:max-w-[210px] pointer-events-auto transition-all"
+            style={{
+              bottom: '7%',
+              left: '5%',
+            }}
+          >
             <div className="relative w-12 h-16 sm:w-16 sm:h-22 bg-stone-950/80 border border-slate-700/80 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden shadow-inner">
               <img 
                 src={currentUser?.currentBodySprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'} 

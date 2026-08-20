@@ -3,6 +3,9 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        pixel: ['"Press Start 2P"', 'monospace', 'cursive'],
+      },
       colors: {
         'rpg-dark': '#1a1a1d',
         'rpg-slate': '#4e4e50',

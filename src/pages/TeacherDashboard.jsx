@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Plus, Check, X, Search, Image as ImageIcon, BookCopy, Save, Upload, Clock, Shield, Star, DollarSign, Swords, Skull, Heart, Gift, Ticket, Download, FileText, ExternalLink } from 'lucide-react';
 import { useGame } from '../context/GameContext';
+import RealmAnalytics from '../components/RealmAnalytics';
 
 const TeacherDashboard = () => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const TeacherDashboard = () => {
     gallerySubmissions,
   } = useGame();
 
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'analytics'
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newQuest, setNewQuest] = useState({
     title: '',
@@ -190,8 +192,38 @@ const TeacherDashboard = () => {
 
       <div className="max-w-7xl mx-auto p-6 space-y-8">
 
-        {/* Realm Overview Section */}
-        <div className="bg-black/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
+        {/* Master Navigation Tabs */}
+        <div className="flex flex-wrap items-center gap-3 p-2 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`px-4 py-2 rounded-lg font-pixel text-xs tracking-wider uppercase transition-all ${
+              activeTab === 'overview'
+                ? 'bg-amber-600 text-amber-50 shadow-[0_2px_0_#78350f]'
+                : 'bg-[#181a24] text-zinc-400 hover:text-zinc-200 border border-white/5'
+            }`}
+          >
+            ⚔️ Command Deck
+          </button>
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`px-4 py-2 rounded-lg font-pixel text-xs tracking-wider uppercase transition-all ${
+              activeTab === 'analytics'
+                ? 'bg-amber-600 text-amber-50 shadow-[0_2px_0_#78350f]'
+                : 'bg-[#181a24] text-zinc-400 hover:text-zinc-200 border border-white/5'
+            }`}
+          >
+            📊 Realm Analytics
+          </button>
+        </div>
+
+        {activeTab === 'analytics' && (
+          <RealmAnalytics profiles={students} submissions={submissions} />
+        )}
+
+        {activeTab === 'overview' && (
+          <>
+            {/* Realm Overview Section */}
+            <div className="bg-black/60 backdrop-blur-md border border-white/10 rounded-xl p-6">
           <h2 className="font-['Press_Start_2P'] text-xl text-yellow-400 text-center mb-6">REALM OVERVIEW</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
             <div>
@@ -756,6 +788,8 @@ const TeacherDashboard = () => {
             );
           })()}
         </div>
+          </>
+        )}
 
       </div>
     </div>
