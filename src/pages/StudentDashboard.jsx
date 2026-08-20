@@ -203,9 +203,9 @@ const StudentDashboard = () => {
       {/* Desktop / Tablet Container (Locked to 100dvh with rich slate/grey background) */}
       <div className="hidden md:flex fixed inset-0 w-full h-[100dvh] overflow-hidden bg-gradient-to-br from-[#1a1c26] via-[#11121a] to-[#0a0b10] items-center justify-center select-none p-0 m-0 z-10">
         
-        {/* 16:9 Aspect-Clamped Canvas Container with Outer Drop Shadow & Bevel */}
+        {/* 16:9 Aspect-Clamped Canvas Container with Adaptive Tablet Scaling */}
         <div 
-          className="relative flex items-center justify-center overflow-hidden rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.95),0_0_40px_rgba(0,0,0,0.8)] bg-black"
+          className="relative flex items-center justify-center overflow-hidden rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.95),0_0_40px_rgba(0,0,0,0.8)] bg-black transition-transform duration-300 [@media(max-aspect-ratio:16/10)]:scale-[1.05] [@media(max-aspect-ratio:4/3)]:scale-[1.08] max-[1600px]:[aspect-ratio:4/3]:scale-[1.08] max-[1600px]:[aspect-ratio:16/10]:scale-[1.05]"
           style={{
             width: 'min(100vw, calc(100dvh * (16 / 9)))',
             height: 'min(100dvh, calc(100vw * (9 / 16)))',
