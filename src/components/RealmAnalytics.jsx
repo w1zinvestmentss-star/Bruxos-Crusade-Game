@@ -4,6 +4,7 @@ export default function RealmAnalytics({ profiles = [], submissions = [] }) {
   const [subTab, setSubTab] = useState('donor'); // 'donor' | 'parent' | 'student'
   const [daysRange, setDaysRange] = useState(14);
   const [selectedStudentId, setSelectedStudentId] = useState(null);
+  const [dossierStudentId, setDossierStudentId] = useState(null);
 
   // 1. Calculate Aggregate Global Telemetry
   const globalMetrics = useMemo(() => {
@@ -145,6 +146,27 @@ export default function RealmAnalytics({ profiles = [], submissions = [] }) {
 
   // Active Selected Student Report for Live Preview
   const activeReport = parentReports.find((r) => r.profile.id === selectedStudentId) || parentReports[0];
+
+  // Active Dossier Profile for Stage 3
+  const activeDossier = profiles.find((p) => p.id === dossierStudentId) || profiles[0];
+
+  // Dynamic Hero Title Generator
+  const getHeroHonorific = (p) => {
+    if (!p) return 'Valiant Hero of the Realm';
+    const hw = p.upload_quests_completed ?? p.uploadQuestsCompleted ?? 0;
+    const quizzes = (p.quiz_quests_completed ?? p.quizQuestsCompleted ?? 0) + (p.multi_step_quests_completed ?? p.multiStepQuestsCompleted ?? 0);
+    const defeatedList = p.defeated_bosses ?? p.defeatedBosses ?? [];
+    const bosses = Array.isArray(defeatedList) ? defeatedList.length : 0;
+    const growth = (p.final_gpa ?? p.finalGPA ?? 0) - (p.midterm_gpa ?? p.midtermGPA ?? 0);
+
+    if (bosses >= 12) return 'Grand Conqueror of the Dungeon';
+    if (hw >= 40) return 'Grand Scribe of the Golden Quill';
+    if (quizzes >= 80) return 'Archmage of Curriculum Lore';
+    if (growth >= 40) return 'Sovereign of the Great Comeback';
+    if ((p.sports_quests_completed ?? p.sportsQuestsCompleted ?? 0) >= 15) return 'Champion Vanguard of the Proving Grounds';
+    if ((p.arts_quests_completed ?? p.artsQuestsCompleted ?? 0) >= 15) return 'Master Artisan of the Grand Studio';
+    return `Knight of the Fifth Grade (${p.hero_class || p.heroClass || 'Adventurer'})`;
+  };
 
   // Copy Email Summary to Clipboard
   const handleCopyEmail = (report) => {
@@ -608,14 +630,245 @@ Thank you for supporting our hero's learning journey!`;
         </div>
       )}
 
-      {/* SUB-VIEW 3: PLACEHOLDER FOR STAGE 3 */}
-      {subTab === 'student' && (
-        <div className="p-12 text-center rounded-xl border border-white/10 bg-[#12131c]">
-          <div className="text-3xl mb-3">🎓</div>
-          <h3 className="font-pixel text-lg text-amber-200 mb-2">Stage 3: Student Hero Legacy Dossiers</h3>
-          <p className="text-sm text-zinc-400 max-w-md mx-auto">
-            Ready to be activated in Stage 3. Will feature individual student selectors and printable parchment certificates of achievement.
-          </p>
+      {/* SUB-VIEW 3: STUDENT HERO DOSSIERS & CERTIFICATES */}
+      {subTab === 'student' && activeDossier && (
+        <div className="space-y-6">
+          {/* Student Selector & Print Controls (Hidden in Print) */}
+          <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl border border-white/10 bg-[#12131c] print:hidden">
+            <div className="flex items-center gap-3">
+              <label className="text-xs font-pixel text-zinc-300 uppercase">Select Hero:</label>
+              <select
+                value={activeDossier.id}
+                onChange={(e) => setDossierStudentId(e.target.value)}
+                className="px-3 py-1.5 rounded-lg bg-black border border-white/20 text-xs font-pixel text-amber-300 focus:outline-none"
+              >
+                {profiles.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.hero_name || p.heroName} ({p.real_name || p.realName || 'No Name'}) - Lvl {Math.floor((p.xp || 0) / 1000) + 1}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => window.print()}
+                className="px-4 py-2 rounded-lg font-pixel text-xs tracking-wider uppercase bg-gradient-to-b from-amber-600 to-amber-800 hover:from-amber-500 text-amber-50 border-t border-amber-400/40 shadow-[0_2px_0_#78350f]"
+              >
+                🖨 Print Current Certificate
+              </button>
+            </div>
+          </div>
+
+          {/* SCREEN VIEW: FULL HERO DOSSIER (Hidden in Print) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 print:hidden">
+            {/* Left Column: Avatar & Character Card (4 cols) */}
+            <div className="lg:col-span-4 p-6 rounded-xl border-2 border-amber-500/40 bg-gradient-to-br from-[#1c1e2b] via-[#12131d] to-[#0a0b10] shadow-2xl text-center flex flex-col items-center justify-between">
+              <div className="w-full">
+                <span className="px-2.5 py-0.5 text-[9px] font-pixel text-amber-400 uppercase bg-amber-950/60 border border-amber-500/30 rounded">
+                  Class of 2025 • Grade 5
+                </span>
+
+                <h3 className="font-pixel text-xl text-amber-100 mt-3 font-bold">
+                  {activeDossier.hero_name || activeDossier.heroName}
+                </h3>
+                <div className="text-xs text-zinc-400 font-sans mt-0.5">
+                  {activeDossier.real_name || activeDossier.realName}
+                </div>
+
+                <div className="text-[11px] font-pixel text-cyan-300 mt-2 px-2 py-1 rounded bg-cyan-950/40 border border-cyan-500/30">
+                  {getHeroHonorific(activeDossier)}
+                </div>
+
+                {/* Hero Avatar Portrait */}
+                <div className="relative w-32 h-32 mx-auto my-4 rounded-xl border-2 border-amber-500/30 bg-black/60 overflow-hidden flex items-center justify-center shadow-inner">
+                  {(activeDossier.current_body_sprite || activeDossier.currentBodySprite) ? (
+                    <img
+                      src={activeDossier.current_body_sprite || activeDossier.currentBodySprite}
+                      alt={activeDossier.hero_name || activeDossier.heroName}
+                      className="w-full h-full object-contain pixelated"
+                    />
+                  ) : (
+                    <span className="text-4xl">🧙‍♂️</span>
+                  )}
+                </div>
+
+                {/* Core Level & Economy Stats */}
+                <div className="grid grid-cols-2 gap-2 text-left font-pixel text-xs w-full">
+                  <div className="p-2.5 rounded-lg bg-black/40 border border-white/5">
+                    <div className="text-zinc-500 text-[9px]">LEVEL</div>
+                    <div className="text-base text-cyan-300 font-bold">
+                      {Math.floor((activeDossier.xp || 0) / 1000) + 1}
+                    </div>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-black/40 border border-white/5">
+                    <div className="text-zinc-500 text-[9px]">TOTAL XP</div>
+                    <div className="text-base text-amber-300 font-bold">
+                      {(activeDossier.xp || 0).toLocaleString()}
+                    </div>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-black/40 border border-white/5">
+                    <div className="text-zinc-500 text-[9px]">GOLD ACCUMULATED</div>
+                    <div className="text-sm text-yellow-300 font-bold">
+                      {(activeDossier.gold || 0).toLocaleString()} G
+                    </div>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-black/40 border border-white/5">
+                    <div className="text-zinc-500 text-[9px]">ACTIVE REALM DAYS</div>
+                    <div className="text-sm text-emerald-300 font-bold">
+                      {activeDossier.login_streak ?? activeDossier.loginStreak ?? 0} Days
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Academic Growth Delta */}
+              <div className="w-full mt-4 p-3 rounded-lg bg-amber-950/20 border border-amber-500/20 text-left">
+                <div className="text-[9px] font-pixel text-amber-400 uppercase">Academic Growth Trajectory</div>
+                <div className="flex justify-between items-center text-xs font-pixel text-zinc-300 mt-1">
+                  <span>Strategy: <strong className="text-cyan-300">{activeDossier.midterm_gpa ?? activeDossier.midtermGPA ?? 0}</strong></span>
+                  <span>➔</span>
+                  <span>Execution: <strong className="text-amber-300">{activeDossier.final_gpa ?? activeDossier.finalGPA ?? 0}</strong></span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Detailed Achievement Breakdown & Live Certificate Preview (8 cols) */}
+            <div className="lg:col-span-8 space-y-6">
+              {/* 6 Category Accomplishment Grid */}
+              <div className="p-6 rounded-xl border border-white/10 bg-[#12131c] shadow-xl">
+                <h4 className="font-pixel text-sm text-amber-200 uppercase tracking-wider mb-4">
+                  📜 Lifetime Academic & Holistic Exploits
+                </h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 font-pixel">
+                  <div className="p-3 rounded-lg bg-black/40 border border-cyan-500/20">
+                    <div className="text-[10px] text-cyan-400 uppercase">Curriculum Blitzes</div>
+                    <div className="text-xl text-cyan-200 font-bold mt-1">
+                      {(activeDossier.quiz_quests_completed ?? activeDossier.quizQuestsCompleted ?? 0) + (activeDossier.multi_step_quests_completed ?? activeDossier.multiStepQuestsCompleted ?? 0) + (activeDossier.cipher_quests_completed ?? activeDossier.cipherQuestsCompleted ?? 0)}
+                    </div>
+                    <div className="text-[9px] text-zinc-500 mt-0.5">Math & Science Quests</div>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-black/40 border border-amber-500/20">
+                    <div className="text-[10px] text-amber-400 uppercase">Homework Verified</div>
+                    <div className="text-xl text-amber-200 font-bold mt-1">
+                      {activeDossier.upload_quests_completed ?? activeDossier.uploadQuestsCompleted ?? 0}
+                    </div>
+                    <div className="text-[9px] text-zinc-500 mt-0.5">Dispatches Dispatched</div>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-black/40 border border-red-500/20">
+                    <div className="text-[10px] text-red-400 uppercase">PE & Athletics Feats</div>
+                    <div className="text-xl text-red-200 font-bold mt-1">
+                      {activeDossier.sports_quests_completed ?? activeDossier.sportsQuestsCompleted ?? 0}
+                    </div>
+                    <div className="text-[9px] text-zinc-500 mt-0.5">Fitness Sessions</div>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-black/40 border border-purple-500/20">
+                    <div className="text-[10px] text-purple-400 uppercase">Creative Arts Works</div>
+                    <div className="text-xl text-purple-200 font-bold mt-1">
+                      {activeDossier.arts_quests_completed ?? activeDossier.artsQuestsCompleted ?? 0}
+                    </div>
+                    <div className="text-[9px] text-zinc-500 mt-0.5">Artwork Projects</div>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-black/40 border border-emerald-500/20">
+                    <div className="text-[10px] text-emerald-400 uppercase">Reflections Written</div>
+                    <div className="text-xl text-emerald-200 font-bold mt-1">
+                      {activeDossier.journal_quests_completed ?? activeDossier.journalQuestsCompleted ?? 0}
+                    </div>
+                    <div className="text-[9px] text-zinc-500 mt-0.5">Scribe Sanctum Logs</div>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-black/40 border border-yellow-500/20">
+                    <div className="text-[10px] text-yellow-400 uppercase">Dungeon Bosses Slain</div>
+                    <div className="text-xl text-yellow-200 font-bold mt-1">
+                      {Array.isArray(activeDossier.defeated_bosses ?? activeDossier.defeatedBosses) ? (activeDossier.defeated_bosses ?? activeDossier.defeatedBosses).length : 0}
+                    </div>
+                    <div className="text-[9px] text-zinc-500 mt-0.5">Major Boss Trophies</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Live Diploma Preview Box */}
+              <div className="p-6 rounded-xl border-2 border-amber-500/40 bg-gradient-to-b from-[#181a24] to-[#0d0e14] shadow-xl text-center space-y-3">
+                <div className="text-xs font-pixel text-amber-400 uppercase tracking-widest">
+                  ⚜️ Kingdom Decree of Academic Valor (Preview) ⚜️
+                </div>
+                <p className="text-xs text-zinc-300 font-serif italic max-w-lg mx-auto">
+                  "Be it known across the realm that {activeDossier.real_name || activeDossier.realName || activeDossier.hero_name || activeDossier.heroName}, known in legend as {activeDossier.hero_name || activeDossier.heroName}, has achieved the rank of Level {Math.floor((activeDossier.xp || 0) / 1000) + 1} {getHeroHonorific(activeDossier)} through tireless dedication to the curriculum."
+                </p>
+                <div className="pt-2">
+                  <button
+                    onClick={() => window.print()}
+                    className="px-5 py-2 rounded-lg font-pixel text-xs tracking-wider uppercase bg-gradient-to-b from-amber-600 to-amber-800 text-amber-100 border-t border-amber-400/40 shadow-lg hover:from-amber-500 transition-all cursor-pointer"
+                  >
+                    📄 Print Official Diploma (PDF)
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* PRINT-ONLY CERTIFICATE TEMPLATE (Formatted for Standard 8.5x11 Print/PDF) */}
+          <div className="hidden print:block p-12 text-black bg-white min-h-[700px] border-8 border-double border-amber-900 rounded-2xl relative text-center font-serif">
+            {/* Decorative Ornate Corners */}
+            <span className="absolute top-3 left-4 text-2xl select-none">⚜️</span>
+            <span className="absolute top-3 right-4 text-2xl select-none">⚜️</span>
+            <span className="absolute bottom-3 left-4 text-2xl select-none">⚜️</span>
+            <span className="absolute bottom-3 right-4 text-2xl select-none">⚜️</span>
+
+            {/* Royal Header */}
+            <div className="space-y-1 mb-6">
+              <div className="text-xs uppercase tracking-[0.3em] text-zinc-600 font-sans font-bold">
+                Kingdom of Ontario • Grade 5 Academic Crusade
+              </div>
+              <h1 className="text-3xl font-extrabold tracking-wider uppercase text-amber-950 font-serif">
+                Decree of Academic Valor
+              </h1>
+              <div className="w-48 h-0.5 bg-amber-900 mx-auto mt-2" />
+            </div>
+
+            {/* Award Citation */}
+            <p className="text-sm italic text-zinc-700 max-w-xl mx-auto mb-4 leading-relaxed">
+              Let it be proclaimed across all schools and taverns of the realm that
+            </p>
+
+            {/* Student Name */}
+            <div className="my-4">
+              <div className="text-3xl font-bold text-black border-b-2 border-black/20 pb-1 inline-block min-w-[320px]">
+                {activeDossier.real_name || activeDossier.realName || activeDossier.hero_name || activeDossier.heroName}
+              </div>
+              <div className="text-sm font-sans font-semibold text-amber-900 mt-1 uppercase tracking-widest">
+                Known in the Realm as: "{activeDossier.hero_name || activeDossier.heroName}"
+              </div>
+            </div>
+
+            {/* Honorific & Accomplishment Summary */}
+            <p className="text-sm text-zinc-800 max-w-2xl mx-auto leading-relaxed my-4">
+              has faithfully completed the Crusade, attained the legendary distinction of <br />
+              <strong className="text-base text-amber-950 uppercase">{getHeroHonorific(activeDossier)}</strong>, <br />
+              conquering <strong>{(activeDossier.quiz_quests_completed ?? activeDossier.quizQuestsCompleted ?? 0) + (activeDossier.multi_step_quests_completed ?? activeDossier.multiStepQuestsCompleted ?? 0)}</strong> academic challenges, 
+              dispatching <strong>{activeDossier.upload_quests_completed ?? activeDossier.uploadQuestsCompleted ?? 0}</strong> verified homework scrolls, and reaching <strong>Level {Math.floor((activeDossier.xp || 0) / 1000) + 1}</strong>.
+            </p>
+
+            {/* Signature & Seal Block */}
+            <div className="grid grid-cols-2 gap-12 mt-16 pt-8 border-t border-zinc-300 max-w-xl mx-auto text-center font-sans text-xs">
+              <div>
+                <div className="border-b border-black w-48 mx-auto mb-1" />
+                <div className="font-bold text-zinc-800">Game Master & Teacher</div>
+                <div className="text-[10px] text-zinc-500">Authorized by the Realm</div>
+              </div>
+              <div>
+                <div className="text-base font-serif font-bold text-amber-950 mb-1">
+                  {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                </div>
+                <div className="font-bold text-zinc-800">Date of Decree</div>
+                <div className="text-[10px] text-zinc-500">Academic Year Completion</div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
