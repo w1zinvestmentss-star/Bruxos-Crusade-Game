@@ -110,9 +110,10 @@ const Login = () => {
 
           {/* Scroll Down Indicator */}
           <motion.div
+            onClick={() => document.getElementById('guide-section')?.scrollIntoView({ behavior: 'smooth' })}
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute bottom-10 text-center"
+            className="absolute bottom-10 text-center cursor-pointer select-none hover:text-yellow-400 transition-colors"
           >
             <p className="font-['VT323'] text-lg">Scroll Down for Info</p>
             <ArrowDown className="mx-auto mt-2" />
@@ -120,7 +121,7 @@ const Login = () => {
         </section>
 
         {/* Section 2: Guide to the Realm */}
-        <section className="py-24 px-4 sm:px-6 md:px-8 bg-black/30">
+        <section id="guide-section" className="py-24 px-4 sm:px-6 md:px-8 bg-black/30">
           <div className="max-w-6xl mx-auto">
             <h2 className="font-['Press_Start_2P'] text-3xl md:text-4xl text-center mb-16 text-yellow-400">
               GUIDE TO THE REALM
@@ -154,13 +155,86 @@ const Login = () => {
           </div>
         </section>
 
-        {/* Section 3: The Architect */}
-        <footer className="py-20 px-4 text-center">
-          <div className="max-w-3xl mx-auto">
-            <h3 className="font-['Press_Start_2P'] text-2xl mb-4 text-yellow-400">THE ARCHITECT</h3>
-            <p className="font-['VT323'] text-stone-300 text-xl max-w-2xl mx-auto leading-relaxed">
-              This realm was forged by The Game Master to test the limits of what education can be. Built with React, magic, and a lot of coffee.
-            </p>
+        {/* Section 3: The Architects */}
+        <footer className="py-20 px-4 text-center bg-black/50 border-t border-white/10">
+          <div className="max-w-4xl mx-auto">
+            <h3 className="font-['Press_Start_2P'] text-2xl md:text-3xl mb-10 text-yellow-400 drop-shadow-[0_2px_10px_rgba(234,179,8,0.4)]">
+              THE ARCHITECTS
+            </h3>
+
+            {/* Dual Architect Character Showcase */}
+            <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 mb-10">
+              
+              {/* Architect 1: Jeffrey "Bruxo" P. A. Munroe */}
+              <div className="flex flex-col items-center">
+                {/* Town Hall Zoomed Character Viewport Frame */}
+                <div className="relative w-28 h-36 md:w-36 md:h-48 bg-stone-950/90 border-2 border-yellow-500/80 rounded-2xl overflow-hidden shadow-[0_0_25px_rgba(234,179,8,0.35)] flex items-center justify-center mb-3">
+                  {/* Gold Spotlight Beam */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-yellow-500/25 via-yellow-500/5 to-transparent pointer-events-none z-0" />
+                  
+                  {/* Zoomed Character Sprite (Bust/Headshot View) */}
+                  <img 
+                    src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Jeffrey.Bruxo.M.png" 
+                    alt="Jeffrey Bruxo P. A. Munroe" 
+                    className="w-full h-auto object-cover scale-[1.85] translate-y-6 md:translate-y-8 drop-shadow-[0_8px_16px_rgba(0,0,0,0.9)] z-10"
+                  />
+
+                  {/* Pedestal Ground Glow */}
+                  <div className="absolute bottom-0 w-full h-4 bg-yellow-500/40 blur-md rounded-full z-0" />
+                </div>
+
+                <h4 className="font-['Press_Start_2P'] text-xs sm:text-sm text-yellow-400 font-bold max-w-[200px] leading-relaxed mt-1">
+                  Jeffrey "Bruxo" P. A. Munroe
+                </h4>
+                <p className="font-['VT323'] text-lg text-amber-200/80 mt-0.5">Game Master & Educator</p>
+              </div>
+
+              {/* Architect 2: Devonna Munroe */}
+              <div className="flex flex-col items-center">
+                {/* Town Hall Zoomed Character Viewport Frame */}
+                <div className="relative w-28 h-36 md:w-36 md:h-48 bg-stone-950/90 border-2 border-purple-500/80 rounded-2xl overflow-hidden shadow-[0_0_25px_rgba(168,85,247,0.35)] flex items-center justify-center mb-3">
+                  {/* Purple/Amethyst Spotlight Beam */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-purple-500/25 via-purple-500/5 to-transparent pointer-events-none z-0" />
+                  
+                  {/* Zoomed Character Sprite (Bust/Headshot View) */}
+                  <img 
+                    src="https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Curator.png" 
+                    alt="Devonna Munroe" 
+                    className="w-full h-auto object-cover scale-[1.85] translate-y-6 md:translate-y-8 drop-shadow-[0_8px_16px_rgba(0,0,0,0.9)] z-10"
+                  />
+
+                  {/* Pedestal Ground Glow */}
+                  <div className="absolute bottom-0 w-full h-4 bg-purple-500/40 blur-md rounded-full z-0" />
+                </div>
+
+                <h4 className="font-['Press_Start_2P'] text-xs sm:text-sm text-purple-300 font-bold max-w-[200px] leading-relaxed mt-1">
+                  Devonna Munroe
+                </h4>
+                <p className="font-['VT323'] text-lg text-purple-200/80 mt-0.5">Curator & Educator</p>
+              </div>
+
+            </div>
+
+            {/* Scarborough Mission Statement */}
+            <div className="max-w-2xl mx-auto p-6 rounded-xl border border-white/10 bg-black/60 backdrop-blur-md shadow-xl">
+              <p className="font-['VT323'] text-stone-200 text-xl sm:text-2xl leading-relaxed">
+                "We are both Teachers from Scarborough looking to create a better, more inspiring learning environment for our community. Forged with passion, gamified pedagogy, and dedication to our students."
+              </p>
+            </div>
+
+            {/* CTA BUTTON TO THE ABOUT PAGE */}
+            <div className="mt-10 mb-6">
+              <button
+                onClick={() => navigate('/about')}
+                className="px-6 py-4 rounded-xl font-['Press_Start_2P'] text-xs sm:text-sm text-stone-950 bg-gradient-to-b from-yellow-400 to-yellow-600 hover:from-yellow-300 hover:to-yellow-500 border-2 border-yellow-300 shadow-[0_0_25px_rgba(234,179,8,0.5)] active:translate-y-1 transition-all"
+              >
+                📜 DISCOVER THE CRUSADE: OUR MISSION & STORY
+              </button>
+            </div>
+
+            <div className="text-stone-500 font-['VT323'] text-lg">
+              Bruxo's Crusade © 2026 • Forged for Ontario Grade 5 Crusaders
+            </div>
           </div>
         </footer>
       </div>
