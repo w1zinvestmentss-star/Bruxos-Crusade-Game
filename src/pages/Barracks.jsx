@@ -11,7 +11,7 @@ const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equi
 
   const BARRACKS_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Barracks.background1.jpg";
 
-  const shopItems =[
+  const shopItems = [
     // LEVEL 1: The Survivor Collection (Cost: 50, Level Req: 1)
     { id: 1001, name: 'Deprived Wanderer', cost: 50, reqLevel: 1, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Deprived.Wanderer.png' },
     { id: 1002, name: 'Exiled Monk', cost: 50, reqLevel: 1, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Exiled.Monk.png' },
@@ -20,6 +20,8 @@ const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equi
     { id: 1005, name: 'Shinobi Apprentice', cost: 50, reqLevel: 1, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Shinobi.Apprentice.png' },
     { id: 1006, name: 'Survivalist', cost: 50, reqLevel: 1, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Survivalist.png' },
     { id: 1007, name: 'Yharnam Traveler', cost: 50, reqLevel: 1, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Yharnam.Traveler.png' },
+    { id: 1032, name: 'Crypt Hunter', cost: 50, reqLevel: 1, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Crypt%20Hunter.png' },
+    { id: 1033, name: 'Eclipse Pilgrim', cost: 50, reqLevel: 1, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Eclipse%20Pilgrim.png' },
 
     // LEVEL 2: The Hunter Collection (Cost: 300, Level Req: 5)
     { id: 1008, name: 'Beast Hunter', cost: 300, reqLevel: 5, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Beast.Hunter.png' },
@@ -30,6 +32,8 @@ const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equi
     { id: 1013, name: 'Tactical Mercenary', cost: 300, reqLevel: 5, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Tactical.Mercenary.png' },
     { id: 1014, name: 'Vampire Killer', cost: 300, reqLevel: 5, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Vampire.Killer.png' },
     { id: 1031, name: 'Kat Felis', cost: 300, reqLevel: 5, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Kat.Felis.png?v=1' },
+    { id: 1034, name: 'Soma Sorrow', cost: 300, reqLevel: 5, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Soma%20Sorrow.png' },
+    { id: 1035, name: 'Carmilla', cost: 300, reqLevel: 5, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Carmilla.png' },
 
     // LEVEL 3: The Slayer Collection (Cost: 1500, Level Req: 10)
     { id: 1015, name: 'Bio-Weapon', cost: 1500, reqLevel: 10, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Bio-Weapon.png' },
@@ -38,6 +42,7 @@ const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equi
     { id: 1018, name: 'Cyber-Demon Ninja', cost: 1500, reqLevel: 10, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Cyber-Demon.Ninja.png' },
     { id: 1019, name: 'Sun Warrior', cost: 1500, reqLevel: 10, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Sun.Warrior.png' },
     { id: 1020, name: 'Void Walker', cost: 1500, reqLevel: 10, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Void.Walker.png' },
+    { id: 1036, name: 'Elemental Scribe', cost: 1500, reqLevel: 10, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Elemental%20Scribe.png' },
 
     // LEVEL 4: The Lord Collection (Cost: 5000, Level Req: 15)
     { id: 1021, name: 'Abyssal Warden', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Abyssal.Warden.png' },
@@ -50,6 +55,10 @@ const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equi
     { id: 1028, name: 'Lord of Cinder', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Lord.of.Cinder.png' },
     { id: 1029, name: 'Mecha Shogun', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mecha.Shogun.png' },
     { id: 1030, name: 'Rot Champion', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Rot.Champion.png' },
+    { id: 1037, name: 'The Masked Duelist', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The%20Masked%20Duelist.png' },
+    { id: 1038, name: 'Astral Weaver', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Astral%20Weaver.png' },
+    { id: 1039, name: 'Crimson Regent', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Crimson%20Regent.png' },
+    { id: 1040, name: 'Reincarnate of Chaos', cost: 5000, reqLevel: 15, type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Reincarnate%20of%20Chaos.png' },
 
     // BOSS LOOT (Tier 4 Bosses)
     { id: 'loot_104', name: 'Library Titan Armor', cost: 0, reqBoss: 'The Library Titan', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Library.Titan.Armor.png' },
@@ -65,16 +74,16 @@ const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equi
     { id: 'loot_1104', name: 'Weaver of Fates Armor', cost: 0, reqBoss: 'The Weaver of Fates', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Weaver.of.Fates.Armor.png' },
     { id: 'loot_1204', name: 'Storm-Born King Armor', cost: 0, reqBoss: 'The Storm-Born King', type: 'outfit', icon: Shirt, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Storm-Born%20King.outfit.png' },
 
-// COMPANIONS (PETS)
-      { id: 2001, name: 'Mystic Owlet', cost: 300, reqLevel: 1, type: 'pet', icon: Bird, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mystic.Owlet.png', buff: '+15% XP (Quizzes & Puzzles)' },
-      { id: 2002, name: 'Fire Whelp', cost: 300, reqLevel: 1, type: 'pet', icon: Flame, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Fire.Whelp.png', buff: '+15% Gold (Homework & Reports)' },
-      { id: 2003, name: 'Astral Fox', cost: 800, reqLevel: 5, type: 'pet', icon: Sparkles, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Astral.Fox.png', buff: '+5% Gold & XP (All Quests)' },
+    // COMPANIONS (PETS)
+    { id: 2001, name: 'Mystic Owlet', cost: 300, reqLevel: 1, type: 'pet', icon: Bird, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Mystic.Owlet.png', buff: '+15% XP (Quizzes & Puzzles)' },
+    { id: 2002, name: 'Fire Whelp', cost: 300, reqLevel: 1, type: 'pet', icon: Flame, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Fire.Whelp.png', buff: '+15% Gold (Homework & Reports)' },
+    { id: 2003, name: 'Astral Fox', cost: 800, reqLevel: 5, type: 'pet', icon: Sparkles, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Astral.Fox.png', buff: '+5% Gold & XP (All Quests)' },
 
-      // MAGIC SPELLS (CONSUMABLES)
-      { id: 'spell_1', name: 'Oath of the Abyss', cost: 150, type: 'consumable', buffType: 'oath', icon: Wand, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Oath.of.the.Abyss.png?v=1' },
-      { id: 'spell_2', name: 'Ember of the Ashen', cost: 250, type: 'consumable', buffType: 'ember', icon: Flame, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Ember.of.the.Ashen.png?v=1' },
-      // PvP ITEMS
-      { id: 2005, name: "Voidwalker's Grasp", cost: 500, type: 'pvp', imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Voidwalker\'s.Grasp.png' }
+    // MAGIC SPELLS (CONSUMABLES)
+    { id: 'spell_1', name: 'Oath of the Abyss', cost: 150, type: 'consumable', buffType: 'oath', icon: Wand, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Oath.of.the.Abyss.png?v=1' },
+    { id: 'spell_2', name: 'Ember of the Ashen', cost: 250, type: 'consumable', buffType: 'ember', icon: Flame, imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Ember.of.the.Ashen.png?v=1' },
+    // PvP ITEMS
+    { id: 2005, name: "Voidwalker's Grasp", cost: 500, type: 'pvp', imageLink: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Voidwalker\'s.Grasp.png' }
   ];
 
   const handleBuyItem = async (item) => {
