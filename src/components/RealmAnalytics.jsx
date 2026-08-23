@@ -24,6 +24,7 @@ export default function RealmAnalytics({ profiles = [], submissions = [] }) {
         avgActiveDays: 0,
         avgStrategy: 0,
         avgExecution: 0,
+        totalQuestsAll: 0,
       };
     }
 
@@ -69,6 +70,9 @@ export default function RealmAnalytics({ profiles = [], submissions = [] }) {
       executionSum += (p.final_gpa ?? p.finalGPA ?? 0);
     });
 
+    // Grand Total of All Quests
+    const totalQuestsAll = questions + homework + sports + arts + journals + wellness;
+
     return {
       totalStudents,
       totalQuestions: questions,
@@ -83,6 +87,7 @@ export default function RealmAnalytics({ profiles = [], submissions = [] }) {
       avgActiveDays: Math.round(totalDays / totalStudents),
       avgStrategy: Math.round(strategySum / totalStudents),
       avgExecution: Math.round(executionSum / totalStudents),
+      totalQuestsAll,
     };
   }, [profiles]);
 
@@ -154,7 +159,12 @@ export default function RealmAnalytics({ profiles = [], submissions = [] }) {
   const getHeroHonorific = (p) => {
     if (!p) return 'Valiant Hero of the Realm';
     const hw = p.upload_quests_completed ?? p.uploadQuestsCompleted ?? 0;
-    const quizzes = (p.quiz_quests_completed ?? p.quizQuestsCompleted ?? 0) + (p.multi_step_quests_completed ?? p.multiStepQuestsCompleted ?? 0);
+    const quizzes = (p.quiz_quests_completed ?? p.quizQuestsCompleted ?? 0) + 
+                    (p.multi_step_quests_completed ?? p.multiStepQuestsCompleted ?? 0) +
+                    (p.cipher_quests_completed ?? p.cipherQuestsCompleted ?? 0) +
+                    (p.gauntlet_quests_completed ?? p.gauntletQuestsCompleted ?? 0) +
+                    (p.incantation_quests_completed ?? p.incantationQuestsCompleted ?? 0) +
+                    (p.scenario_quests_completed ?? p.scenarioQuestsCompleted ?? 0);
     const defeatedList = p.defeated_bosses ?? p.defeatedBosses ?? [];
     const bosses = Array.isArray(defeatedList) ? defeatedList.length : 0;
     const growth = (p.final_gpa ?? p.finalGPA ?? 0) - (p.midterm_gpa ?? p.midtermGPA ?? 0);
@@ -257,10 +267,18 @@ Thank you for supporting our hero's learning journey!`;
                 </p>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-6">
                 <div className="text-right">
-                  <div className="text-xs text-zinc-400 font-pixel">TOTAL ACTIVE HEROES</div>
-                  <div className="text-2xl font-pixel text-amber-300 font-bold">{globalMetrics.totalStudents} Students</div>
+                  <div className="text-[10px] text-zinc-400 font-pixel uppercase">TOTAL QUESTS COMPLETED</div>
+                  <div className="text-2xl font-pixel text-cyan-300 font-bold">
+                    {(globalMetrics.totalQuestsAll || 0).toLocaleString()} Quests
+                  </div>
+                </div>
+                <div className="text-right border-l border-white/10 pl-6">
+                  <div className="text-[10px] text-zinc-400 font-pixel uppercase">TOTAL ACTIVE HEROES</div>
+                  <div className="text-2xl font-pixel text-amber-300 font-bold">
+                    {globalMetrics.totalStudents} Students
+                  </div>
                 </div>
               </div>
             </div>
