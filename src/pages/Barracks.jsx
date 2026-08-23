@@ -136,9 +136,9 @@ const { currentUser, buyItem, equipOutfit, unequipOutfit, buyTomeOfRebirth, equi
       </button>
 
       <div className="relative z-10">
-        {/* Centered Page Title (Clearance for floating back button) */}
-        <div className="text-center mb-8 pt-4 md:pt-6">
-          <h1 className="text-3xl md:text-5xl text-yellow-400 font-['Press_Start_2P'] drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
+        {/* Centered Page Title with Full Mobile Clearance */}
+        <div className="text-center mb-6 md:mb-8 pt-14 sm:pt-16 md:pt-6">
+          <h1 className="text-xl sm:text-3xl md:text-5xl text-yellow-400 font-['Press_Start_2P'] drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] tracking-wide">
             THE BARRACKS
           </h1>
         </div>
