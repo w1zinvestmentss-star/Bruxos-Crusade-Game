@@ -1,15 +1,116 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
 import { ArrowLeft, Trophy, Lock, Coins, Star, Gift, Ticket, Zap, Loader2 } from 'lucide-react';
 
+const TROPHYROOM_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Halloftriumphs.background.png";
+
+const getAchievementProgress = (ach, currentUser) => {
+  if (!currentUser) return 0;
+  switch (ach.metric) {
+    case 'level': 
+      return Math.floor((currentUser.xp || 0) / 1000) + 1;
+    case 'streak': 
+      return currentUser.loginStreak || 0;
+    case 'quizzes': 
+      return currentUser.quizQuestsCompleted || 0;
+    case 'journals': 
+      return currentUser.journalQuestsCompleted || 0;
+    case 'sports': 
+      return currentUser.sportsQuestsCompleted || 0;
+    case 'arts': 
+      return currentUser.artsQuestsCompleted || 0;
+    case 'total_quests':
+      return (currentUser.uploadQuestsCompleted || 0) +
+             (currentUser.quizQuestsCompleted || 0) +
+             (currentUser.multiStepQuestsCompleted || 0) +
+             (currentUser.sportsQuestsCompleted || 0) +
+             (currentUser.artsQuestsCompleted || 0) +
+             (currentUser.journalQuestsCompleted || 0) +
+             (currentUser.scenarioQuestsCompleted || 0) +
+             (currentUser.cipherQuestsCompleted || 0) +
+             (currentUser.incantationQuestsCompleted || 0) +
+             (currentUser.wellnessQuestsCompleted || 0);
+    case 'bosses': 
+      return currentUser.defeatedBosses?.length || 0;
+    case 'outfits': 
+      return currentUser.inventory?.filter(i => i.type === 'outfit').length || 0;
+    case 'scenarios': 
+      return currentUser.scenarioQuestsCompleted || 0;
+    case 'ciphers': 
+      return currentUser.cipherQuestsCompleted || 0;
+    case 'incantations': 
+      return currentUser.incantationQuestsCompleted || 0;
+    case 'wellness': 
+      return currentUser.wellnessQuestsCompleted || 0;
+    case 'tickets': 
+      return currentUser.totalTicketsEarned || currentUser.raffleTickets || 0;
+    case 'uploads': 
+      return currentUser.uploadQuestsCompleted || 0;
+    default: 
+      return 0;
+  }
+};
+
+const getMetricLabel = (metric) => {
+  switch (metric) {
+    case 'level': return "Hero Level";
+    case 'streak': return "Total Logins";
+    case 'quizzes': return "Math Quizzes";
+    case 'journals': return "Reflections";
+    case 'sports': return "Athletics Quests";
+    case 'arts': return "Creative Quests";
+    case 'total_quests': return "Total Quests Done";
+    case 'bosses': return "Bosses Slain";
+    case 'outfits': return "Outfits Owned";
+    case 'scenarios': return "Science Speed Runs";
+    case 'ciphers': return "History Speed Runs";
+    case 'incantations': return "Incantations Recited";
+    case 'wellness': return "Tavern Rests";
+    case 'tickets': return "Raffle Tickets Earned";
+    case 'uploads': return "Homework Uploads";
+    default: return "Progress";
+  }
+};
+
 const TrophyRoom = () => {
   const navigate = useNavigate();
-  const { currentUser, ACHIEVEMENTS, students, currentRafflePrize = "Mystery Box", prizeClaims, claimAchievementPrize, pendingPrizesList } = useGame();
+  const { 
+    currentUser, 
+    ACHIEVEMENTS = [], 
+    students = [], 
+    currentRafflePrize = "Mystery Box", 
+    prizeClaims = [], 
+    claimAchievementPrize, 
+    pendingPrizesList = [] 
+  } = useGame();
+
   const [activeFilter, setActiveFilter] = useState('all');
   const [claimingId, setClaimingId] = useState(null);
+  const isMountedRef = useRef(true);
 
-  const TROPHYROOM_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Halloftriumphs.background.png";
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  // Performance: Pre-calculate speed race claimed counts once per students update
+  const claimedCountsMap = useMemo(() => {
+    const map = {};
+    students.forEach((s) => {
+      (s.unlockedAchievements || []).forEach((achId) => {
+        map[achId] = (map[achId] || 0) + 1;
+      });
+    });
+    return map;
+  }, [students]);
+
+  // Memoize user-specific pending prizes
+  const userPrizes = useMemo(() => {
+    return (pendingPrizesList || []).filter(p => p.student_id === currentUser?.id);
+  }, [pendingPrizesList, currentUser?.id]);
 
   if (!currentUser) {
     return (
@@ -18,83 +119,29 @@ const TrophyRoom = () => {
         <div className="absolute inset-0 bg-black/80"></div>
         <div className="relative z-10 text-center bg-black/70 p-8 rounded-xl border border-white/10">
           <p className="text-2xl">The Hall of Triumphs awaits, but you must be logged in.</p>
-          <button onClick={() => navigate('/login')} className="mt-4 px-4 py-2 bg-yellow-600 text-black rounded font-['Press_Start_2P'] text-sm hover:bg-yellow-500">Login</button>
+          <button onClick={() => navigate('/login')} className="mt-4 px-4 py-2 bg-yellow-600 text-black rounded font-['Press_Start_2P'] text-sm hover:bg-yellow-500 cursor-pointer">Login</button>
         </div>
       </div>
     );
   }
 
-  const getAchievementProgress = (ach) => {
-    if (!currentUser) return 0;
-    switch (ach.metric) {
-      case 'level': 
-        return Math.floor((currentUser.xp || 0) / 1000) + 1;
-      case 'streak': 
-        return currentUser.loginStreak || 0;
-      case 'quizzes': 
-        return currentUser.quizQuestsCompleted || 0;
-      case 'journals': 
-        return currentUser.journalQuestsCompleted || 0;
-      case 'sports': 
-        return currentUser.sportsQuestsCompleted || 0;
-      case 'arts': 
-        return currentUser.artsQuestsCompleted || 0;
-      case 'total_quests':
-        return (currentUser.uploadQuestsCompleted || 0) +
-               (currentUser.quizQuestsCompleted || 0) +
-               (currentUser.multiStepQuestsCompleted || 0) +
-               (currentUser.sportsQuestsCompleted || 0) +
-               (currentUser.artsQuestsCompleted || 0) +
-               (currentUser.journalQuestsCompleted || 0) +
-               (currentUser.scenarioQuestsCompleted || 0) +
-               (currentUser.cipherQuestsCompleted || 0) +
-               (currentUser.incantationQuestsCompleted || 0) +
-               (currentUser.wellnessQuestsCompleted || 0);
-      case 'bosses': 
-        return currentUser.defeatedBosses?.length || 0;
-      case 'outfits': 
-        return currentUser.inventory?.filter(i => i.type === 'outfit').length || 0;
-      case 'scenarios': 
-        return currentUser.scenarioQuestsCompleted || 0;
-      case 'ciphers': 
-        return currentUser.cipherQuestsCompleted || 0;
-      case 'incantations': 
-        return currentUser.incantationQuestsCompleted || 0;
-      case 'wellness': 
-        return currentUser.wellnessQuestsCompleted || 0;
-      case 'tickets': 
-        return currentUser.totalTicketsEarned || 0;
-      case 'uploads': 
-        return currentUser.uploadQuestsCompleted || 0;
-      default: 
-        return 0;
-    }
-  };
-
-  const getMetricLabel = (metric) => {
-    switch (metric) {
-      case 'level': return "Hero Level";
-      case 'streak': return "Total Logins";
-      case 'quizzes': return "Math Quizzes";
-      case 'journals': return "Reflections";
-      case 'sports': return "Athletics Quests";
-      case 'arts': return "Creative Quests";
-      case 'total_quests': return "Total Quests Done";
-      case 'bosses': return "Bosses Slain";
-      case 'outfits': return "Outfits Owned";
-      case 'scenarios': return "Science Speed Runs";
-      case 'ciphers': return "History Speed Runs";
-      case 'incantations': return "Incantations Recited";
-      case 'wellness': return "Tavern Rests";
-      case 'tickets': return "Raffle Tickets Earned";
-      case 'uploads': return "Homework Uploads";
-      default: return "Progress";
+  const handleClaim = async (achievementId) => {
+    if (claimingId) return;
+    setClaimingId(achievementId);
+    try {
+      await claimAchievementPrize(currentUser.id, achievementId);
+    } catch (err) {
+      alert("Failed to claim prize. Please check your connection and try again.");
+    } finally {
+      if (isMountedRef.current) {
+        setClaimingId(null);
+      }
     }
   };
 
   return (
-    <div className="min-h-screen text-stone-200 p-4 sm:p-6 md:p-8 relative">
-      {/* Fixed Viewport Background (Prevents stretching/wrapping on long pages) */}
+    <div className="min-h-screen text-stone-200 p-4 sm:p-6 md:p-8 relative select-none">
+      {/* Fixed Viewport Background */}
       <div className="fixed inset-0 z-0 h-full w-full overflow-hidden pointer-events-none">
         <img 
           src={TROPHYROOM_BG} 
@@ -104,26 +151,36 @@ const TrophyRoom = () => {
         <div className="absolute inset-0 bg-black/80"></div>
       </div>
 
-      <div className="max-w-6xl mx-auto relative z-10">
-        <button onClick={() => navigate(-1)} className="mb-8 flex items-center gap-2 text-stone-300 hover:text-white transition-colors font-['Press_Start_2P'] text-xs">
-          <ArrowLeft size={16} /> Back to Map
-        </button>
+      {/* Fixed Floating Return to Map Button */}
+      <button 
+        onClick={() => navigate('/student-dashboard')} 
+        className="fixed top-4 left-4 z-50 bg-black/80 backdrop-blur-md border-2 border-yellow-500/50 hover:border-yellow-400 text-yellow-400 font-['Press_Start_2P'] text-[10px] py-2.5 px-4 rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.8)] flex items-center gap-2 transition-all cursor-pointer"
+      >
+        <ArrowLeft size={16} /> RETURN TO MAP
+      </button>
+
+      <div className="max-w-6xl mx-auto relative z-10 pt-12 sm:pt-14 md:pt-4">
 
         <header className="text-center mb-16">
           <h1 className="text-4xl sm:text-5xl text-yellow-500 font-['Press_Start_2P'] [text-shadow:_0_0_20px_rgb(234_179_8_/_60%)]">HALL OF TRIUMPHS</h1>
-          <p className="text-stone-400 text-center max-w-2xl mx-auto mt-6 italic">
+          <p className="text-stone-400 text-center max-w-2xl mx-auto mt-6 italic font-['VT323'] text-xl">
             Behold the greatest feats of the realm. Unlock real-world prizes and eternal glory.
           </p>
         </header>
 
+        {/* MONTHLY GRAND RAFFLE BANNER */}
         <div className="bg-black/60 backdrop-blur-md border border-stone-600/50 px-6 py-6 rounded-xl shadow-[0_0_30px_rgba(139,92,246,0.15)] mb-6 mx-auto max-w-5xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
           <div className="flex flex-col z-10">
-            <div className="text-purple-300 font-bold tracking-widest text-sm uppercase mb-1 flex items-center gap-2"><Ticket size={16} /> MONTHLY GRAND RAFFLE</div>
+            <div className="text-purple-300 font-bold tracking-widest text-sm uppercase mb-1 flex items-center gap-2">
+              <Ticket size={16} /> MONTHLY GRAND RAFFLE
+            </div>
             <div className="text-3xl md:text-4xl text-yellow-400 font-['Press_Start_2P'] drop-shadow-md mb-2 relative inline-block">
               <span className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-black/60 via-transparent to-transparent -z-10 blur-xl"></span>
               {currentRafflePrize}
             </div>
-            <div className="text-stone-300 font-['VT323'] text-xl">Earn Raffle Tickets from Bounties and Achievements to increase your odds! Draw is at the end of the month.</div>
+            <div className="text-stone-300 font-['VT323'] text-xl">
+              Earn Raffle Tickets from Bounties and Achievements to increase your odds! Draw is at the end of the month.
+            </div>
           </div>
           <div className="flex flex-col items-center justify-center bg-gradient-to-b from-yellow-700/20 to-yellow-900/40 border-2 border-yellow-600/80 shadow-[0_0_15px_rgba(202,138,4,0.3)] rounded-lg p-4 min-w-[160px] z-10">
             <Ticket size={32} className="text-yellow-400 mb-2" />
@@ -135,6 +192,7 @@ const TrophyRoom = () => {
           </div>
         </div>
 
+        {/* HOW TO WIN GUIDE */}
         <section className="max-w-5xl mx-auto mb-10">
           <h2 className="text-2xl text-yellow-500 font-['Press_Start_2P'] mb-4">HOW TO WIN</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -143,26 +201,27 @@ const TrophyRoom = () => {
                 <Ticket className="text-blue-400" size={24} />
                 <span className="font-bold text-stone-200 uppercase tracking-wider font-mono">Raffle Tickets</span>
               </div>
-              <p className="text-stone-400 text-sm leading-relaxed">Earn these to enter the Grand Monthly Draw. More tickets = better odds!</p>
+              <p className="text-stone-400 text-sm leading-relaxed font-mono">Earn these to enter the Grand Monthly Draw. More tickets = better odds!</p>
             </div>
             <div className="bg-green-500/10 border border-stone-500/40 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] p-5 rounded-lg flex flex-col">
               <div className="flex items-center gap-2 mb-2">
                 <Gift className="text-green-400" size={24} />
                 <span className="font-bold text-stone-200 uppercase tracking-wider font-mono">Guaranteed</span>
               </div>
-              <p className="text-stone-400 text-sm leading-relaxed">Complete the goal, get the prize. No luck required. Includes the Pity Timer safety net!</p>
+              <p className="text-stone-400 text-sm leading-relaxed font-mono">Complete the goal, get the prize. No luck required. Includes the Pity Timer safety net!</p>
             </div>
             <div className="bg-red-500/10 border border-stone-500/40 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] p-5 rounded-lg flex flex-col">
               <div className="flex items-center gap-2 mb-2">
                 <Zap className="text-red-400" size={24} />
                 <span className="font-bold text-stone-200 uppercase tracking-wider font-mono">Speed Race</span>
               </div>
-              <p className="text-stone-400 text-sm leading-relaxed">Limited quantities! Be the first to claim. Latecomers get a massive Gold fallback reward.</p>
+              <p className="text-stone-400 text-sm leading-relaxed font-mono">Limited quantities! Be the first to claim. Latecomers get a massive Gold fallback reward.</p>
             </div>
           </div>
         </section>
 
-        <div className="flex flex-wrap justify-center gap-4 mb-8">
+        {/* FILTER BUTTONS */}
+        <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-8">
           {[
             { id: 'all', label: 'All Trophies' },
             { id: 'earned', label: 'Earned' },
@@ -174,7 +233,7 @@ const TrophyRoom = () => {
               onClick={() => setActiveFilter(filter.id)}
               className={
                 activeFilter === filter.id
-                  ? "bg-yellow-600 text-white border-2 border-yellow-400 px-4 py-2 rounded-lg font-bold font-mono shadow-[0_0_10px_rgba(202,138,4,0.5)] transition-all"
+                  ? "bg-yellow-600 text-white border-2 border-yellow-400 px-4 py-2 rounded-lg font-bold font-mono shadow-[0_0_10px_rgba(202,138,4,0.5)] transition-all cursor-pointer"
                   : "bg-stone-800/80 text-stone-300 border border-stone-600 px-4 py-2 rounded-lg font-mono hover:bg-stone-700 hover:text-white hover:border-stone-500 cursor-pointer transition-all"
               }
             >
@@ -183,6 +242,7 @@ const TrophyRoom = () => {
           ))}
         </div>
 
+        {/* ACHIEVEMENTS GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {(ACHIEVEMENTS || []).filter(ach => {
             if (activeFilter === 'earned') return currentUser.unlockedAchievements?.includes(ach.id);
@@ -192,10 +252,12 @@ const TrophyRoom = () => {
           }).map((achievement) => {
             const isFutureGated = achievement.unlockDate && new Date() < new Date(achievement.unlockDate);
             const isUnlocked = currentUser.unlockedAchievements?.includes(achievement.id);
-            const claimedCount = students.filter(s => s.unlockedAchievements?.includes(achievement.id)).length;
+            const claimedCount = claimedCountsMap[achievement.id] || 0;
 
-            let displayTitle = achievement.title;
-            let displayDesc = achievement.desc || achievement.description;
+            const displayTitle = achievement.title;
+            const displayDesc = achievement.desc || achievement.description;
+            const progress = getAchievementProgress(achievement, currentUser);
+            const percentage = Math.min((progress / achievement.target) * 100, 100);
 
             return (
               <div 
@@ -209,152 +271,134 @@ const TrophyRoom = () => {
                 }`}
               >
                 <div className="bg-stone-900 rounded-[10px] p-6 h-full flex flex-col justify-between relative">
-                {isFutureGated && (
+                  {isFutureGated && (
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-bold font-mono whitespace-nowrap shadow-lg z-10">
-                        ⏳ EVENT STARTS: {new Date(achievement.unlockDate).toLocaleDateString()}
+                      ⏳ EVENT STARTS: {new Date(achievement.unlockDate).toLocaleDateString()}
                     </div>
-                )}
-                <div>
-                  <div className="flex justify-between items-start mb-4">
-                    <h2 className={`text-xl font-['Press_Start_2P'] leading-tight pr-4 ${isUnlocked ? 'text-yellow-400' : 'text-stone-400'}`}>
-                      {displayTitle}
-                    </h2>
-                    {isUnlocked ? (
-                      <div className="flex flex-col items-center flex-shrink-0">
-                        <Trophy className="text-yellow-400 mb-1 drop-shadow" size={28} />
-                        <span className="text-[10px] font-mono text-green-400 bg-green-900/40 px-2 py-1 rounded border border-green-700">UNLOCKED</span>
+                  )}
+
+                  <div>
+                    <div className="flex justify-between items-start mb-4">
+                      <h2 className={`text-xl font-['Press_Start_2P'] leading-tight pr-4 ${isUnlocked ? 'text-yellow-400' : 'text-stone-400'}`}>
+                        {displayTitle}
+                      </h2>
+                      {isUnlocked ? (
+                        <div className="flex flex-col items-center flex-shrink-0">
+                          <Trophy className="text-yellow-400 mb-1 drop-shadow" size={28} />
+                          <span className="text-[10px] font-mono text-green-400 bg-green-900/40 px-2 py-1 rounded border border-green-700">UNLOCKED</span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center flex-shrink-0">
+                          <Lock className="text-stone-500 mb-1" size={28} />
+                          <span className="text-[10px] font-mono text-stone-400 bg-stone-800 px-2 py-1 rounded border border-stone-600">LOCKED</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <p className="text-stone-300 font-['VT323'] text-2xl mb-6">{displayDesc}</p>
+
+                    <div className="mt-2 mb-6">
+                      <div className="flex justify-between font-mono text-xs mb-1 text-stone-500">
+                        <span>{getMetricLabel(achievement.metric)}</span>
+                        <span>{Math.min(progress, achievement.target)} / {achievement.target}</span>
                       </div>
-                    ) : (
-                      <div className="flex flex-col items-center flex-shrink-0">
-                        <Lock className="text-stone-500 mb-1" size={28} />
-                        <span className="text-[10px] font-mono text-stone-400 bg-stone-800 px-2 py-1 rounded border border-stone-600">LOCKED</span>
+                      <div className="w-full bg-black/60 rounded-full h-2.5 border border-stone-800/80 overflow-hidden relative">
+                        <div 
+                          className="bg-gradient-to-r from-yellow-600 to-yellow-400 h-full rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(234,179,8,0.4)]" 
+                          style={{ width: `${percentage}%` }}
+                        />
                       </div>
-                    )}
+                    </div>
                   </div>
-
-                  <p className="text-stone-300 font-['VT323'] text-2xl mb-6">{displayDesc}</p>
-                  {(() => {
-                    const progress = getAchievementProgress(achievement);
-                    const percentage = Math.min((progress / achievement.target) * 100, 100);
-
-                    return (
-                      <div className="mt-2 mb-6">
-                        <div className="flex justify-between font-mono text-xs mb-1 text-stone-500">
-                          <span>{getMetricLabel(achievement.metric)}</span>
-                          <span>{Math.min(progress, achievement.target)} / {achievement.target}</span>
-                        </div>
-                        <div className="w-full bg-black/60 rounded-full h-2.5 border border-stone-800/80 overflow-hidden relative">
-                          <div 
-                            className="bg-gradient-to-r from-yellow-600 to-yellow-400 h-full rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(234,179,8,0.4)]" 
-                            style={{ width: `${percentage}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
 
                   <div className="space-y-4 relative">
-                   <div className="flex flex-wrap gap-2">
-                     {achievement.rewardXp > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {achievement.rewardXp > 0 && (
                         <div className="flex items-center gap-1 text-sm font-mono px-3 py-1 rounded-full bg-blue-500/10 text-blue-300">
-                            <Star size={14} />
-                            <span>{achievement.rewardXp} XP</span>
+                          <Star size={14} />
+                          <span>{achievement.rewardXp} XP</span>
                         </div>
-                     )}
-                     {achievement.rewardTicket > 0 && (
+                      )}
+                      {achievement.rewardTicket > 0 && (
                         <div className="flex items-center gap-1 text-sm font-mono px-3 py-1 rounded-full bg-purple-500/10 text-purple-300">
-                            <Ticket size={14} />
-                            <span>{achievement.rewardTicket} Ticket(s)</span>
+                          <Ticket size={14} />
+                          <span>{achievement.rewardTicket} Ticket(s)</span>
                         </div>
-                     )}
-                  </div>
+                      )}
+                    </div>
 
-                  {achievement.limit && (
+                    {achievement.limit && (
                       <div className="bg-orange-600/20 text-orange-400 font-bold border border-orange-500/50 p-2 rounded text-sm mb-2 flex flex-col">
                         <span>⚡ SPEED RACE: {claimedCount} / {achievement.limit} Claimed.</span>
                         {claimedCount >= achievement.limit && (
-                            <span className="text-red-500 mt-1 uppercase text-xs">
-                                ❌ PHYSICAL PRIZES EXHAUSTED. Backup Reward: {achievement.fallbackGold} Gold.
-                            </span>
+                          <span className="text-red-500 mt-1 uppercase text-xs">
+                            ❌ PHYSICAL PRIZES EXHAUSTED. Backup Reward: {achievement.fallbackGold} Gold.
+                          </span>
                         )}
                       </div>
-                  )}
+                    )}
 
-                  {achievement.realWorldPrize && (() => {
-                    const claim = prizeClaims?.find(c => c.achievement_id === achievement.id);
-                    const claimStatus = claim?.status || null;
+                    {achievement.realWorldPrize && (() => {
+                      const claim = prizeClaims?.find(c => c.achievement_id === achievement.id);
+                      const claimStatus = claim?.status || null;
+                      const isClaiming = claimingId === achievement.id;
 
-                    const handleClaim = async () => {
-                      if (claimingId === achievement.id) return;
-                      setClaimingId(achievement.id);
-                      await claimAchievementPrize(currentUser.id, achievement.id);
-                      setClaimingId(null);
-                    };
+                      return (
+                        <div className={`mt-4 p-4 rounded bg-stone-950/80 border-l-4 ${isUnlocked ? 'border-l-yellow-500' : 'border-l-stone-600'}`}>
+                          <div className={`flex items-center gap-2 mb-2 ${isUnlocked ? 'text-yellow-500' : 'text-stone-500'}`}>
+                            <Gift size={18} />
+                            <span className="font-bold font-mono text-sm uppercase tracking-wider">Real-World Prize</span>
+                          </div>
+                          <p className="text-stone-200 text-lg font-['VT323'] mb-3">{achievement.realWorldPrize}</p>
 
-                    return (
-                      <div className={`mt-4 p-4 rounded bg-stone-950/80 border-l-4 ${isUnlocked ? 'border-l-yellow-500' : 'border-l-stone-600'}`}>
-                        <div className={`flex items-center gap-2 mb-2 ${isUnlocked ? 'text-yellow-500' : 'text-stone-500'}`}>
-                          <Gift size={18} />
-                          <span className="font-bold font-mono text-sm uppercase tracking-wider">Real-World Prize</span>
+                          {isUnlocked && (
+                            claimStatus === 'fulfilled' ? (
+                              <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/10 text-emerald-400 font-bold text-sm cursor-default select-none">
+                                ✅ Fulfilled!
+                              </div>
+                            ) : claimStatus === 'pending' ? (
+                              <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-amber-500/10 text-amber-400 font-bold text-sm cursor-default select-none">
+                                ⏳ Awaiting Teacher Approval
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => handleClaim(achievement.id)}
+                                disabled={isClaiming || !!claimingId}
+                                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-yellow-600 hover:bg-yellow-500 disabled:bg-yellow-800/40 disabled:cursor-not-allowed text-white font-bold text-sm transition-all cursor-pointer"
+                              >
+                                {isClaiming
+                                  ? <><Loader2 size={14} className="animate-spin" /> Claiming...</>
+                                  : <><Gift size={14} /> Claim Prize</>}
+                              </button>
+                            )
+                          )}
                         </div>
-                        <p className="text-stone-200 text-lg font-['VT323'] mb-3">{achievement.realWorldPrize}</p>
-
-                        {isUnlocked && (
-                          claimStatus === 'fulfilled' ? (
-                            <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/10 text-emerald-400 font-bold text-sm cursor-default select-none">
-                              ✅ Fulfilled!
-                            </div>
-                          ) : claimStatus === 'pending' ? (
-                            <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-amber-500/10 text-amber-400 font-bold text-sm cursor-default select-none">
-                              ⏳ Awaiting Teacher Approval
-                            </div>
-                          ) : (
-                            <button
-                              onClick={handleClaim}
-                              disabled={claimingId === achievement.id}
-                              className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-yellow-600 hover:bg-yellow-500 disabled:bg-yellow-800/40 disabled:cursor-not-allowed text-white font-bold text-sm transition-all"
-                            >
-                              {claimingId === achievement.id
-                                ? <><Loader2 size={14} className="animate-spin" /> Claiming...</>
-                                : <><Gift size={14} /> Claim Prize</>}
-                            </button>
-                          )
-                        )}
-                      </div>
-                    );
-                  })()}
-                </div>
+                      );
+                    })()}
+                  </div>
                 </div>
               </div>
             );
           })}
         </div>
 
-        {(() => {
-          const userPrizes = (pendingPrizesList || []).filter(p => p.student_id === currentUser?.id);
-          if (userPrizes.length === 0) {
-            return (
-              <div className="bg-black/60 border border-yellow-500/30 rounded-xl p-6 mt-8 max-w-5xl mx-auto">
-                <h2 className="text-2xl font-bold mb-4 text-yellow-400 font-['Press_Start_2P']">🎁 MY PRIZES</h2>
-                <p className="text-stone-500 italic">No prizes yet. Keep earning tickets!</p>
-              </div>
-            );
-          }
-          return (
-            <div className="bg-black/60 border border-yellow-500/30 rounded-xl p-6 mt-8 max-w-5xl mx-auto">
-              <h2 className="text-2xl font-bold mb-4 text-yellow-400 font-['Press_Start_2P']">🎁 MY PRIZES</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {userPrizes.map((prize, idx) => (
-                  <div key={prize.id || idx} className="bg-stone-800 p-4 rounded-lg border border-yellow-500/20">
-                    <p className="text-xl text-white font-['VT323']">{prize.prize}</p>
-                    <p className="text-sm text-stone-400">Status: {prize.status}</p>
-                  </div>
-                ))}
-              </div>
+        {/* MY PRIZES SECTION */}
+        <div className="bg-black/60 border border-yellow-500/30 rounded-xl p-6 mt-8 max-w-5xl mx-auto">
+          <h2 className="text-2xl font-bold mb-4 text-yellow-400 font-['Press_Start_2P']">🎁 MY PRIZES</h2>
+          {userPrizes.length === 0 ? (
+            <p className="text-stone-500 italic font-mono text-sm">No prizes yet. Keep earning tickets!</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {userPrizes.map((prize, idx) => (
+                <div key={prize.id || idx} className="bg-stone-800 p-4 rounded-lg border border-yellow-500/20">
+                  <p className="text-xl text-white font-['VT323']">{prize.prize}</p>
+                  <p className="text-sm text-stone-400 font-mono">Status: {prize.status}</p>
+                </div>
+              ))}
             </div>
-          );
-        })()}
+          )}
+        </div>
+
       </div>
     </div>
   );
