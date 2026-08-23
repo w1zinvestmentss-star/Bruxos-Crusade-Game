@@ -215,90 +215,238 @@ const Leaderboard = () => {
         <div className="p-2 sm:p-4 min-h-[50vh]">
 
           {topThree.length > 0 && (
-            <div className="flex justify-center items-end gap-2 sm:gap-6 md:gap-10 my-6 md:my-14 py-4 min-h-[220px] md:min-h-[360px] border-b border-white/10 pb-8">
-              {/* TOP 3 RESPONSIVE JRPG PODIUM STAGE (Mobile & Desktop Aligned) */}
-              
-              {/* 2ND PLACE (LEFT) */}
-              {topThree[1] && (
-                <div className="flex flex-col items-center group flex-shrink-0">
-                  <div className="relative w-24 h-30 sm:w-32 sm:h-44 md:w-40 md:h-52 bg-stone-950/90 border-2 border-slate-400/80 rounded-xl md:rounded-2xl overflow-hidden shadow-[0_0_25px_rgba(148,163,184,0.25)] flex items-center justify-center mb-2 md:mb-3">
-                    <div className="absolute inset-0 bg-gradient-to-b from-slate-300/25 via-slate-300/5 to-transparent pointer-events-none z-0" />
-                    <img 
-                      src={topThree[1].currentBodySprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'} 
-                      alt={topThree[1].heroName} 
-                      className="w-full h-auto object-cover scale-[1.85] translate-y-5 sm:translate-y-8 drop-shadow-[0_6px_12px_rgba(0,0,0,0.9)] z-10"
-                    />
-                    <div className="absolute bottom-0 w-full h-3 bg-slate-300/30 blur-sm rounded-full z-0" />
-                  </div>
-                  
-                  {/* Rank Badge */}
-                  <div className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-slate-300 text-stone-950 rounded-full font-bold font-['Press_Start_2P'] text-[10px] sm:text-xs md:text-sm flex items-center justify-center -mt-5 sm:-mt-7 z-20 shadow-lg border-2 border-slate-100">
-                    2
-                  </div>
-                  
-                  <h3 className="font-['VT323'] text-base sm:text-xl md:text-2xl text-white font-bold mt-1.5 md:mt-2 text-center truncate max-w-[90px] sm:max-w-[140px]">
-                    {topThree[1].heroName}
-                  </h3>
-                  <p className="font-['VT323'] text-sm sm:text-lg md:text-xl text-cyan-300 font-bold">
-                    {activeTab === 'scholar' ? 'MANA: ' : ''}{getScore(topThree[1])}
-                  </p>
-                </div>
-              )}
+            <div className="my-4 md:my-14 border-b border-white/10 pb-8">
 
-              {/* 1ST PLACE (CENTER - TALLEST CHAMPION) */}
-              {topThree[0] && (
-                <div className="flex flex-col items-center group -mt-4 sm:-mt-6 flex-shrink-0">
-                  <div className="relative w-28 h-36 sm:w-40 sm:h-52 md:w-48 md:h-64 bg-stone-950/90 border-2 border-yellow-500/80 rounded-xl md:rounded-2xl overflow-hidden shadow-[0_0_35px_rgba(234,179,8,0.35)] flex items-center justify-center mb-2 md:mb-3">
-                    <div className="absolute inset-0 bg-gradient-to-b from-yellow-500/30 via-yellow-500/10 to-transparent pointer-events-none z-0" />
-                    <img 
-                      src={topThree[0].currentBodySprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'} 
-                      alt={topThree[0].heroName} 
-                      className="w-full h-auto object-cover scale-[1.85] translate-y-6 sm:translate-y-10 drop-shadow-[0_8px_16px_rgba(0,0,0,0.9)] z-10"
-                    />
-                    <div className="absolute bottom-0 w-full h-4 md:h-5 bg-yellow-500/40 blur-md rounded-full z-0" />
-                  </div>
-                  
-                  {/* Rank Badge */}
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-yellow-400 text-stone-950 rounded-full font-bold font-['Press_Start_2P'] text-xs md:text-base flex items-center justify-center -mt-6 sm:-mt-8 z-20 shadow-xl border-2 border-yellow-200">
-                    1
-                  </div>
-                  
-                  <h3 className="font-['Press_Start_2P'] text-[10px] sm:text-base md:text-xl text-yellow-400 font-bold mt-1.5 md:mt-2 text-center truncate max-w-[110px] sm:max-w-[180px] drop-shadow">
-                    {topThree[0].heroName}
-                  </h3>
-                  <p className="font-['VT323'] text-base sm:text-xl md:text-2xl text-cyan-300 font-bold">
-                    {activeTab === 'scholar' ? 'MANA: ' : ''}{getScore(topThree[0])}
-                  </p>
-                </div>
-              )}
+              {/* ========================================================= */}
+              {/* 📱 MOBILE VIEW: LARGE-IMAGE CELEBRATION STAGE (flex md:hidden) */}
+              {/* ========================================================= */}
+              <div className="flex md:hidden flex-col gap-4 px-1">
+                
+                {/* --- #1 GRAND CHAMPION (Apex Full-Width Showcase) --- */}
+                {topThree[0] && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="relative overflow-hidden p-5 rounded-2xl border-2 border-yellow-500/80 bg-gradient-to-b from-yellow-950/40 via-[#181a24] to-[#0a0b10] shadow-[0_0_30px_rgba(234,179,8,0.3)] text-center flex flex-col items-center"
+                  >
+                    {/* Champion Header Badge */}
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-400 text-stone-950 font-pixel text-[9px] font-bold uppercase tracking-wider mb-4 shadow-md">
+                      <span>👑</span> REALM CHAMPION • RANK 1
+                    </div>
 
-              {/* 3RD PLACE (RIGHT) */}
-              {topThree[2] && (
-                <div className="flex flex-col items-center group flex-shrink-0">
-                  <div className="relative w-20 h-28 sm:w-28 sm:h-40 md:w-36 md:h-48 bg-stone-950/90 border-2 border-amber-700/80 rounded-xl md:rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(180,83,9,0.25)] flex items-center justify-center mb-2 md:mb-3">
-                    <div className="absolute inset-0 bg-gradient-to-b from-amber-700/25 via-amber-700/5 to-transparent pointer-events-none z-0" />
-                    <img 
-                      src={topThree[2].currentBodySprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'} 
-                      alt={topThree[2].heroName} 
-                      className="w-full h-auto object-cover scale-[1.85] translate-y-5 sm:translate-y-7 drop-shadow-[0_6px_12px_rgba(0,0,0,0.9)] z-10"
-                    />
-                    <div className="absolute bottom-0 w-full h-3 bg-amber-700/30 blur-sm rounded-full z-0" />
-                  </div>
-                  
-                  {/* Rank Badge */}
-                  <div className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-amber-700 text-stone-100 rounded-full font-bold font-['Press_Start_2P'] text-[10px] sm:text-xs md:text-sm flex items-center justify-center -mt-5 sm:-mt-7 z-20 shadow-lg border-2 border-amber-500">
-                    3
-                  </div>
-                  
-                  <h3 className="font-['VT323'] text-base sm:text-xl md:text-2xl text-amber-500 font-bold mt-1.5 md:mt-2 text-center truncate max-w-[80px] sm:max-w-[130px]">
-                    {topThree[2].heroName}
-                  </h3>
-                  <p className="font-['VT323'] text-sm sm:text-lg md:text-xl text-cyan-300 font-bold">
-                    {activeTab === 'scholar' ? 'MANA: ' : ''}{getScore(topThree[2])}
-                  </p>
-                </div>
-              )}
+                    {/* LARGE CHARACTER PORTRAIT STAGE */}
+                    <div className="relative mb-3">
+                      <div className="relative w-36 h-48 sm:w-40 sm:h-52 bg-stone-950 border-2 border-yellow-400 rounded-2xl overflow-hidden shadow-[0_0_25px_rgba(234,179,8,0.4)] flex items-center justify-center">
+                        {/* Golden Spotlight Ray */}
+                        <div className="absolute inset-0 bg-gradient-to-b from-yellow-500/35 via-yellow-500/10 to-transparent pointer-events-none z-0" />
+                        
+                        {/* Zoomed Character Sprite */}
+                        <img 
+                          src={topThree[0].currentBodySprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'} 
+                          alt={topThree[0].heroName} 
+                          className="w-full h-auto object-cover scale-[1.9] translate-y-8 drop-shadow-[0_8px_16px_rgba(0,0,0,0.9)] z-10"
+                        />
 
+                        {/* Pedestal Ground Aura */}
+                        <div className="absolute bottom-0 w-full h-4 bg-yellow-500/50 blur-md rounded-full z-0" />
+                      </div>
+
+                      {/* Floating Rank 1 Crest */}
+                      <div className="w-10 h-10 bg-yellow-400 text-stone-950 rounded-full font-pixel text-sm font-bold flex items-center justify-center absolute -bottom-4 left-1/2 -translate-x-1/2 z-20 shadow-xl border-2 border-yellow-200">
+                        1
+                      </div>
+                    </div>
+
+                    {/* Hero Name & Stats */}
+                    <div className="mt-3">
+                      <h3 className="font-pixel text-base sm:text-lg text-yellow-300 font-bold tracking-wide">
+                        {topThree[0].heroName}
+                      </h3>
+                      <div className="font-mono text-xs text-stone-400 mt-0.5">
+                        Level {topThree[0].level || Math.floor((topThree[0].xp || 0) / 1000) + 1}
+                      </div>
+                      <div className="font-pixel text-base text-cyan-300 font-bold mt-1">
+                        {activeTab === 'scholar' ? 'MANA ' : ''}{getScore(topThree[0])}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* --- #2 & #3 VANGUARDS (Dual Large-Portrait Grid) --- */}
+                <div className="grid grid-cols-2 gap-3">
+                  
+                  {/* --- #2 SILVER VANGUARD --- */}
+                  {topThree[1] && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 }}
+                      className="relative overflow-hidden p-3 rounded-xl border-2 border-slate-400/70 bg-gradient-to-b from-slate-900/40 via-[#14151f] to-[#0a0b10] shadow-lg text-center flex flex-col items-center justify-between"
+                    >
+                      <div className="w-full">
+                        <span className="px-2 py-0.5 rounded bg-slate-300 text-stone-950 font-pixel text-[8px] font-bold uppercase tracking-wider inline-block mb-3">
+                          #2 VANGUARD
+                        </span>
+
+                        {/* Centered Vertical Portrait Frame (Prevents Head Cutoff) */}
+                        <div className="relative mb-3 mx-auto">
+                          <div className="relative w-28 h-38 sm:w-32 sm:h-44 mx-auto bg-stone-950 border border-slate-400 rounded-xl overflow-hidden shadow flex items-center justify-center">
+                            <div className="absolute inset-0 bg-gradient-to-b from-slate-300/25 via-slate-300/5 to-transparent pointer-events-none z-0" />
+                            <img 
+                              src={topThree[1].currentBodySprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'} 
+                              alt={topThree[1].heroName} 
+                              className="w-full h-auto object-cover scale-[1.8] translate-y-7 drop-shadow z-10"
+                            />
+                            <div className="absolute bottom-0 w-full h-3 bg-slate-300/30 blur-sm rounded-full z-0" />
+                          </div>
+
+                          <div className="w-7 h-7 bg-slate-300 text-stone-950 rounded-full font-pixel text-xs font-bold flex items-center justify-center absolute -bottom-3 left-1/2 -translate-x-1/2 z-20 shadow-md border border-slate-100">
+                            2
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-2 w-full">
+                        <h3 className="font-pixel text-xs text-slate-200 font-bold truncate max-w-[120px] mx-auto">
+                          {topThree[1].heroName}
+                        </h3>
+                        <div className="font-mono text-[10px] text-stone-400 mt-0.5">
+                          Level {topThree[1].level || Math.floor((topThree[1].xp || 0) / 1000) + 1}
+                        </div>
+                        <div className="font-pixel text-xs text-cyan-300 font-bold mt-1">
+                          {activeTab === 'scholar' ? 'MANA ' : ''}{getScore(topThree[1])}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* --- #3 BRONZE CONTENDER --- */}
+                  {topThree[2] && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="relative overflow-hidden p-3 rounded-xl border-2 border-amber-700/70 bg-gradient-to-b from-amber-950/30 via-[#14151f] to-[#0a0b10] shadow-lg text-center flex flex-col items-center justify-between"
+                    >
+                      <div className="w-full">
+                        <span className="px-2 py-0.5 rounded bg-amber-700 text-stone-100 font-pixel text-[8px] font-bold uppercase tracking-wider inline-block mb-3">
+                          #3 CONTENDER
+                        </span>
+
+                        {/* Centered Vertical Portrait Frame (Prevents Head Cutoff) */}
+                        <div className="relative mb-3 mx-auto">
+                          <div className="relative w-28 h-38 sm:w-32 sm:h-44 mx-auto bg-stone-950 border border-amber-600 rounded-xl overflow-hidden shadow flex items-center justify-center">
+                            <div className="absolute inset-0 bg-gradient-to-b from-amber-700/25 via-amber-700/5 to-transparent pointer-events-none z-0" />
+                            <img 
+                              src={topThree[2].currentBodySprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'} 
+                              alt={topThree[2].heroName} 
+                              className="w-full h-auto object-cover scale-[1.8] translate-y-7 drop-shadow z-10"
+                            />
+                            <div className="absolute bottom-0 w-full h-3 bg-amber-700/30 blur-sm rounded-full z-0" />
+                          </div>
+
+                          <div className="w-7 h-7 bg-amber-700 text-stone-100 rounded-full font-pixel text-xs font-bold flex items-center justify-center absolute -bottom-3 left-1/2 -translate-x-1/2 z-20 shadow-md border border-amber-500">
+                            3
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-2 w-full">
+                        <h3 className="font-pixel text-xs text-amber-300 font-bold truncate max-w-[120px] mx-auto">
+                          {topThree[2].heroName}
+                        </h3>
+                        <div className="font-mono text-[10px] text-stone-400 mt-0.5">
+                          Level {topThree[2].level || Math.floor((topThree[2].xp || 0) / 1000) + 1}
+                        </div>
+                        <div className="font-pixel text-xs text-cyan-300 font-bold mt-1">
+                          {activeTab === 'scholar' ? 'MANA ' : ''}{getScore(topThree[2])}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                </div>
+              </div>
+
+
+              {/* ========================================================= */}
+              {/* 🖥️ DESKTOP & TABLET VIEW: HORIZONTAL 3-STEP PODIUM (hidden md:flex) */}
+              {/* ========================================================= */}
+              <div className="hidden md:flex justify-center items-end gap-6 md:gap-10 py-4 min-h-[280px] md:min-h-[360px]">
+                
+                {/* 2ND PLACE (LEFT) */}
+                {topThree[1] && (
+                  <div className="flex flex-col items-center group flex-shrink-0">
+                    <div className="relative w-32 h-44 md:w-40 md:h-52 bg-stone-950/90 border-2 border-slate-400/80 rounded-2xl overflow-hidden shadow-[0_0_25px_rgba(148,163,184,0.25)] flex items-center justify-center mb-3">
+                      <div className="absolute inset-0 bg-gradient-to-b from-slate-300/25 via-slate-300/5 to-transparent pointer-events-none z-0" />
+                      <img 
+                        src={topThree[1].currentBodySprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'} 
+                        alt={topThree[1].heroName} 
+                        className="w-full h-auto object-cover scale-[1.85] translate-y-8 drop-shadow-[0_6px_12px_rgba(0,0,0,0.9)] z-10"
+                      />
+                      <div className="absolute bottom-0 w-full h-3 bg-slate-300/30 blur-sm rounded-full z-0" />
+                    </div>
+                    <div className="w-8 h-8 md:w-10 md:h-10 bg-slate-300 text-stone-950 rounded-full font-bold font-pixel text-xs md:text-sm flex items-center justify-center -mt-7 z-20 shadow-lg border-2 border-slate-100">
+                      2
+                    </div>
+                    <h3 className="font-pixel text-sm md:text-base text-white font-bold mt-2 text-center truncate max-w-[140px]">
+                      {topThree[1].heroName}
+                    </h3>
+                    <p className="font-pixel text-xs md:text-sm text-cyan-300 font-bold mt-0.5">
+                      {activeTab === 'scholar' ? 'MANA: ' : ''}{getScore(topThree[1])}
+                    </p>
+                  </div>
+                )}
+
+                {/* 1ST PLACE (CENTER - TALLEST CHAMPION) */}
+                {topThree[0] && (
+                  <div className="flex flex-col items-center group -mt-6 flex-shrink-0">
+                    <div className="relative w-40 h-52 md:w-48 md:h-64 bg-stone-950/90 border-2 border-yellow-500/80 rounded-2xl overflow-hidden shadow-[0_0_35px_rgba(234,179,8,0.35)] flex items-center justify-center mb-3">
+                      <div className="absolute inset-0 bg-gradient-to-b from-yellow-500/30 via-yellow-500/10 to-transparent pointer-events-none z-0" />
+                      <img 
+                        src={topThree[0].currentBodySprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'} 
+                        alt={topThree[0].heroName} 
+                        className="w-full h-auto object-cover scale-[1.85] translate-y-10 drop-shadow-[0_8px_16px_rgba(0,0,0,0.9)] z-10"
+                      />
+                      <div className="absolute bottom-0 w-full h-5 bg-yellow-500/40 blur-md rounded-full z-0" />
+                    </div>
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-yellow-400 text-stone-950 rounded-full font-bold font-pixel text-sm md:text-base flex items-center justify-center -mt-8 z-20 shadow-xl border-2 border-yellow-200">
+                      1
+                    </div>
+                    <h3 className="font-pixel text-base md:text-xl text-yellow-400 font-bold mt-2 text-center truncate max-w-[180px] drop-shadow">
+                      {topThree[0].heroName}
+                    </h3>
+                    <p className="font-pixel text-sm md:text-base text-cyan-300 font-bold mt-0.5">
+                      {activeTab === 'scholar' ? 'MANA: ' : ''}{getScore(topThree[0])}
+                    </p>
+                  </div>
+                )}
+
+                {/* 3RD PLACE (RIGHT) */}
+                {topThree[2] && (
+                  <div className="flex flex-col items-center group flex-shrink-0">
+                    <div className="relative w-28 h-40 md:w-36 md:h-48 bg-stone-950/90 border-2 border-amber-700/80 rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(180,83,9,0.25)] flex items-center justify-center mb-3">
+                      <div className="absolute inset-0 bg-gradient-to-b from-amber-700/25 via-amber-700/5 to-transparent pointer-events-none z-0" />
+                      <img 
+                        src={topThree[2].currentBodySprite || 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/new.base.body2.png'} 
+                        alt={topThree[2].heroName} 
+                        className="w-full h-auto object-cover scale-[1.85] translate-y-7 drop-shadow-[0_6px_12px_rgba(0,0,0,0.9)] z-10"
+                      />
+                      <div className="absolute bottom-0 w-full h-3 bg-amber-700/30 blur-sm rounded-full z-0" />
+                    </div>
+                    <div className="w-8 h-8 md:w-10 md:h-10 bg-amber-700 text-stone-100 rounded-full font-bold font-pixel text-xs md:text-sm flex items-center justify-center -mt-7 z-20 shadow-lg border-2 border-amber-500">
+                      3
+                    </div>
+                    <h3 className="font-pixel text-sm md:text-base text-amber-500 font-bold mt-2 text-center truncate max-w-[130px]">
+                      {topThree[2].heroName}
+                    </h3>
+                    <p className="font-pixel text-xs md:text-sm text-cyan-300 font-bold mt-0.5">
+                      {activeTab === 'scholar' ? 'MANA: ' : ''}{getScore(topThree[2])}
+                    </p>
+                  </div>
+                )}
+
+              </div>
             </div>
           )}
 
