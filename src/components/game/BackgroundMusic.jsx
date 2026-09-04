@@ -105,6 +105,10 @@ const BackgroundMusic = () => {
     setIsMuted(!isMuted);
   };
 
+  if (location.pathname === '/about' || !currentTrack) {
+    return null;
+  }
+
   return (
     <div className="fixed bottom-4 right-4 z-50">
       <button
