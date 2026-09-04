@@ -140,6 +140,10 @@ const BriefingRoom = () => {
   const [gauntletAnswer, setGauntletAnswer] = useState('');
   const [activeBlitz, setActiveBlitz] = useState(null);
   const [blitzInput, setBlitzInput] = useState('');
+  const [isLockedByMistake, setIsLockedByMistake] = useState(false);
+  const [wrongOptionClicked, setWrongOptionClicked] = useState(null);
+  const [shuffledOptions, setShuffledOptions] = useState([]);
+  const mistakeTimeoutRef = useRef(null);
   const [activeMultiStep, setActiveMultiStep] = useState(null);
   const [multiStepInput, setMultiStepInput] = useState('');
   const [hydraScore, setHydraScore] = useState(0);
@@ -180,6 +184,7 @@ const BriefingRoom = () => {
     if (quest?.type === 'blitz') {
       const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
       setActiveBlitz({ isActive: true, timeLeft: quest.timeLimit || 60, score: 0, currentQ: randomQ });
+      loadQuestion(randomQ);
     }
     if (quest?.type === 'multi-step') {
       if (quest.stepBank && quest.stepBank.length > 0) {
@@ -354,28 +359,76 @@ const BriefingRoom = () => {
     return () => clearInterval(timerId);
   }, [isAccepted, quest, activeBlitz?.timeLeft]);
 
-  const handleBlitzSubmit = (selectedOption = null) => {
-    if (!activeBlitz) return;
-
-    const answerToCheck = selectedOption !== null ? selectedOption : blitzInput;
-    const isCorrect = answerToCheck.toString().trim().toLowerCase() === activeBlitz.currentQ.a.toString().trim().toLowerCase();
-
-    const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
-
-    if (isCorrect) {
-      setActiveBlitz(prev => ({ ...prev, score: prev.score + 1, currentQ: randomQ }));
+  // Helper to shuffle options on each new question
+  const loadQuestion = (questionObj) => {
+    if (!questionObj) return;
+    const rawOptions = questionObj.options || (questionObj.wrongOptions ? [questionObj.a, ...questionObj.wrongOptions] : null);
+    if (rawOptions && rawOptions.length > 0) {
+      // Fisher-Yates shuffle
+      const shuffled = [...rawOptions].sort(() => Math.random() - 0.5);
+      setShuffledOptions(shuffled);
     } else {
-      setActiveBlitz(prev => ({ ...prev, currentQ: randomQ }));
+      setShuffledOptions([]);
     }
+    setIsLockedByMistake(false);
+    setWrongOptionClicked(null);
+  };
 
+  const handleNextBlitzQuestion = (isCorrect = false) => {
+    if (!quest?.questionBank) return;
+    const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
+    setActiveBlitz(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        score: isCorrect ? prev.score + 1 : prev.score,
+        currentQ: randomQ
+      };
+    });
+    loadQuestion(randomQ);
     setBlitzInput('');
   };
 
-  const handleBlitzPass = () => {
+  const handleOptionClick = (selectedOption) => {
+    if (isLockedByMistake || !activeBlitz?.currentQ) return; // Prevent clicks during cooldown
+
+    const isCorrect = selectedOption.toString().trim().toLowerCase() === activeBlitz.currentQ.a.toString().trim().toLowerCase();
+
+    if (isCorrect) {
+      // Correct Answer: +1 Score, instant next question
+      handleNextBlitzQuestion(true);
+    } else {
+      // Incorrect Answer: 1.2s Stun Lockout (NO score deduction)
+      setIsLockedByMistake(true);
+      setWrongOptionClicked(selectedOption);
+
+      if (mistakeTimeoutRef.current) clearTimeout(mistakeTimeoutRef.current);
+      mistakeTimeoutRef.current = setTimeout(() => {
+        setIsLockedByMistake(false);
+        setWrongOptionClicked(null);
+        handleNextBlitzQuestion(false); // Moves to next question after the pause
+      }, 1200);
+    }
+  };
+
+  // Instant Pass Handler (0s delay, 0 penalty)
+  const handlePass = () => {
+    if (isLockedByMistake) return;
+    handleNextBlitzQuestion(false); // Instantly skips to next question
+  };
+
+  const handleBlitzSubmit = (selectedOption = null) => {
     if (!activeBlitz) return;
-    const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
-    setActiveBlitz(prev => ({ ...prev, currentQ: randomQ }));
-    setBlitzInput('');
+    if (selectedOption !== null) {
+      handleOptionClick(selectedOption);
+      return;
+    }
+    const isCorrect = blitzInput.toString().trim().toLowerCase() === activeBlitz.currentQ.a.toString().trim().toLowerCase();
+    handleNextBlitzQuestion(isCorrect);
+  };
+
+  const handleBlitzPass = () => {
+    handlePass();
   };
 
   const handleMultiStepSubmit = () => {
@@ -556,18 +609,56 @@ const BriefingRoom = () => {
                 </h2>
               </div>
 
-              {activeBlitz.currentQ?.options ? (
-                <div className="flex flex-col gap-3 mb-4 w-full">
-                  {activeBlitz.currentQ.options.map((opt, idx) => (
-                    <button 
-                      key={idx} 
-                      onClick={() => handleBlitzSubmit(opt)}
-                      className="w-full text-left p-4 bg-[#07080c] border-2 border-cyan-700/60 rounded-lg hover:bg-stone-800 hover:border-cyan-400 transition-colors text-cyan-100 font-mono text-lg md:text-xl active:translate-y-[2px]"
+              {shuffledOptions.length > 0 || activeBlitz.currentQ?.options ? (
+                <>
+                  {/* Multiple Choice Options Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                    {shuffledOptions.map((option, idx) => {
+                      const isThisWrong = wrongOptionClicked === option;
+
+                      return (
+                        <button
+                          key={idx}
+                          disabled={isLockedByMistake}
+                          onClick={() => handleOptionClick(option)}
+                          className={`w-full p-4 rounded-xl font-pixel text-xs sm:text-sm tracking-wide text-left transition-all duration-100 flex items-center gap-3 cursor-pointer ${
+                            isThisWrong
+                              ? 'bg-red-900 border-2 border-red-500 text-red-100 animate-shake shadow-[0_0_20px_rgba(239,68,68,0.5)]'
+                              : isLockedByMistake
+                              ? 'bg-zinc-900/60 border border-white/5 text-zinc-600 cursor-not-allowed opacity-50'
+                              : 'bg-gradient-to-b from-[#1c1e2b] to-[#12131d] hover:from-[#252839] hover:to-[#181a26] text-zinc-100 border-2 border-[#2b2e42] hover:border-cyan-400 shadow-[0_3px_0_#0a0b10] active:translate-y-0.5'
+                          }`}
+                        >
+                          <span className="w-6 h-6 rounded-md bg-black/50 border border-white/10 flex items-center justify-center font-mono text-xs text-amber-300">
+                            {String.fromCharCode(65 + idx)}
+                          </span>
+                          <span className="flex-1">{option}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Cooldown Warning Notice */}
+                  {isLockedByMistake && (
+                    <div className="text-center font-pixel text-xs text-red-400 mb-4 animate-pulse">
+                      ⚔️ Miscast! Recharging in 1s...
+                    </div>
+                  )}
+
+                  {/* Instant Pass Button */}
+                  <div className="flex justify-center pt-2">
+                    <button
+                      type="button"
+                      disabled={isLockedByMistake}
+                      onClick={handlePass}
+                      className="px-6 py-2.5 rounded-lg font-pixel text-[10px] sm:text-xs tracking-wider uppercase transition-all duration-100
+                        bg-gradient-to-b from-zinc-700 to-zinc-900 hover:from-zinc-600 hover:to-zinc-800 text-zinc-300 hover:text-zinc-100 
+                        border-t border-zinc-500/30 shadow-[0_3px_0_#18181b] active:translate-y-0.5 cursor-pointer disabled:opacity-40"
                     >
-                      {opt}
+                      ⏭ PASS QUESTION (0s Delay)
                     </button>
-                  ))}
-                </div>
+                  </div>
+                </>
               ) : (
                 <>
                   {/* Answer Input */}
