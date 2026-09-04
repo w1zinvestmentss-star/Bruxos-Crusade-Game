@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { User, LogOut, Trophy, Palette, Swords, Skull, BookText } from 'lucide-react';
 import { useGame } from '../context/GameContext';
+import IntroCinematic from '../components/IntroCinematic';
 
 const Awakening = () => {
   const { updateHeroIdentity } = useGame();
@@ -68,6 +69,7 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
   const { currentUser, setUserRole, clearNotifications, quests, isProfileLoaded, session } = useGame();
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [hasSeenIntro, setHasSeenIntro] = useState(false);
 
   useEffect(() => {
     if (currentUser) {
@@ -96,7 +98,7 @@ const StudentDashboard = () => {
       default: 'border-yellow-500/50 hover:border-yellow-400',
       danger: 'border-red-900/80 hover:border-red-600',
       gold: 'border-yellow-400 text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)] bg-black hover:bg-yellow-900/30',
-      emerald: 'border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)] bg-black hover:bg-emerald-950/30 hover:border-emerald-400' // Added emerald theme
+      emerald: 'border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)] bg-black hover:bg-emerald-950/30 hover:border-emerald-400'
     };
 
     return (
@@ -125,7 +127,6 @@ const StudentDashboard = () => {
     );
   };
 
-  // If logged in but the database is still loading, stay on the loading screen
   if (session && !isProfileLoaded) {
     return (
       <div className="min-h-screen bg-stone-950 flex flex-col items-center justify-center z-[200]">
@@ -137,6 +138,13 @@ const StudentDashboard = () => {
   }
 
   if (currentUser && (currentUser.heroName === 'New Hero' || currentUser.heroClass === 'None' || !currentUser.heroClass)) {
+    if (!hasSeenIntro) {
+      return (
+        <IntroCinematic 
+          onComplete={() => setHasSeenIntro(true)} 
+        />
+      );
+    }
     return <Awakening />;
   }
 

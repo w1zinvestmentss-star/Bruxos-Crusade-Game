@@ -20,7 +20,7 @@ const DEFAULT_TRACK = '';
 
 const BackgroundMusic = () => {
   const location = useLocation();
-  const { quests } = useGame();
+  const { quests, currentUser } = useGame();
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef(null);
   const [currentTrack, setCurrentTrack] = useState('');
@@ -82,6 +82,8 @@ const BackgroundMusic = () => {
     } else {
       if (location.pathname === '/archives') {
         targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-Archive-theme.mp3';
+      } else if (location.pathname === '/student-dashboard' && (!currentUser?.heroClass || currentUser?.heroClass === 'None')) {
+        targetTrack = '';
       } else {
         targetTrack = ROUTE_TRACKS[location.pathname] || DEFAULT_TRACK;
       }
@@ -96,7 +98,7 @@ const BackgroundMusic = () => {
        setCurrentTrack('');
     }
 
-  }, [location, quests, currentTrack]);
+  }, [location, quests, currentTrack, currentUser]);
 
   useEffect(() => {
     if (audioRef.current) {
