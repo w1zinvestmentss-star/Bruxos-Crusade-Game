@@ -140,10 +140,16 @@ const BriefingRoom = () => {
   const [gauntletAnswer, setGauntletAnswer] = useState('');
   const [activeBlitz, setActiveBlitz] = useState(null);
   const [blitzInput, setBlitzInput] = useState('');
-  const [isLockedByMistake, setIsLockedByMistake] = useState(false);
+  const [consecutiveMisses, setConsecutiveMisses] = useState(0);
+  const [isLockedOut, setIsLockedOut] = useState(false);
+  const [lockoutTimeLeft, setLockoutTimeLeft] = useState(0);
+  const [isSpawning, setIsSpawning] = useState(false);
   const [wrongOptionClicked, setWrongOptionClicked] = useState(null);
   const [shuffledOptions, setShuffledOptions] = useState([]);
-  const mistakeTimeoutRef = useRef(null);
+  const [lastDeduction, setLastDeduction] = useState(0);
+  const lockoutTimerRef = useRef(null);
+  const countdownIntervalRef = useRef(null);
+  const spawnTimerRef = useRef(null);
   const [activeMultiStep, setActiveMultiStep] = useState(null);
   const [multiStepInput, setMultiStepInput] = useState('');
   const [hydraScore, setHydraScore] = useState(0);
@@ -184,7 +190,12 @@ const BriefingRoom = () => {
     if (quest?.type === 'blitz') {
       const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
       setActiveBlitz({ isActive: true, timeLeft: quest.timeLimit || 60, score: 0, currentQ: randomQ });
-      loadQuestion(randomQ);
+      setConsecutiveMisses(0);
+      setIsLockedOut(false);
+      setLockoutTimeLeft(0);
+      setIsSpawning(false);
+      setLastDeduction(0);
+      loadNextQuestion(randomQ);
     }
     if (quest?.type === 'multi-step') {
       if (quest.stepBank && quest.stepBank.length > 0) {
@@ -359,22 +370,38 @@ const BriefingRoom = () => {
     return () => clearInterval(timerId);
   }, [isAccepted, quest, activeBlitz?.timeLeft]);
 
-  // Helper to shuffle options on each new question
-  const loadQuestion = (questionObj) => {
-    if (!questionObj) return;
-    const rawOptions = questionObj.options || (questionObj.wrongOptions ? [questionObj.a, ...questionObj.wrongOptions] : null);
+  useEffect(() => {
+    return () => {
+      if (lockoutTimerRef.current) clearTimeout(lockoutTimerRef.current);
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+      if (spawnTimerRef.current) clearTimeout(spawnTimerRef.current);
+    };
+  }, []);
+
+  // Question Loader with 400ms Spawn Debounce Shield
+  const loadNextQuestion = (nextQuestionObj) => {
+    if (!nextQuestionObj) return;
+
+    // 1. Shuffle Options (Fisher-Yates)
+    const rawOptions = nextQuestionObj.options || (nextQuestionObj.wrongOptions ? [nextQuestionObj.a, ...(nextQuestionObj.wrongOptions || [])] : null);
     if (rawOptions && rawOptions.length > 0) {
-      // Fisher-Yates shuffle
       const shuffled = [...rawOptions].sort(() => Math.random() - 0.5);
       setShuffledOptions(shuffled);
     } else {
       setShuffledOptions([]);
     }
-    setIsLockedByMistake(false);
+
+    // 2. 400ms Spawn Protection (Disables clicking for 0.4s to stop sub-frame spamming)
+    setIsSpawning(true);
+    if (spawnTimerRef.current) clearTimeout(spawnTimerRef.current);
+    spawnTimerRef.current = setTimeout(() => setIsSpawning(false), 400);
+
+    // 3. Clear transient wrong visual and deductions
     setWrongOptionClicked(null);
+    setLastDeduction(0);
   };
 
-  const handleNextBlitzQuestion = (isCorrect = false) => {
+  const handleAdvanceQuestion = (isCorrect = false) => {
     if (!quest?.questionBank) return;
     const randomQ = quest.questionBank[Math.floor(Math.random() * quest.questionBank.length)];
     setActiveBlitz(prev => {
@@ -385,36 +412,71 @@ const BriefingRoom = () => {
         currentQ: randomQ
       };
     });
-    loadQuestion(randomQ);
+    loadNextQuestion(randomQ);
     setBlitzInput('');
   };
 
   const handleOptionClick = (selectedOption) => {
-    if (isLockedByMistake || !activeBlitz?.currentQ) return; // Prevent clicks during cooldown
+    if (isLockedOut || isSpawning || !activeBlitz?.currentQ) return;
 
     const isCorrect = selectedOption.toString().trim().toLowerCase() === activeBlitz.currentQ.a.toString().trim().toLowerCase();
 
     if (isCorrect) {
-      // Correct Answer: +1 Score, instant next question
-      handleNextBlitzQuestion(true);
+      // Correct Answer: +1 Point, reset miss streak
+      setConsecutiveMisses(0);
+      setLastDeduction(0);
+      handleAdvanceQuestion(true);
     } else {
-      // Incorrect Answer: 1.2s Stun Lockout (NO score deduction)
-      setIsLockedByMistake(true);
+      // Incorrect Answer: Track Escalating Penalties
+      const nextMissCount = consecutiveMisses + 1;
+      setConsecutiveMisses(nextMissCount);
       setWrongOptionClicked(selectedOption);
 
-      if (mistakeTimeoutRef.current) clearTimeout(mistakeTimeoutRef.current);
-      mistakeTimeoutRef.current = setTimeout(() => {
-        setIsLockedByMistake(false);
+      // Calculate Point Deduction (0 on miss 1 & 2; -1 on miss 3; -2 on miss 4+)
+      let pointsToDeduct = 0;
+      if (nextMissCount === 3) pointsToDeduct = 1;
+      else if (nextMissCount >= 4) pointsToDeduct = 2;
+
+      if (pointsToDeduct > 0) {
+        setActiveBlitz(prev => prev ? ({ ...prev, score: Math.max(0, prev.score - pointsToDeduct) }) : prev); // Floor at 0 points
+        setLastDeduction(pointsToDeduct);
+      }
+
+      // Cooldown duration: 1st miss = 1000ms, 2nd miss = 2500ms, 3rd miss = 4000ms, 4th+ miss = 5000ms
+      const penaltyMs = nextMissCount === 1 ? 1000 : nextMissCount === 2 ? 2500 : nextMissCount === 3 ? 4000 : 5000;
+      
+      setIsLockedOut(true);
+      setLockoutTimeLeft(Math.ceil(penaltyMs / 1000));
+
+      // Countdown interval for visual UI timer
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = setInterval(() => {
+        setLockoutTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(countdownIntervalRef.current);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      if (lockoutTimerRef.current) clearTimeout(lockoutTimerRef.current);
+      lockoutTimerRef.current = setTimeout(() => {
+        if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+        setIsLockedOut(false);
+        setLockoutTimeLeft(0);
         setWrongOptionClicked(null);
-        handleNextBlitzQuestion(false); // Moves to next question after the pause
-      }, 1200);
+        handleAdvanceQuestion(false); // Move to next question after penalty expires
+      }, penaltyMs);
     }
   };
 
-  // Instant Pass Handler (0s delay, 0 penalty)
+  // PASS Handler: 0s delay, 0 penalty, RESETS miss streak to 0
   const handlePass = () => {
-    if (isLockedByMistake) return;
-    handleNextBlitzQuestion(false); // Instantly skips to next question
+    if (isLockedOut || isSpawning) return;
+    setConsecutiveMisses(0);
+    setLastDeduction(0);
+    handleAdvanceQuestion(false);
   };
 
   const handleBlitzSubmit = (selectedOption = null) => {
@@ -424,7 +486,12 @@ const BriefingRoom = () => {
       return;
     }
     const isCorrect = blitzInput.toString().trim().toLowerCase() === activeBlitz.currentQ.a.toString().trim().toLowerCase();
-    handleNextBlitzQuestion(isCorrect);
+    if (isCorrect) {
+      setConsecutiveMisses(0);
+      handleAdvanceQuestion(true);
+    } else {
+      handleAdvanceQuestion(false);
+    }
   };
 
   const handleBlitzPass = () => {
@@ -612,20 +679,21 @@ const BriefingRoom = () => {
               {shuffledOptions.length > 0 || activeBlitz.currentQ?.options ? (
                 <>
                   {/* Multiple Choice Options Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                     {shuffledOptions.map((option, idx) => {
                       const isThisWrong = wrongOptionClicked === option;
+                      const isButtonDisabled = isLockedOut || isSpawning;
 
                       return (
                         <button
                           key={idx}
-                          disabled={isLockedByMistake}
+                          disabled={isButtonDisabled}
                           onClick={() => handleOptionClick(option)}
                           className={`w-full p-4 rounded-xl font-pixel text-xs sm:text-sm tracking-wide text-left transition-all duration-100 flex items-center gap-3 cursor-pointer ${
                             isThisWrong
-                              ? 'bg-red-900 border-2 border-red-500 text-red-100 animate-shake shadow-[0_0_20px_rgba(239,68,68,0.5)]'
-                              : isLockedByMistake
-                              ? 'bg-zinc-900/60 border border-white/5 text-zinc-600 cursor-not-allowed opacity-50'
+                              ? 'bg-red-900 border-2 border-red-500 text-red-100 shadow-[0_0_20px_rgba(239,68,68,0.5)]'
+                              : isButtonDisabled
+                              ? 'bg-zinc-900/40 border border-white/5 text-zinc-600 cursor-not-allowed opacity-50'
                               : 'bg-gradient-to-b from-[#1c1e2b] to-[#12131d] hover:from-[#252839] hover:to-[#181a26] text-zinc-100 border-2 border-[#2b2e42] hover:border-cyan-400 shadow-[0_3px_0_#0a0b10] active:translate-y-0.5'
                           }`}
                         >
@@ -638,24 +706,47 @@ const BriefingRoom = () => {
                     })}
                   </div>
 
-                  {/* Cooldown Warning Notice */}
-                  {isLockedByMistake && (
-                    <div className="text-center font-pixel text-xs text-red-400 mb-4 animate-pulse">
-                      ⚔️ Miscast! Recharging in 1s...
+                  {/* Anti-Spam Notice & Penalty Banner */}
+                  {isLockedOut && (
+                    <div className={`p-3.5 rounded-xl border text-center font-pixel text-xs mb-4 shadow-xl ${
+                      consecutiveMisses >= 3
+                        ? 'bg-red-950/90 border-red-500 text-red-200 animate-pulse shadow-[0_0_25px_rgba(239,68,68,0.4)]'
+                        : consecutiveMisses === 2
+                        ? 'bg-amber-950/80 border-amber-500 text-amber-300'
+                        : 'bg-zinc-900/80 border-zinc-700 text-zinc-300'
+                    }`}>
+                      {consecutiveMisses >= 3 ? (
+                        <div>
+                          <div className="text-red-400 font-bold uppercase mb-1">
+                            🛑 SPAM DETECTED ({lastDeduction > 0 ? `-${lastDeduction} PTS` : ''})
+                          </div>
+                          <div className="font-mono text-[11px] text-zinc-300">
+                            Locked for {lockoutTimeLeft}s. Use the PASS button to skip safely without penalties!
+                          </div>
+                        </div>
+                      ) : consecutiveMisses === 2 ? (
+                        <div>
+                          <span className="text-amber-400 font-bold">⚠️ Warning:</span> 2nd consecutive miss. Paused for {lockoutTimeLeft}s. (Next miss will deduct points!)
+                        </div>
+                      ) : (
+                        <div>
+                          Miscast! Recharging in {lockoutTimeLeft}s...
+                        </div>
+                      )}
                     </div>
                   )}
 
-                  {/* Instant Pass Button */}
+                  {/* Instant PASS Button */}
                   <div className="flex justify-center pt-2">
                     <button
                       type="button"
-                      disabled={isLockedByMistake}
+                      disabled={isLockedOut}
                       onClick={handlePass}
                       className="px-6 py-2.5 rounded-lg font-pixel text-[10px] sm:text-xs tracking-wider uppercase transition-all duration-100
                         bg-gradient-to-b from-zinc-700 to-zinc-900 hover:from-zinc-600 hover:to-zinc-800 text-zinc-300 hover:text-zinc-100 
                         border-t border-zinc-500/30 shadow-[0_3px_0_#18181b] active:translate-y-0.5 cursor-pointer disabled:opacity-40"
                     >
-                      ⏭ PASS QUESTION (0s Delay)
+                      ⏭ PASS QUESTION (0s Delay • Resets Penalty)
                     </button>
                   </div>
                 </>
