@@ -26,6 +26,7 @@ const THEMES = {
     bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Ravens.Roost.png',
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Messenger.Raven.png',
     title: 'The Aviary',
+    audio: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Heralds.post.mp3',
     dialogue: 'The flock is ready. Attach your parchment, and it shall be delivered swiftly to the Game Master for review.'
   },
   gauntlet: {
@@ -62,18 +63,21 @@ const THEMES = {
     bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Lexicon.Vault.jpg',
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Arch.Scholar.png',
     title: "The Lexicon Vault",
+    audio: "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The%20Fall%202.mp3",
     dialogue: "Greetings, scribe. To unlock the secrets of our ancestors, you must master the ancient tongue. Match each definition with its correct word before the sand runs out!"
   },
   114: {
     bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Decipherers.Study.jpg',
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Decipherer.png',
     title: "The Decipherer's Study",
+    audio: "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The%20Rise.mp3",
     dialogue: "Ah, the traveler. Many have tried to decode the fractured runes of our ancestors, but only those with absolute focus can decipher the broken words. Unscramble the spell letters before my candle burns out!"
   },
   'scout-arts': {
     bg: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Grand.Studio.png',
     npc: 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.Master.Artisan.png',
     title: 'The Artisan\'s Studio',
+    audio: "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.artisans.canva.music.mp3",
     dialogue: 'True power requires creation, not just destruction. Show me your masterpiece. Ensure your work captures the essence of the realm.'
   },
   'scout-sports': {

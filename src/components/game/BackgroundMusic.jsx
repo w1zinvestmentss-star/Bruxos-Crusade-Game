@@ -47,9 +47,9 @@ const BackgroundMusic = () => {
         } else if (questId === 112) {
           targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Requiem.for.a.Dream(Theyaretryingtoendme).mp3';
         } else if (questId === 113) {
-          targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-Archive-theme.mp3';
+          targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The%20Fall%202.mp3';
         } else if (questId === 114) {
-          targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Please%20dont%20say%20my%20name%20out%20of%20context.mp3';
+          targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The%20Rise.mp3';
         } else {
           switch (quest.type) {
             case '106':
@@ -62,8 +62,11 @@ const BackgroundMusic = () => {
             case 'scout-sports':
               targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Kunckle.up.mp3';
               break;
+            case 'scout-arts':
+              targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The.artisans.canva.music.mp3';
+              break;
             case 'upload':
-              targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/The-Archive-theme.mp3';
+              targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Heralds.post.mp3';
               break;
             case 'gauntlet':
               targetTrack = 'https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Unbreakable%20Determination.mp3';
