@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
-import { ArrowLeft, Sword, Shield, Coins, Star } from 'lucide-react';
+import { ArrowLeft, Sword, Shield, Coins, Star, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const DUNGEON_BG = "https://cdn.jsdelivr.net/gh/w1zinvestmentss-star/game-assets@main/Dungeon.background.png";
@@ -60,7 +60,7 @@ const getRequirementLabel = (requirement) => {
 
 const Dungeon = () => {
   const navigate = useNavigate();
-  const { currentUser, BOSSES = [], fightBoss, submitBossStrike } = useGame();
+  const { currentUser, BOSSES = [], fightBoss, submitBossStrike, submissions = [] } = useGame();
 
   const [activeBossBattle, setActiveBossBattle] = useState(null);
   const [battleInput, setBattleInput] = useState('');
@@ -204,6 +204,15 @@ const Dungeon = () => {
                     const currentProgress = getBossProgress(boss, currentUser);
                     const isUnlocked = currentProgress >= boss.target;
 
+                    // Check for active pending submission for this boss
+                    const pendingBossStrike = (submissions || []).find(s => 
+                      (s.is_boss_strike || s.isBossStrike) && 
+                      (s.quest_id === boss.id || s.questId === boss.id) && 
+                      (s.student_id === currentUser.id || s.studentId === currentUser.id) && 
+                      s.status === 'pending'
+                    );
+                    const isPending = !!pendingBossStrike;
+
                     return (
                       <div key={boss.id} className="bg-stone-900/90 border-2 border-red-900/50 rounded-xl p-4 flex flex-col justify-between shadow-2xl shadow-red-900/20 backdrop-blur-sm">
                         <div>
@@ -243,6 +252,10 @@ const Dungeon = () => {
                           <button disabled className="w-full mt-2 py-3 px-4 rounded-lg font-bold font-['Press_Start_2P'] text-xs bg-stone-800 text-stone-500 border border-stone-700 cursor-not-allowed flex items-center justify-center gap-2">
                             <Shield size={16}/> DEFEATED
                           </button>
+                        ) : isPending ? (
+                          <div className="w-full mt-2 py-3 px-4 rounded-lg font-bold font-['Press_Start_2P'] text-[10px] sm:text-xs bg-yellow-900/30 text-yellow-500 border border-yellow-700 flex items-center justify-center gap-2 select-none shadow-inner">
+                            <Clock size={16} /> PENDING
+                          </div>
                         ) : !isUnlocked ? (
                           <button disabled className="w-full mt-2 py-3 px-4 rounded-lg font-bold font-['Press_Start_2P'] text-xs bg-gray-900/80 text-gray-600 border border-gray-800 cursor-not-allowed">
                             LOCKED

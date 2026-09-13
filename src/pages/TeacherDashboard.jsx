@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  LogOut, Check, X, Search, Image as ImageIcon, BookCopy, Save, 
-  Clock, Shield, Star, DollarSign, Swords, Skull, Heart, Gift, 
-  Ticket, Download, ExternalLink, Trash2, Award, Sparkles 
+import {
+  LogOut, Check, X, Search, Image as ImageIcon, BookCopy, Save,
+  Clock, Shield, Star, DollarSign, Swords, Skull, Heart, Gift,
+  Ticket, Download, ExternalLink, Trash2, Award, Sparkles
 } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 import RealmAnalytics from '../components/RealmAnalytics';
@@ -107,7 +107,7 @@ const TeacherDashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#0a0b10] text-stone-200 font-sans select-none">
-      
+
       {/* Top Admin Header */}
       <div className="bg-[#151722] border-b border-red-900/50 text-white px-6 py-4 flex justify-between items-center shadow-2xl">
         <div className="flex items-center gap-3">
@@ -119,8 +119,8 @@ const TeacherDashboard = () => {
             <p className="text-[10px] font-mono text-zinc-400">Scarborough Realm • Grade 5 Control Portal</p>
           </div>
         </div>
-        <button 
-          onClick={handleLogout} 
+        <button
+          onClick={handleLogout}
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-950/60 border border-red-500/40 hover:bg-red-900 text-red-300 font-pixel text-xs transition-all cursor-pointer"
         >
           <LogOut size={14} /> LOGOUT
@@ -133,21 +133,19 @@ const TeacherDashboard = () => {
         <div className="flex flex-wrap items-center gap-3 p-2 rounded-xl bg-[#12131c] border border-white/10 shadow-lg">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`px-5 py-2.5 rounded-lg font-pixel text-xs tracking-wider uppercase transition-all cursor-pointer ${
-              activeTab === 'overview'
+            className={`px-5 py-2.5 rounded-lg font-pixel text-xs tracking-wider uppercase transition-all cursor-pointer ${activeTab === 'overview'
                 ? 'bg-amber-600 text-amber-50 shadow-[0_2px_0_#78350f]'
                 : 'bg-[#181a24] text-zinc-400 hover:text-zinc-200 border border-white/5'
-            }`}
+              }`}
           >
             ⚔️ Command Deck
           </button>
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`px-5 py-2.5 rounded-lg font-pixel text-xs tracking-wider uppercase transition-all cursor-pointer ${
-              activeTab === 'analytics'
+            className={`px-5 py-2.5 rounded-lg font-pixel text-xs tracking-wider uppercase transition-all cursor-pointer ${activeTab === 'analytics'
                 ? 'bg-amber-600 text-amber-50 shadow-[0_2px_0_#78350f]'
                 : 'bg-[#181a24] text-zinc-400 hover:text-zinc-200 border border-white/5'
-            }`}
+              }`}
           >
             📊 Realm Analytics
           </button>
@@ -159,7 +157,7 @@ const TeacherDashboard = () => {
 
         {activeTab === 'overview' && (
           <div className="space-y-8">
-            
+
             {/* 1. REALM TELEMETRY HERO BANNER */}
             <div className="relative overflow-hidden p-6 rounded-xl border-2 border-[#2b2e42] bg-gradient-to-br from-[#1c1e2b] via-[#12131d] to-[#0a0b10] shadow-2xl">
               <span className="absolute top-2 left-2 text-[9px] text-amber-500/50 select-none">✦</span>
@@ -195,7 +193,7 @@ const TeacherDashboard = () => {
 
             {/* 2. ADMIN QUICK ACTIONS: GRAND RAFFLE & SYSTEM MAINTENANCE */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
+
               {/* Grand Raffle Control */}
               <div className="p-6 rounded-xl border border-indigo-500/40 bg-gradient-to-br from-[#1b1a2e] via-[#12131d] to-[#0a0b10] shadow-xl flex flex-col justify-between">
                 <div>
@@ -212,7 +210,7 @@ const TeacherDashboard = () => {
                       onChange={(e) => setCurrentRafflePrize(e.target.value)}
                       className="bg-black/80 text-white text-sm font-mono px-3 py-2 rounded-lg flex-grow border border-indigo-400/50 focus:border-indigo-300 focus:outline-none"
                     />
-                    <button 
+                    <button
                       onClick={async () => {
                         const res = await updateRafflePrize(currentRafflePrize);
                         if (res.success) alert("Billboard updated permanently!");
@@ -274,7 +272,7 @@ const TeacherDashboard = () => {
 
             {/* 3. CORE ACTION ARENA: PENDING APPROVALS (7 COLS) & WELLNESS LOGS (5 COLS) */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              
+
               {/* Approvals Column (7 Columns) */}
               <div className="lg:col-span-7 p-6 rounded-xl border-2 border-[#2b2e42] bg-[#12131c] shadow-xl flex flex-col justify-between">
                 <div>
@@ -299,13 +297,12 @@ const TeacherDashboard = () => {
                         const proofUrl = sub.proofContent;
 
                         return (
-                          <div 
-                            key={sub.id} 
-                            className={`p-4 rounded-xl border ${
-                              isBossStrike 
-                                ? 'border-red-500 bg-red-950/20 shadow-[0_0_15px_rgba(239,68,68,0.2)]' 
+                          <div
+                            key={sub.id}
+                            className={`p-4 rounded-xl border ${isBossStrike
+                                ? 'border-red-500 bg-red-950/20 shadow-[0_0_15px_rgba(239,68,68,0.2)]'
                                 : 'border-white/10 bg-[#161824]'
-                            }`}
+                              }`}
                           >
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
                               <div>
@@ -340,10 +337,10 @@ const TeacherDashboard = () => {
                             {isImageSubmission ? (
                               <div className="rounded-lg bg-black/60 p-2 border border-white/5 mb-3">
                                 {proofUrl ? (
-                                  <img 
-                                    src={proofUrl} 
-                                    alt="Proof" 
-                                    className="w-full h-48 object-cover rounded border border-white/10" 
+                                  <img
+                                    src={proofUrl}
+                                    alt="Proof"
+                                    className="w-full h-48 object-cover rounded border border-white/10"
                                   />
                                 ) : (
                                   <div className="h-24 flex items-center justify-center text-zinc-500 text-xs font-mono">No image attached</div>
@@ -413,8 +410,8 @@ const TeacherDashboard = () => {
                       </div>
                     ) : (
                       wellnessLogs.map(log => (
-                        <div 
-                          key={log.id} 
+                        <div
+                          key={log.id}
                           className={`p-3.5 rounded-lg border flex justify-between items-center ${getFeelingBadge(log.feeling)}`}
                         >
                           <div>
@@ -492,13 +489,13 @@ const TeacherDashboard = () => {
 
             {/* 5. UNIFIED PRIZE FULFILLMENT & CLAIMS HUB */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
+
               {/* Achievement Claims */}
               <div className="p-6 rounded-xl border-2 border-[#2b2e42] bg-[#12131c] shadow-xl">
                 <h3 className="font-pixel text-xs text-yellow-400 uppercase tracking-wider mb-4 flex items-center gap-2">
                   <Star size={16} /> ACHIEVEMENT PRIZE CLAIMS
                 </h3>
-                
+
                 {(() => {
                   const pendingClaims = (prizeClaims || []).filter(c => c.status === 'pending');
                   if (pendingClaims.length === 0) {
@@ -572,7 +569,7 @@ const TeacherDashboard = () => {
               <h3 className="font-pixel text-sm text-purple-400 uppercase tracking-wider mb-4 flex items-center gap-2">
                 🎨 TAVERN GROVE GALLERY EXHIBITION
               </h3>
-              
+
               {gallerySubmissions.length === 0 ? (
                 <div className="p-8 text-center text-zinc-500 font-pixel text-xs">
                   The gallery is empty. Pin student art from Pending Submissions to feature it here!
